@@ -1,0 +1,105 @@
+Gene Expression Programming (GEP) in Go
+A successor to Genetic Programming
+13:00 26 Apr 2014
+Tags: gep, genetic programming, golang
+
+Glenn Lewis
+Software Engineer, Google
+gmlewis@google.com
+http://plus.google.com/+GlennLewis
+
+http://github.com/gmlewis/gep
+
+
+* Genetic Programming Overview
+
+The book by John R. Koza that got me hooked:
+[[http://www.amazon.com/Genetic-Programming-IV-Human-Competitive-Intelligence/dp/0387250670]]
+
+Fascinating concept:
+
+- Provide a fitness function
+
+- Provide the building blocks (functions)
+
+- Let the computer come up with the solution
+
+
+* Genetic Programming Overview (cont'd)
+
+Examples:
+
+- Tractor-trailer backing up
+
+.image truck.gif
+Image courtesy of [[http://www.handshake.de/user/blickle/Truck/]]
+
+
+* Examples (cont'd):
+
+- Synthesis of electronic circuits
+
+.image kozacircuit.png
+Example circuit from Genetic Programming IV
+
+
+* Gene Expression Programming
+
+Invented by Dr. Cândida Ferreira
+
+- paper: [[http://www.gene-expression-programming.com/webpapers/GEPfirst.pdf]]
+
+- book: [[http://www.amazon.com/Gene-Expression-Programming-Mathematical-Computational/dp/3540327967]]
+
+Key features:
+
+- Expression trees are always valid
+
+.image gep_et.png
+
+
+* Key features (cont'd):
+
+- Expression tree manipulation is trivial
+
+    012345678901234567890
+    +Q-/b*+*Qbaabaabbaaab
+
+- Tremendous performance gains
+
+"...GEP does evolve better rules than the GP rule, using computational resources that are more than four orders of magnitude smaller than those used by GP."
+
+- "Karva" intermediate language simple to convert to any programming language
+
+
+* GEP in Go - Logic Example - Fitness function
+
+.code nand.go /^var.nandTests/,/^}$/
+.code nand.go /^func.validateNand/,/^}/
+
+
+* GEP in Go - Logic Example
+
+.play nand.go /^func.main/+1,/^}/-1
+
+
+* GEP in Go - Symbolic regression example - Fitness function
+
+.code symbolic_regression.go /^var.srTests/,/11110/
+.code symbolic_regression.go /^func.validateFunc/,/^}/
+
+
+* GEP in Go - Symbolic regression example
+
+.play symbolic_regression.go /^func.main/+1,/^}/-1
+
+
+* Next steps
+
+- Write Karva-to-Go translator
+
+- Truck backer-upper experiment
+
+- Analog circuit design experiments
+
+- Robotic control algorithm generation

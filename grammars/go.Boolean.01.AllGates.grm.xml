@@ -1,0 +1,713 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE grammar SYSTEM "grammar.dtd">
+<grammar name="Go" version="5" ext="go" type="All Gates">
+   <!--List of all the Boolean functions supported by GeneXproTools 4.0. All functions must be completely defined.-->
+   <!--To generate Carriage Return Line Feeds (CrLf) use the token {CRLF} (curly braces included).-->
+   <!--To generate Tabs use the token {TAB} (curly braces included).-->
+   <!--Use {CHARX} as an escape for the x in the definition of the functions.-->
+   <functions count="258">
+      <function idx="10000" symbol="Not" terminals="1" uniontype="">(!(x0))</function>
+      <function idx="10001" symbol="And" terminals="2" uniontype="{tempvarname} = {tempvarname} &amp;&amp; {member}">(x0 &amp;&amp; x1)</function>
+      <function idx="10002" symbol="Or" terminals="2" uniontype="{tempvarname} = {tempvarname} || {member}">(x0 || x1)</function>
+      <function idx="10003" symbol="Nand" terminals="2" uniontype="{tempvarname} = gepNand({tempvarname},{member})">gepNand(x0,x1)</function>
+      <function idx="10004" symbol="Nor" terminals="2" uniontype="{tempvarname} = gepNor({tempvarname},{member})">gepNor(x0,x1)</function>
+      <function idx="10005" symbol="Xor" terminals="2" uniontype="{tempvarname} = {tempvarname} ^ {member}">gepXor(x0 , x1)</function>
+      <function idx="10006" symbol="Nxor" terminals="2" uniontype="{tempvarname} = gepN{CHARX}or({tempvarname},{member})">gepN{CHARX}or(x0,x1)</function>
+
+      <function idx="10007" symbol="And3" terminals="3" uniontype="">gepAnd3(x0,x1,x2)</function>
+      <function idx="10008" symbol="Or3" terminals="3" uniontype="">gepOr3(x0,x1,x2)</function>
+      <function idx="10009" symbol="Nand3" terminals="3" uniontype="">gepNand3(x0,x1,x2)</function>
+      <function idx="10010" symbol="Nor3" terminals="3" uniontype="">gepNor3(x0,x1,x2)</function>
+      <function idx="10011" symbol="Odd3" terminals="3" uniontype="">gepOdd3(x0,x1,x2)</function>
+      <function idx="10012" symbol="Even3" terminals="3" uniontype="">gepEven3(x0,x1,x2)</function>
+
+      <function idx="10013" symbol="And4" terminals="4" uniontype="">gepAnd4(x0,x1,x2,x3)</function>
+      <function idx="10014" symbol="Or4" terminals="4" uniontype="">gepOr4(x0,x1,x2,x3)</function>
+      <function idx="10015" symbol="Nand4" terminals="4" uniontype="">gepNand4(x0,x1,x2,x3)</function>
+      <function idx="10016" symbol="Nor4" terminals="4" uniontype="">gepNor4(x0,x1,x2,x3)</function>
+      <function idx="10017" symbol="Odd4" terminals="4" uniontype="">gepOdd4(x0,x1,x2,x3)</function>
+      <function idx="10018" symbol="Even4" terminals="4" uniontype="">gepEven4(x0,x1,x2,x3)</function>
+
+      <function idx="10019" symbol="Id" terminals="1" uniontype="">(x0)</function>
+      <function idx="10020" symbol="Zero" terminals="1" uniontype="">(false)</function>
+      <function idx="10021" symbol="One" terminals="1" uniontype="">(true)</function>
+
+      <function idx="10022" symbol="LT" terminals="2" uniontype="{tempvarname} = gepLT({tempvarname},{member})">gepLT(x0,x1)</function>
+      <function idx="10023" symbol="GT" terminals="2" uniontype="{tempvarname} = gepGT({tempvarname},{member})">gepGT(x0,x1)</function>
+      <function idx="10024" symbol="LOE" terminals="2" uniontype="{tempvarname} = gepLOE({tempvarname},{member})">gepLOE(x0,x1)</function>
+      <function idx="10025" symbol="GOE" terminals="2" uniontype="{tempvarname} = gepGOE({tempvarname},{member})">gepGOE(x0,x1)</function>
+      <function idx="10026" symbol="NotA" terminals="2" uniontype="">(!(x0))</function>
+      <function idx="10027" symbol="NotB" terminals="2" uniontype="">(!(x1))</function>
+      <function idx="10028" symbol="IdA" terminals="2" uniontype="">(x0)</function>
+      <function idx="10029" symbol="IdB" terminals="2" uniontype="">(x1)</function>
+      <function idx="10030" symbol="Zero2" terminals="2" uniontype="">(false)</function>
+      <function idx="10031" symbol="One2" terminals="2" uniontype="">(true)</function>
+
+      <function idx="10032" symbol="LT3" terminals="3" uniontype="">gepLT3(x0,x1,x2)</function>
+      <function idx="10033" symbol="GT3" terminals="3" uniontype="">gepGT3(x0,x1,x2)</function>
+      <function idx="10034" symbol="LOE3" terminals="3" uniontype="">gepLOE3(x0,x1,x2)</function>
+      <function idx="10035" symbol="GOE3" terminals="3" uniontype="">gepGOE3(x0,x1,x2)</function>
+      <function idx="10036" symbol="Mux" terminals="3" uniontype="">gepMu{CHARX}(x0,x1,x2)</function>
+      <function idx="10037" symbol="If" terminals="3" uniontype="">gepIf(x0,x1,x2)</function>
+      <function idx="10038" symbol="Maj" terminals="3" uniontype="">gepMaj(x0,x1,x2)</function>
+      <function idx="10039" symbol="Min" terminals="3" uniontype="">gepMin(x0,x1,x2)</function>
+      <function idx="10040" symbol="2Off" terminals="3" uniontype="">gep2Off(x0,x1,x2)</function>
+      <function idx="10041" symbol="2On" terminals="3" uniontype="">gep2On(x0,x1,x2)</function>
+
+      <function idx="10042" symbol="LM3A1" terminals="3" uniontype="">gepLM3A1(x0,x1,x2)</function>
+      <function idx="10043" symbol="LM3A2" terminals="3" uniontype="">gepLM3A2(x0,x1,x2)</function>
+      <function idx="10044" symbol="LM3A3" terminals="3" uniontype="">gepLM3A3(x0,x1,x2)</function>
+      <function idx="10045" symbol="LM3A4" terminals="3" uniontype="">gepLM3A4(x0,x1,x2)</function>
+
+      <function idx="10046" symbol="LM3B1" terminals="3" uniontype="">gepLM3B1(x0,x1,x2)</function>
+      <function idx="10047" symbol="LM3B2" terminals="3" uniontype="">gepLM3B2(x0,x1,x2)</function>
+      <function idx="10048" symbol="LM3B3" terminals="3" uniontype="">gepLM3B3(x0,x1,x2)</function>
+      <function idx="10049" symbol="LM3B4" terminals="3" uniontype="">gepLM3B4(x0,x1,x2)</function>
+
+      <function idx="10050" symbol="LM3C1" terminals="3" uniontype="">gepLM3C1(x0,x1,x2)</function>
+      <function idx="10051" symbol="LM3C2" terminals="3" uniontype="">gepLM3C2(x0,x1,x2)</function>
+      <function idx="10052" symbol="LM3C3" terminals="3" uniontype="">gepLM3C3(x0,x1,x2)</function>
+      <function idx="10053" symbol="LM3C4" terminals="3" uniontype="">gepLM3C4(x0,x1,x2)</function>
+
+      <function idx="10054" symbol="LM3D1" terminals="3" uniontype="">gepLM3D1(x0,x1,x2)</function>
+      <function idx="10055" symbol="LM3D2" terminals="3" uniontype="">gepLM3D2(x0,x1,x2)</function>
+      <function idx="10056" symbol="LM3D3" terminals="3" uniontype="">gepLM3D3(x0,x1,x2)</function>
+      <function idx="10057" symbol="LM3D4" terminals="3" uniontype="">gepLM3D4(x0,x1,x2)</function>
+
+      <function idx="10058" symbol="LM3E1" terminals="3" uniontype="">gepLM3E1(x0,x1,x2)</function>
+      <function idx="10059" symbol="LM3E2" terminals="3" uniontype="">gepLM3E2(x0,x1,x2)</function>
+      <function idx="10060" symbol="LM3E3" terminals="3" uniontype="">gepLM3E3(x0,x1,x2)</function>
+
+      <function idx="10061" symbol="LM3F1" terminals="3" uniontype="">gepLM3F1(x0,x1,x2)</function>
+      <function idx="10062" symbol="LM3F2" terminals="3" uniontype="">gepLM3F2(x0,x1,x2)</function>
+      <function idx="10063" symbol="LM3F3" terminals="3" uniontype="">gepLM3F3(x0,x1,x2)</function>
+
+      <function idx="10064" symbol="LM3G1" terminals="3" uniontype="">gepLM3G1(x0,x1,x2)</function>
+      <function idx="10065" symbol="LM3G2" terminals="3" uniontype="">gepLM3G2(x0,x1,x2)</function>
+      <function idx="10066" symbol="LM3G3" terminals="3" uniontype="">gepLM3G3(x0,x1,x2)</function>
+      <function idx="10067" symbol="LM3G4" terminals="3" uniontype="">gepLM3G4(x0,x1,x2)</function>
+
+      <function idx="10068" symbol="LM3H1" terminals="3" uniontype="">gepLM3H1(x0,x1,x2)</function>
+      <function idx="10069" symbol="LM3H2" terminals="3" uniontype="">gepLM3H2(x0,x1,x2)</function>
+      <function idx="10070" symbol="LM3H3" terminals="3" uniontype="">gepLM3H3(x0,x1,x2)</function>
+      <function idx="10071" symbol="LM3H4" terminals="3" uniontype="">gepLM3H4(x0,x1,x2)</function>
+
+      <function idx="10072" symbol="LT3A" terminals="3" uniontype="">gepLT3A(x0,x1,x2)</function>
+      <function idx="10073" symbol="GT3A" terminals="3" uniontype="">gepGT3A(x0,x1,x2)</function>
+      <function idx="10074" symbol="LOE3A" terminals="3" uniontype="">gepLOE3A(x0,x1,x2)</function>
+      <function idx="10075" symbol="GOE3A" terminals="3" uniontype="">gepGOE3A(x0,x1,x2)</function>
+      <function idx="10076" symbol="ET3A" terminals="3" uniontype="">gepET3A(x0,x1,x2)</function>
+      <function idx="10077" symbol="NET3A" terminals="3" uniontype="">gepNET3A(x0,x1,x2)</function>
+
+      <function idx="10078" symbol="LT3B" terminals="3" uniontype="">gepLT3B(x0,x1,x2)</function>
+      <function idx="10079" symbol="GT3B" terminals="3" uniontype="">gepGT3B(x0,x1,x2)</function>
+      <function idx="10080" symbol="LOE3B" terminals="3" uniontype="">gepLOE3B(x0,x1,x2)</function>
+      <function idx="10081" symbol="GOE3B" terminals="3" uniontype="">gepGOE3B(x0,x1,x2)</function>
+      <function idx="10082" symbol="ET3B" terminals="3" uniontype="">gepET3B(x0,x1,x2)</function>
+      <function idx="10083" symbol="NET3B" terminals="3" uniontype="">gepNET3B(x0,x1,x2)</function>
+
+      <function idx="10084" symbol="LT3C" terminals="3" uniontype="">gepLT3C(x0,x1,x2)</function>
+      <function idx="10085" symbol="GT3C" terminals="3" uniontype="">gepGT3C(x0,x1,x2)</function>
+      <function idx="10086" symbol="LOE3C" terminals="3" uniontype="">gepLOE3C(x0,x1,x2)</function>
+      <function idx="10087" symbol="GOE3C" terminals="3" uniontype="">gepGOE3C(x0,x1,x2)</function>
+      <function idx="10088" symbol="ET3C" terminals="3" uniontype="">gepET3C(x0,x1,x2)</function>
+      <function idx="10089" symbol="NET3C" terminals="3" uniontype="">gepNET3C(x0,x1,x2)</function>
+
+      <function idx="10090" symbol="T004" terminals="3" uniontype="">gepT004(x0,x1,x2)</function>
+      <function idx="10091" symbol="T008" terminals="3" uniontype="">gepT008(x0,x1,x2)</function>
+      <function idx="10092" symbol="T009" terminals="3" uniontype="">gepT009(x0,x1,x2)</function>
+      <function idx="10093" symbol="T032" terminals="3" uniontype="">gepT032(x0,x1,x2)</function>
+
+      <function idx="10094" symbol="T033" terminals="3" uniontype="">gepT033(x0,x1,x2)</function>
+      <function idx="10095" symbol="T041" terminals="3" uniontype="">gepT041(x0,x1,x2)</function>
+      <function idx="10096" symbol="T055" terminals="3" uniontype="">gepT055(x0,x1,x2)</function>
+      <function idx="10097" symbol="T057" terminals="3" uniontype="">gepT057(x0,x1,x2)</function>
+
+      <function idx="10098" symbol="T064" terminals="3" uniontype="">gepT064(x0,x1,x2)</function>
+      <function idx="10099" symbol="T065" terminals="3" uniontype="">gepT065(x0,x1,x2)</function>
+      <function idx="10100" symbol="T069" terminals="3" uniontype="">gepT069(x0,x1,x2)</function>
+      <function idx="10101" symbol="T073" terminals="3" uniontype="">gepT073(x0,x1,x2)</function>
+
+      <function idx="10102" symbol="T081" terminals="3" uniontype="">gepT081(x0,x1,x2)</function>
+      <function idx="10103" symbol="T089" terminals="3" uniontype="">gepT089(x0,x1,x2)</function>
+      <function idx="10104" symbol="T093" terminals="3" uniontype="">gepT093(x0,x1,x2)</function>
+      <function idx="10105" symbol="T096" terminals="3" uniontype="">gepT096(x0,x1,x2)</function>
+
+      <function idx="10106" symbol="T101" terminals="3" uniontype="">gepT101(x0,x1,x2)</function>
+      <function idx="10107" symbol="T109" terminals="3" uniontype="">gepT109(x0,x1,x2)</function>
+      <function idx="10108" symbol="T111" terminals="3" uniontype="">gepT111(x0,x1,x2)</function>
+      <function idx="10109" symbol="T121" terminals="3" uniontype="">gepT121(x0,x1,x2)</function>
+
+      <function idx="10110" symbol="T123" terminals="3" uniontype="">gepT123(x0,x1,x2)</function>
+      <function idx="10111" symbol="T125" terminals="3" uniontype="">gepT125(x0,x1,x2)</function>
+      <function idx="10112" symbol="T154" terminals="3" uniontype="">gepT154(x0,x1,x2)</function>
+      <function idx="10113" symbol="T223" terminals="3" uniontype="">gepT223(x0,x1,x2)</function>
+
+      <function idx="10114" symbol="T239" terminals="3" uniontype="">gepT239(x0,x1,x2)</function>
+      <function idx="10115" symbol="T249" terminals="3" uniontype="">gepT249(x0,x1,x2)</function>
+      <function idx="10116" symbol="T251" terminals="3" uniontype="">gepT251(x0,x1,x2)</function>
+      <function idx="10117" symbol="T253" terminals="3" uniontype="">gepT253(x0,x1,x2)</function>
+
+      <function idx="10118" symbol="LT4" terminals="4" uniontype="">gepLT4(x0,x1,x2,x3)</function>
+      <function idx="10119" symbol="GT4" terminals="4" uniontype="">gepGT4(x0,x1,x2,x3)</function>
+      <function idx="10120" symbol="LOE4" terminals="4" uniontype="">gepLOE4(x0,x1,x2,x3)</function>
+      <function idx="10121" symbol="GOE4" terminals="4" uniontype="">gepGOE4(x0,x1,x2,x3)</function>
+
+      <function idx="10122" symbol="Tie" terminals="4" uniontype="">gepTie(x0,x1,x2,x3)</function>
+      <function idx="10123" symbol="Ntie" terminals="4" uniontype="">gepNtie(x0,x1,x2,x3)</function>
+      <function idx="10124" symbol="3Off" terminals="4" uniontype="">gep3Off(x0,x1,x2,x3)</function>
+      <function idx="10125" symbol="3On" terminals="4" uniontype="">gep3On(x0,x1,x2,x3)</function>
+
+      <function idx="10126" symbol="LM4A1" terminals="4" uniontype="">gepLM4A1(x0,x1,x2,x3)</function>
+      <function idx="10127" symbol="LM4A2" terminals="4" uniontype="">gepLM4A2(x0,x1,x2,x3)</function>
+      <function idx="10128" symbol="LM4A3" terminals="4" uniontype="">gepLM4A3(x0,x1,x2,x3)</function>
+      <function idx="10129" symbol="LM4A4" terminals="4" uniontype="">gepLM4A4(x0,x1,x2,x3)</function>
+      <function idx="10130" symbol="LM4A5" terminals="4" uniontype="">gepLM4A5(x0,x1,x2,x3)</function>
+      <function idx="10131" symbol="LM4A6" terminals="4" uniontype="">gepLM4A6(x0,x1,x2,x3)</function>
+      <function idx="10132" symbol="LM4A7" terminals="4" uniontype="">gepLM4A7(x0,x1,x2,x3)</function>
+      <function idx="10133" symbol="LM4A8" terminals="4" uniontype="">gepLM4A8(x0,x1,x2,x3)</function>
+
+      <function idx="10134" symbol="LM4B1" terminals="4" uniontype="">gepLM4B1(x0,x1,x2,x3)</function>
+      <function idx="10135" symbol="LM4B2" terminals="4" uniontype="">gepLM4B2(x0,x1,x2,x3)</function>
+      <function idx="10136" symbol="LM4B3" terminals="4" uniontype="">gepLM4B3(x0,x1,x2,x3)</function>
+      <function idx="10137" symbol="LM4B4" terminals="4" uniontype="">gepLM4B4(x0,x1,x2,x3)</function>
+      <function idx="10138" symbol="LM4B5" terminals="4" uniontype="">gepLM4B5(x0,x1,x2,x3)</function>
+      <function idx="10139" symbol="LM4B6" terminals="4" uniontype="">gepLM4B6(x0,x1,x2,x3)</function>
+      <function idx="10140" symbol="LM4B7" terminals="4" uniontype="">gepLM4B7(x0,x1,x2,x3)</function>
+      <function idx="10141" symbol="LM4B8" terminals="4" uniontype="">gepLM4B8(x0,x1,x2,x3)</function>
+
+      <function idx="10142" symbol="LM4C1" terminals="4" uniontype="">gepLM4C1(x0,x1,x2,x3)</function>
+      <function idx="10143" symbol="LM4C2" terminals="4" uniontype="">gepLM4C2(x0,x1,x2,x3)</function>
+      <function idx="10144" symbol="LM4C3" terminals="4" uniontype="">gepLM4C3(x0,x1,x2,x3)</function>
+      <function idx="10145" symbol="LM4C4" terminals="4" uniontype="">gepLM4C4(x0,x1,x2,x3)</function>
+      <function idx="10146" symbol="LM4C5" terminals="4" uniontype="">gepLM4C5(x0,x1,x2,x3)</function>
+      <function idx="10147" symbol="LM4C6" terminals="4" uniontype="">gepLM4C6(x0,x1,x2,x3)</function>
+      <function idx="10148" symbol="LM4C7" terminals="4" uniontype="">gepLM4C7(x0,x1,x2,x3)</function>
+      <function idx="10149" symbol="LM4C8" terminals="4" uniontype="">gepLM4C8(x0,x1,x2,x3)</function>
+
+      <function idx="10150" symbol="LM4D1" terminals="4" uniontype="">gepLM4D1(x0,x1,x2,x3)</function>
+      <function idx="10151" symbol="LM4D2" terminals="4" uniontype="">gepLM4D2(x0,x1,x2,x3)</function>
+      <function idx="10152" symbol="LM4D3" terminals="4" uniontype="">gepLM4D3(x0,x1,x2,x3)</function>
+      <function idx="10153" symbol="LM4D4" terminals="4" uniontype="">gepLM4D4(x0,x1,x2,x3)</function>
+      <function idx="10154" symbol="LM4D5" terminals="4" uniontype="">gepLM4D5(x0,x1,x2,x3)</function>
+      <function idx="10155" symbol="LM4D6" terminals="4" uniontype="">gepLM4D6(x0,x1,x2,x3)</function>
+      <function idx="10156" symbol="LM4D7" terminals="4" uniontype="">gepLM4D7(x0,x1,x2,x3)</function>
+      <function idx="10157" symbol="LM4D8" terminals="4" uniontype="">gepLM4D8(x0,x1,x2,x3)</function>
+
+      <function idx="10158" symbol="LM4E1" terminals="4" uniontype="">gepLM4E1(x0,x1,x2,x3)</function>
+      <function idx="10159" symbol="LM4E2" terminals="4" uniontype="">gepLM4E2(x0,x1,x2,x3)</function>
+      <function idx="10160" symbol="LM4E3" terminals="4" uniontype="">gepLM4E3(x0,x1,x2,x3)</function>
+      <function idx="10161" symbol="LM4E4" terminals="4" uniontype="">gepLM4E4(x0,x1,x2,x3)</function>
+      <function idx="10162" symbol="LM4E5" terminals="4" uniontype="">gepLM4E5(x0,x1,x2,x3)</function>
+      <function idx="10163" symbol="LM4E6" terminals="4" uniontype="">gepLM4E6(x0,x1,x2,x3)</function>
+      <function idx="10164" symbol="LM4E7" terminals="4" uniontype="">gepLM4E7(x0,x1,x2,x3)</function>
+      <function idx="10165" symbol="LM4E8" terminals="4" uniontype="">gepLM4E8(x0,x1,x2,x3)</function>
+
+      <function idx="10166" symbol="LM4F1" terminals="4" uniontype="">gepLM4F1(x0,x1,x2,x3)</function>
+      <function idx="10167" symbol="LM4F2" terminals="4" uniontype="">gepLM4F2(x0,x1,x2,x3)</function>
+      <function idx="10168" symbol="LM4F3" terminals="4" uniontype="">gepLM4F3(x0,x1,x2,x3)</function>
+      <function idx="10169" symbol="LM4F4" terminals="4" uniontype="">gepLM4F4(x0,x1,x2,x3)</function>
+      <function idx="10170" symbol="LM4F5" terminals="4" uniontype="">gepLM4F5(x0,x1,x2,x3)</function>
+      <function idx="10171" symbol="LM4F6" terminals="4" uniontype="">gepLM4F6(x0,x1,x2,x3)</function>
+      <function idx="10172" symbol="LM4F7" terminals="4" uniontype="">gepLM4F7(x0,x1,x2,x3)</function>
+      <function idx="10173" symbol="LM4F8" terminals="4" uniontype="">gepLM4F8(x0,x1,x2,x3)</function>
+
+      <function idx="10174" symbol="LM4G1" terminals="4" uniontype="">gepLM4G1(x0,x1,x2,x3)</function>
+      <function idx="10175" symbol="LM4G2" terminals="4" uniontype="">gepLM4G2(x0,x1,x2,x3)</function>
+      <function idx="10176" symbol="LM4G3" terminals="4" uniontype="">gepLM4G3(x0,x1,x2,x3)</function>
+      <function idx="10177" symbol="LM4G4" terminals="4" uniontype="">gepLM4G4(x0,x1,x2,x3)</function>
+      <function idx="10178" symbol="LM4G5" terminals="4" uniontype="">gepLM4G5(x0,x1,x2,x3)</function>
+      <function idx="10179" symbol="LM4G6" terminals="4" uniontype="">gepLM4G6(x0,x1,x2,x3)</function>
+      <function idx="10180" symbol="LM4G7" terminals="4" uniontype="">gepLM4G7(x0,x1,x2,x3)</function>
+      <function idx="10181" symbol="LM4G8" terminals="4" uniontype="">gepLM4G8(x0,x1,x2,x3)</function>
+
+      <function idx="10182" symbol="LM4H1" terminals="4" uniontype="">gepLM4H1(x0,x1,x2,x3)</function>
+      <function idx="10183" symbol="LM4H2" terminals="4" uniontype="">gepLM4H2(x0,x1,x2,x3)</function>
+      <function idx="10184" symbol="LM4H3" terminals="4" uniontype="">gepLM4H3(x0,x1,x2,x3)</function>
+      <function idx="10185" symbol="LM4H4" terminals="4" uniontype="">gepLM4H4(x0,x1,x2,x3)</function>
+      <function idx="10186" symbol="LM4H5" terminals="4" uniontype="">gepLM4H5(x0,x1,x2,x3)</function>
+      <function idx="10187" symbol="LM4H6" terminals="4" uniontype="">gepLM4H6(x0,x1,x2,x3)</function>
+      <function idx="10188" symbol="LM4H7" terminals="4" uniontype="">gepLM4H7(x0,x1,x2,x3)</function>
+      <function idx="10189" symbol="LM4H8" terminals="4" uniontype="">gepLM4H8(x0,x1,x2,x3)</function>
+
+      <function idx="10190" symbol="LM4I1" terminals="4" uniontype="">gepLM4I1(x0,x1,x2,x3)</function>
+      <function idx="10191" symbol="LM4I2" terminals="4" uniontype="">gepLM4I2(x0,x1,x2,x3)</function>
+      <function idx="10192" symbol="LM4I3" terminals="4" uniontype="">gepLM4I3(x0,x1,x2,x3)</function>
+      <function idx="10193" symbol="LM4I4" terminals="4" uniontype="">gepLM4I4(x0,x1,x2,x3)</function>
+      <function idx="10194" symbol="LM4I5" terminals="4" uniontype="">gepLM4I5(x0,x1,x2,x3)</function>
+      <function idx="10195" symbol="LM4I6" terminals="4" uniontype="">gepLM4I6(x0,x1,x2,x3)</function>
+      <function idx="10196" symbol="LM4I7" terminals="4" uniontype="">gepLM4I7(x0,x1,x2,x3)</function>
+      <function idx="10197" symbol="LM4I8" terminals="4" uniontype="">gepLM4I8(x0,x1,x2,x3)</function>
+
+      <function idx="10198" symbol="LT4A" terminals="4" uniontype="">gepLT4A(x0,x1,x2,x3)</function>
+      <function idx="10199" symbol="GT4A" terminals="4" uniontype="">gepGT4A(x0,x1,x2,x3)</function>
+      <function idx="10200" symbol="LOE4A" terminals="4" uniontype="">gepLOE4A(x0,x1,x2,x3)</function>
+      <function idx="10201" symbol="GOE4A" terminals="4" uniontype="">gepGOE4A(x0,x1,x2,x3)</function>
+      <function idx="10202" symbol="ET4A" terminals="4" uniontype="">gepET4A(x0,x1,x2,x3)</function>
+      <function idx="10203" symbol="NET4A" terminals="4" uniontype="">gepNET4A(x0,x1,x2,x3)</function>
+
+      <function idx="10204" symbol="LT4B" terminals="4" uniontype="">gepLT4B(x0,x1,x2,x3)</function>
+      <function idx="10205" symbol="GT4B" terminals="4" uniontype="">gepGT4B(x0,x1,x2,x3)</function>
+      <function idx="10206" symbol="LOE4B" terminals="4" uniontype="">gepLOE4B(x0,x1,x2,x3)</function>
+      <function idx="10207" symbol="GOE4B" terminals="4" uniontype="">gepGOE4B(x0,x1,x2,x3)</function>
+      <function idx="10208" symbol="ET4B" terminals="4" uniontype="">gepET4B(x0,x1,x2,x3)</function>
+      <function idx="10209" symbol="NET4B" terminals="4" uniontype="">gepNET4B(x0,x1,x2,x3)</function>
+
+      <function idx="10210" symbol="LT4C" terminals="4" uniontype="">gepLT4C(x0,x1,x2,x3)</function>
+      <function idx="10211" symbol="GT4C" terminals="4" uniontype="">gepGT4C(x0,x1,x2,x3)</function>
+      <function idx="10212" symbol="LOE4C" terminals="4" uniontype="">gepLOE4C(x0,x1,x2,x3)</function>
+      <function idx="10213" symbol="GOE4C" terminals="4" uniontype="">gepGOE4C(x0,x1,x2,x3)</function>
+      <function idx="10214" symbol="ET4C" terminals="4" uniontype="">gepET4C(x0,x1,x2,x3)</function>
+      <function idx="10215" symbol="NET4C" terminals="4" uniontype="">gepNET4C(x0,x1,x2,x3)</function>
+
+      <function idx="10216" symbol="LT4D" terminals="4" uniontype="">gepLT4D(x0,x1,x2,x3)</function>
+      <function idx="10217" symbol="GT4D" terminals="4" uniontype="">gepGT4D(x0,x1,x2,x3)</function>
+      <function idx="10218" symbol="LOE4D" terminals="4" uniontype="">gepLOE4D(x0,x1,x2,x3)</function>
+      <function idx="10219" symbol="GOE4D" terminals="4" uniontype="">gepGOE4D(x0,x1,x2,x3)</function>
+      <function idx="10220" symbol="ET4D" terminals="4" uniontype="">gepET4D(x0,x1,x2,x3)</function>
+      <function idx="10221" symbol="NET4D" terminals="4" uniontype="">gepNET4D(x0,x1,x2,x3)</function>
+
+      <function idx="10222" symbol="LT4E" terminals="4" uniontype="">gepLT4E(x0,x1,x2,x3)</function>
+      <function idx="10223" symbol="GT4E" terminals="4" uniontype="">gepGT4E(x0,x1,x2,x3)</function>
+      <function idx="10224" symbol="LOE4E" terminals="4" uniontype="">gepLOE4E(x0,x1,x2,x3)</function>
+      <function idx="10225" symbol="GOE4E" terminals="4" uniontype="">gepGOE4E(x0,x1,x2,x3)</function>
+      <function idx="10226" symbol="ET4E" terminals="4" uniontype="">gepET4E(x0,x1,x2,x3)</function>
+      <function idx="10227" symbol="NET4E" terminals="4" uniontype="">gepNET4E(x0,x1,x2,x3)</function>
+
+      <function idx="10228" symbol="Q0002" terminals="4" uniontype="">gepQ0002(x0,x1,x2,x3)</function>
+      <function idx="10229" symbol="Q001C" terminals="4" uniontype="">gepQ001C(x0,x1,x2,x3)</function>
+      <function idx="10230" symbol="Q0048" terminals="4" uniontype="">gepQ0048(x0,x1,x2,x3)</function>
+      <function idx="10231" symbol="Q0800" terminals="4" uniontype="">gepQ0800(x0,x1,x2,x3)</function>
+      <function idx="10232" symbol="Q3378" terminals="4" uniontype="">gepQ3378(x0,x1,x2,x3)</function>
+
+      <function idx="10233" symbol="Q3475" terminals="4" uniontype="">gepQ3475(x0,x1,x2,x3)</function>
+      <function idx="10234" symbol="Q3CB0" terminals="4" uniontype="">gepQ3CB0(x0,x1,x2,x3)</function>
+      <function idx="10235" symbol="Q3DEF" terminals="4" uniontype="">gepQ3DEF(x0,x1,x2,x3)</function>
+      <function idx="10236" symbol="Q3DFF" terminals="4" uniontype="">gepQ3DFF(x0,x1,x2,x3)</function>
+      <function idx="10237" symbol="Q4200" terminals="4" uniontype="">gepQ4200(x0,x1,x2,x3)</function>
+
+      <function idx="10238" symbol="Q4C11" terminals="4" uniontype="">gepQ4C11(x0,x1,x2,x3)</function>
+      <function idx="10239" symbol="Q5100" terminals="4" uniontype="">gepQ5100(x0,x1,x2,x3)</function>
+      <function idx="10240" symbol="Q5EEF" terminals="4" uniontype="">gepQ5EEF(x0,x1,x2,x3)</function>
+      <function idx="10241" symbol="Q5EFF" terminals="4" uniontype="">gepQ5EFF(x0,x1,x2,x3)</function>
+      <function idx="10242" symbol="Q6A6D" terminals="4" uniontype="">gepQ6A6D(x0,x1,x2,x3)</function>
+
+      <function idx="10243" symbol="Q6F75" terminals="4" uniontype="">gepQ6F75(x0,x1,x2,x3)</function>
+      <function idx="10244" symbol="Q74C4" terminals="4" uniontype="">gepQ74C4(x0,x1,x2,x3)</function>
+      <function idx="10245" symbol="Q7DA3" terminals="4" uniontype="">gepQ7DA3(x0,x1,x2,x3)</function>
+      <function idx="10246" symbol="Q8304" terminals="4" uniontype="">gepQ8304(x0,x1,x2,x3)</function>
+      <function idx="10247" symbol="Q8430" terminals="4" uniontype="">gepQ8430(x0,x1,x2,x3)</function>
+
+      <function idx="10248" symbol="Q8543" terminals="4" uniontype="">gepQ8543(x0,x1,x2,x3)</function>
+      <function idx="10249" symbol="Q9D80" terminals="4" uniontype="">gepQ9D80(x0,x1,x2,x3)</function>
+      <function idx="10250" symbol="QA092" terminals="4" uniontype="">gepQA092(x0,x1,x2,x3)</function>
+      <function idx="10251" symbol="QB36A" terminals="4" uniontype="">gepQB36A(x0,x1,x2,x3)</function>
+      <function idx="10252" symbol="QCBCF" terminals="4" uniontype="">gepQCBCF(x0,x1,x2,x3)</function>
+
+      <function idx="10253" symbol="QEEB1" terminals="4" uniontype="">gepQEEB1(x0,x1,x2,x3)</function>
+      <function idx="10254" symbol="QEFFF" terminals="4" uniontype="">gepQEFFF(x0,x1,x2,x3)</function>
+      <function idx="10255" symbol="QFF7B" terminals="4" uniontype="">gepQFF7B(x0,x1,x2,x3)</function>
+      <function idx="10256" symbol="QFFF6" terminals="4" uniontype="">gepQFFF6(x0,x1,x2,x3)</function>
+      <function idx="10257" symbol="QFFFB" terminals="4" uniontype="">gepQFFFB(x0,x1,x2,x3)</function>
+
+
+</functions>
+   
+   <!-- Code Structure -->
+    <order>
+        <item name="ModelComments" />
+        <item name="Open">
+	</item>
+        <item name="Subheader">
+	</item>
+        <item name="Prototypes">
+	</item>
+        <item name="Header">
+	</item>
+        <item name="RandomConstants">
+	</item>
+        <item name="Constants">
+	</item>
+        <item name="TemporaryVariable">
+	</item>
+        <item name="Body">
+	</item>
+        <item name="Footer">
+	</item>
+        <item name="Helpers">
+	</item>
+        <item name="LinkingHelpers">
+	</item>
+        <item name="DDF">
+	</item>
+        <item name="UDF">
+	</item>
+        <item name="Close">
+	</item>
+    </order>
+    
+   <!-- Opening and Closing Statements -->
+   <open>package gepModel{CRLF}{CRLF}</open>
+   <close></close>
+   
+   <!-- The default header is applied to all non specified cases. -->
+   <headers>
+      <header type="default" replace="no">{CRLF}{CRLF}func gepModel(d []bool) bool {</header>
+   </headers>
+   
+   <subheaders>
+      <subheader type="default" replace="no"></subheader>
+   </subheaders>
+
+   <randomconstants>
+       <randomconst type="default" replace="no" indexzero="false" indexone="true">{TAB}const {labelname} = {labelindex}{CRLF}</randomconst>
+   </randomconstants>
+   <categories>
+     <functioncall call=""/>
+     <transformfunction header="" footer=""/>
+     <switch top="" bottom="" categoricaldefault="" numericaldefault=""/>
+     <case format=""/>
+     <equality format=""/>
+   </categories>
+   <transformations>
+     <transformation name="" call="" itemformat="">
+     </transformation>
+   </transformations>
+   <reversetransformations>
+     <transformation name="" call="" itemformat="">
+     </transformation>
+   </reversetransformations>
+
+   <!-- Label constants -->
+   <constants>
+      <constant type="default" replace="no" labelindex="0">{TAB}const {labelname} = {labelindex}{CRLF}</constant>
+   </constants>
+    
+   <!-- The default temporary variable name is applied to all non specified cases. -->
+   <tempvars>
+      <tempvar type="default" typename="bool" varname="blTemp">blTemp := false</tempvar>
+   </tempvars>
+   <endline>{CRLF}</endline>
+   <!-- Number of TABs to add to each line in the code block -->
+   <indent>1</indent>
+   <!-- parenstype can be either 0->() or 1->[]. Defines the parentheses used in arrays-->
+   <parenstype>1</parenstype>
+   <footers>
+      <footer type="default" replace="no">return {tempvarname}{CRLF}}</footer>
+   </footers>
+
+   <helpers count="245" declaration="" assignment="">
+      <helper replaces="Nand" prototype="">func gepNand(x, y bool) bool {{CRLF}{TAB}return (!(x &amp;&amp; y)){CRLF}}{CRLF}</helper>
+      <helper replaces="Nor" prototype="">func gepNor(x, y bool) bool {{CRLF}{TAB}return (!(x || y)){CRLF}}{CRLF}</helper>
+      <helper replaces="Xor" prototype="">func gepXor(x, y bool) bool {{CRLF}{TAB}return ((x || y) &amp;&amp; !(x &amp;&amp; y)){CRLF}}{CRLF}</helper>
+      <helper replaces="Nxor" prototype="">func gepNxor(x, y bool) bool {{CRLF}{TAB}return ((!((x || y))) || (x &amp;&amp; y)){CRLF}}{CRLF}</helper>
+
+      <helper replaces="And3" prototype="">func gepAnd3(x, y, z bool) bool {{CRLF}{TAB}return (x &amp;&amp; y &amp;&amp; z){CRLF}}{CRLF}</helper>
+      <helper replaces="Or3" prototype="">func gepOr3(x, y, z bool) bool {{CRLF}{TAB}return (x || y || z){CRLF}}{CRLF}</helper>
+      <helper replaces="Nand3" prototype="">func gepNand3(x, y, z bool) bool {{CRLF}{TAB}return (!(x &amp;&amp; y &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="Nor3" prototype="">func gepNor3(x, y, z bool) bool {{CRLF}{TAB}return (!(x || y || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="Odd3" prototype="">func gepOdd3(x, y, z bool) bool {{CRLF}{TAB}return ((!((((!((x &amp;&amp; y))) &amp;&amp; (x || y)) &amp;&amp; z))) &amp;&amp; (((!((x &amp;&amp; y))) &amp;&amp; (x || y)) || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="Even3" prototype="">func gepEven3(x, y, z bool) bool {{CRLF}{TAB}return ((!(((!(x)) &amp;&amp; ((!((y &amp;&amp; z))) &amp;&amp; (y || z))))) &amp;&amp; ((!(x)) || ((!((y &amp;&amp; z))) &amp;&amp; (y || z)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="And4" prototype="">func gepAnd4(a, b, c, d bool) bool {{CRLF}{TAB}return (a &amp;&amp; b &amp;&amp; c &amp;&amp; d){CRLF}}{CRLF}</helper>
+      <helper replaces="Or4" prototype="">func gepOr4(a, b, c, d bool) bool {{CRLF}{TAB}return (a || b || c || d){CRLF}}{CRLF}</helper>
+      <helper replaces="Nand4" prototype="">func gepNand4(a, b, c, d bool) bool {{CRLF}{TAB}return (!(a &amp;&amp; b &amp;&amp; c &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="Nor4" prototype="">func gepNor4(a, b, c, d bool) bool {{CRLF}{TAB}return (!(a || b || c || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="Odd4" prototype="">func gepOdd4(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((((!((((!((a &amp;&amp; b))) &amp;&amp; (a || b)) &amp;&amp; c))) &amp;&amp; (((!((a &amp;&amp; b))) &amp;&amp; (a || b)) || c)) &amp;&amp; d))) &amp;&amp; (((!((((!((a &amp;&amp; b))) &amp;&amp; (a || b)) &amp;&amp; c))) &amp;&amp; (((!((a &amp;&amp; b))) &amp;&amp; (a || b)) || c)) || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="Even4" prototype="">func gepEven4(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((((!((((!((a || b))) || (a &amp;&amp; b)) || c))) || (((!((a || b))) || (a &amp;&amp; b)) &amp;&amp; c)) || d))) || (((!((((!((a || b))) || (a &amp;&amp; b)) || c))) || (((!((a || b))) || (a &amp;&amp; b)) &amp;&amp; c)) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT" prototype="">func gepLT(x, y bool) bool {{CRLF}{TAB}return ((!(x)) &amp;&amp; y){CRLF}}{CRLF}</helper>
+      <helper replaces="GT" prototype="">func gepGT(x, y bool) bool {{CRLF}{TAB}return (x &amp;&amp; (!(y))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE" prototype="">func gepLOE(x, y bool) bool {{CRLF}{TAB}return ((!(x)) || y){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE" prototype="">func gepGOE(x, y bool) bool {{CRLF}{TAB}return (x || (!(y))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT3" prototype="">func gepLT3(x, y, z bool) bool {{CRLF}{TAB}return ((!(((!(x)) &amp;&amp; y))) &amp;&amp; z){CRLF}}{CRLF}</helper>
+      <helper replaces="GT3" prototype="">func gepGT3(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; (!(y))) &amp;&amp; (!(z))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE3" prototype="">func gepLOE3(x, y, z bool) bool {{CRLF}{TAB}return ((!(((!(x)) || y))) || z){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE3" prototype="">func gepGOE3(x, y, z bool) bool {{CRLF}{TAB}return (x || (!((y &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="Mux" prototype="">func gepMux(x, y, z bool) bool {{CRLF}{TAB}return (((!(x)) &amp;&amp; y) || (x &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="If" prototype="">func gepIf(x, y, z bool) bool {{CRLF}{TAB}return (((!(x)) &amp;&amp; z) || (x &amp;&amp; y)){CRLF}}{CRLF}</helper>
+      <helper replaces="Maj" prototype="">func gepMaj(x, y, z bool) bool {{CRLF}{TAB}return (((x || z) &amp;&amp; y) || (x &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="Min" prototype="">func gepMin(x, y, z bool) bool {{CRLF}{TAB}return (!((((x || z) &amp;&amp; y) || (x &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="2Off" prototype="">func gep2Off(x, y, z bool) bool {{CRLF}{TAB}return (!(((!(((x || y) || z))) || (((x &amp;&amp; z) || y) &amp;&amp; (x || z))))){CRLF}}{CRLF}</helper>
+      <helper replaces="2On" prototype="">func gep2On(x, y, z bool) bool {{CRLF}{TAB}return ((!(((x &amp;&amp; y) &amp;&amp; z))) &amp;&amp; ((x &amp;&amp; (y || z)) || (y &amp;&amp; z))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM3A1" prototype="">func gepLM3A1(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; (!(z))) || (y &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3A2" prototype="">func gepLM3A2(x, y, z bool) bool {{CRLF}{TAB}return ((x || z) &amp;&amp; (!((y &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3A3" prototype="">func gepLM3A3(x, y, z bool) bool {{CRLF}{TAB}return ((!((x || z))) || (y &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3A4" prototype="">func gepLM3A4(x, y, z bool) bool {{CRLF}{TAB}return (!(((x || z) &amp;&amp; (y || (!(z)))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM3B1" prototype="">func gepLM3B1(x, y, z bool) bool {{CRLF}{TAB}return ((x || (!(z))) &amp;&amp; (y || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3B2" prototype="">func gepLM3B2(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; z) || (!((y || z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3B3" prototype="">func gepLM3B3(x, y, z bool) bool {{CRLF}{TAB}return ((!((x &amp;&amp; z))) &amp;&amp; (y || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3B4" prototype="">func gepLM3B4(x, y, z bool) bool {{CRLF}{TAB}return (!(((x &amp;&amp; z) || (y &amp;&amp; (!(z)))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM3C1" prototype="">func gepLM3C1(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; (!(y))) || (y &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3C2" prototype="">func gepLM3C2(x, y, z bool) bool {{CRLF}{TAB}return ((x || y) &amp;&amp; (!((y &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3C3" prototype="">func gepLM3C3(x, y, z bool) bool {{CRLF}{TAB}return ((!((x || y))) || (y &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3C4" prototype="">func gepLM3C4(x, y, z bool) bool {{CRLF}{TAB}return (!(((x &amp;&amp; (!(y))) || (y &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM3D1" prototype="">func gepLM3D1(x, y, z bool) bool {{CRLF}{TAB}return ((x || (!(y))) &amp;&amp; (y || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3D2" prototype="">func gepLM3D2(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; y) || (!((y || z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3D3" prototype="">func gepLM3D3(x, y, z bool) bool {{CRLF}{TAB}return ((!((x &amp;&amp; y))) &amp;&amp; (y || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3D4" prototype="">func gepLM3D4(x, y, z bool) bool {{CRLF}{TAB}return (!(((x || (!(y))) &amp;&amp; (y || z)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM3E1" prototype="">func gepLM3E1(x, y, z bool) bool {{CRLF}{TAB}return ((!((x &amp;&amp; y))) &amp;&amp; (x || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3E2" prototype="">func gepLM3E2(x, y, z bool) bool {{CRLF}{TAB}return ((!((x || z))) || (x &amp;&amp; y)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3E3" prototype="">func gepLM3E3(x, y, z bool) bool {{CRLF}{TAB}return (!((((!(x)) &amp;&amp; z) || (x &amp;&amp; y)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM3F1" prototype="">func gepLM3F1(x, y, z bool) bool {{CRLF}{TAB}return ((!((x || y))) || (x &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3F2" prototype="">func gepLM3F2(x, y, z bool) bool {{CRLF}{TAB}return ((!((x &amp;&amp; z))) &amp;&amp; (x || y)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3F3" prototype="">func gepLM3F3(x, y, z bool) bool {{CRLF}{TAB}return (!((((!(x)) || z) &amp;&amp; (x || y)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM3G1" prototype="">func gepLM3G1(x, y, z bool) bool {{CRLF}{TAB}return ((!(((x || z) &amp;&amp; y))) &amp;&amp; ((x &amp;&amp; z) || y)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3G2" prototype="">func gepLM3G2(x, y, z bool) bool {{CRLF}{TAB}return ((!(((x || y) || z))) || (x &amp;&amp; (y &amp;&amp; z))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3G3" prototype="">func gepLM3G3(x, y, z bool) bool {{CRLF}{TAB}return ((!(((x || y) &amp;&amp; z))) &amp;&amp; ((x &amp;&amp; y) || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3G4" prototype="">func gepLM3G4(x, y, z bool) bool {{CRLF}{TAB}return ((!((x &amp;&amp; (y || z)))) &amp;&amp; (x || (y &amp;&amp; z))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM3H1" prototype="">func gepLM3H1(x, y, z bool) bool {{CRLF}{TAB}return (!((!(x &amp;&amp; y)) &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3H2" prototype="">func gepLM3H2(x, y, z bool) bool {{CRLF}{TAB}return (!(x &amp;&amp; (!(y &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3H3" prototype="">func gepLM3H3(x, y, z bool) bool {{CRLF}{TAB}return (!((!(x || y)) || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM3H4" prototype="">func gepLM3H4(x, y, z bool) bool {{CRLF}{TAB}return (!(x || (!(y || z)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT3A" prototype="">func gepLT3A(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; (!(z))) || (!(y))){CRLF}}{CRLF}</helper>
+      <helper replaces="GT3A" prototype="">func gepGT3A(x, y, z bool) bool {{CRLF}{TAB}return (((!(x)) || (y || z)) &amp;&amp; (!((y &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE3A" prototype="">func gepLOE3A(x, y, z bool) bool {{CRLF}{TAB}return (x &amp;&amp; ((!(y)) || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE3A" prototype="">func gepGOE3A(x, y, z bool) bool {{CRLF}{TAB}return (!((((x || z) || (!(y))) &amp;&amp; (!((x &amp;&amp; z)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="ET3A" prototype="">func gepET3A(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; ((!(y)) || z)) || ((!((x || z))) &amp;&amp; y)){CRLF}}{CRLF}</helper>
+      <helper replaces="NET3A" prototype="">func gepNET3A(x, y, z bool) bool {{CRLF}{TAB}return ((((x &amp;&amp; y) || z) &amp;&amp; (!((y &amp;&amp; z)))) || (!((x || y)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT3B" prototype="">func gepLT3B(x, y, z bool) bool {{CRLF}{TAB}return (((!(x)) || z) &amp;&amp; y){CRLF}}{CRLF}</helper>
+      <helper replaces="GT3B" prototype="">func gepGT3B(x, y, z bool) bool {{CRLF}{TAB}return (!((((!(x)) || (y || z)) &amp;&amp; (!((y &amp;&amp; z)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE3B" prototype="">func gepLOE3B(x, y, z bool) bool {{CRLF}{TAB}return ((!(x)) || (y &amp;&amp; (!(z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE3B" prototype="">func gepGOE3B(x, y, z bool) bool {{CRLF}{TAB}return ((!((x &amp;&amp; z))) &amp;&amp; ((x || z) || (!(y)))){CRLF}}{CRLF}</helper>
+      <helper replaces="ET3B" prototype="">func gepET3B(x, y, z bool) bool {{CRLF}{TAB}return ((!((x || y))) || (((x || z) &amp;&amp; y) &amp;&amp; (!((x &amp;&amp; z))))){CRLF}}{CRLF}</helper>
+      <helper replaces="NET3B" prototype="">func gepNET3B(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; (!((y || z)))) || (((!(x)) || z) &amp;&amp; y)){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT3C" prototype="">func gepLT3C(x, y, z bool) bool {{CRLF}{TAB}return (!((((!(x)) &amp;&amp; (y &amp;&amp; z)) || (!((y || z)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="GT3C" prototype="">func gepGT3C(x, y, z bool) bool {{CRLF}{TAB}return (((!(x)) &amp;&amp; z) || y){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE3C" prototype="">func gepLOE3C(x, y, z bool) bool {{CRLF}{TAB}return ((!((x || z))) || ((x &amp;&amp; z) &amp;&amp; (!(y)))){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE3C" prototype="">func gepGOE3C(x, y, z bool) bool {{CRLF}{TAB}return ((!(x)) &amp;&amp; (y || (!(z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="ET3C" prototype="">func gepET3C(x, y, z bool) bool {{CRLF}{TAB}return (((x &amp;&amp; (!(y))) &amp;&amp; z) || (!((x || ((!(y)) &amp;&amp; z))))){CRLF}}{CRLF}</helper>
+      <helper replaces="NET3C" prototype="">func gepNET3C(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; y) || ((!(((x || y) &amp;&amp; z))) &amp;&amp; (y || z))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="T004" prototype="">func gepT004(x, y, z bool) bool {{CRLF}{TAB}return ((!((x || z))) &amp;&amp; y){CRLF}}{CRLF}</helper>
+      <helper replaces="T008" prototype="">func gepT008(x, y, z bool) bool {{CRLF}{TAB}return ((!(x)) &amp;&amp; (y &amp;&amp; z)){CRLF}}{CRLF}</helper>
+      <helper replaces="T009" prototype="">func gepT009(x, y, z bool) bool {{CRLF}{TAB}return ((!(((x || y) || z))) || ((!(x)) &amp;&amp; (y &amp;&amp; z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T032" prototype="">func gepT032(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; z) &amp;&amp; (!(y))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="T033" prototype="">func gepT033(x, y, z bool) bool {{CRLF}{TAB}return (!((((x || z) &amp;&amp; (!((x &amp;&amp; z)))) || y))){CRLF}}{CRLF}</helper>
+      <helper replaces="T041" prototype="">func gepT041(x, y, z bool) bool {{CRLF}{TAB}return ((!(((x || y) || z))) || ((!((x &amp;&amp; y))) &amp;&amp; ((x || y) &amp;&amp; z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T055" prototype="">func gepT055(x, y, z bool) bool {{CRLF}{TAB}return (!(((x || z) &amp;&amp; y))){CRLF}}{CRLF}</helper>
+      <helper replaces="T057" prototype="">func gepT057(x, y, z bool) bool {{CRLF}{TAB}return (((x || (y &amp;&amp; z)) || (!((y || z)))) &amp;&amp; (!((x &amp;&amp; y)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="T064" prototype="">func gepT064(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; y) &amp;&amp; (!(z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T065" prototype="">func gepT065(x, y, z bool) bool {{CRLF}{TAB}return (((x &amp;&amp; y) || (!((x || y)))) &amp;&amp; (!(z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T069" prototype="">func gepT069(x, y, z bool) bool {{CRLF}{TAB}return (!(((x &amp;&amp; (!(y))) || z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T073" prototype="">func gepT073(x, y, z bool) bool {{CRLF}{TAB}return ((!((x || (y || z)))) || (((x || z) &amp;&amp; y) &amp;&amp; (!((x &amp;&amp; z))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="T081" prototype="">func gepT081(x, y, z bool) bool {{CRLF}{TAB}return ((x || (!(y))) &amp;&amp; (!(z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T089" prototype="">func gepT089(x, y, z bool) bool {{CRLF}{TAB}return (!((((x || (!(y))) &amp;&amp; z) || (!(((x || (!(y))) || z)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="T093" prototype="">func gepT093(x, y, z bool) bool {{CRLF}{TAB}return (((!(x)) &amp;&amp; y) || (!(z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T096" prototype="">func gepT096(x, y, z bool) bool {{CRLF}{TAB}return ((x &amp;&amp; (y || z)) &amp;&amp; (!((y &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="T101" prototype="">func gepT101(x, y, z bool) bool {{CRLF}{TAB}return (((x &amp;&amp; (y || z)) || (!((x || z)))) &amp;&amp; (!((y &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="T109" prototype="">func gepT109(x, y, z bool) bool {{CRLF}{TAB}return ((!((x &amp;&amp; (y &amp;&amp; z)))) &amp;&amp; (((x &amp;&amp; z) || y) || (!((x || z))))){CRLF}}{CRLF}</helper>
+      <helper replaces="T111" prototype="">func gepT111(x, y, z bool) bool {{CRLF}{TAB}return (!((x &amp;&amp; ((!((y || z))) || (y &amp;&amp; z))))){CRLF}}{CRLF}</helper>
+      <helper replaces="T121" prototype="">func gepT121(x, y, z bool) bool {{CRLF}{TAB}return (((x || (y &amp;&amp; z)) || (!((y || z)))) &amp;&amp; (!(((x &amp;&amp; y) &amp;&amp; z)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="T123" prototype="">func gepT123(x, y, z bool) bool {{CRLF}{TAB}return ((!(y)) || ((!((x &amp;&amp; z))) &amp;&amp; (x || z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T125" prototype="">func gepT125(x, y, z bool) bool {{CRLF}{TAB}return (!((((x &amp;&amp; y) || (!((x || y)))) &amp;&amp; z))){CRLF}}{CRLF}</helper>
+      <helper replaces="T154" prototype="">func gepT154(x, y, z bool) bool {{CRLF}{TAB}return (((x &amp;&amp; (!(y))) || z) &amp;&amp; ((!((x &amp;&amp; z))) || y)){CRLF}}{CRLF}</helper>
+      <helper replaces="T223" prototype="">func gepT223(x, y, z bool) bool {{CRLF}{TAB}return (((!(x)) || y) || (!(z))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="T239" prototype="">func gepT239(x, y, z bool) bool {{CRLF}{TAB}return ((!(x)) || (y || z)){CRLF}}{CRLF}</helper>
+      <helper replaces="T249" prototype="">func gepT249(x, y, z bool) bool {{CRLF}{TAB}return ((x || (y &amp;&amp; z)) || (!((y || z)))){CRLF}}{CRLF}</helper>
+      <helper replaces="T251" prototype="">func gepT251(x, y, z bool) bool {{CRLF}{TAB}return ((x || z) || (!(y))){CRLF}}{CRLF}</helper>
+      <helper replaces="T253" prototype="">func gepT253(x, y, z bool) bool {{CRLF}{TAB}return ((x || y) || (!(z))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT4" prototype="">func gepLT4(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((!(((!(a)) &amp;&amp; b))) &amp;&amp; c))) &amp;&amp; d){CRLF}}{CRLF}</helper>
+      <helper replaces="GT4" prototype="">func gepGT4(a, b, c, d bool) bool {{CRLF}{TAB}return (((a &amp;&amp; (!(b))) &amp;&amp; (!(c))) &amp;&amp; (!(d))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE4" prototype="">func gepLOE4(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((!(((!(a)) || b))) || c))) || d){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE4" prototype="">func gepGOE4(a, b, c, d bool) bool {{CRLF}{TAB}return (((a || (!(b))) || (!(c))) || (!(d))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="Tie" prototype="">func gepTie(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((!(((((a &amp;&amp; b) || c) || d) &amp;&amp; ((a || b) || (c &amp;&amp; d))))) || ((((a &amp;&amp; c) || (!(b))) || d) &amp;&amp; (((a &amp;&amp; d) &amp;&amp; (b || c)) || (b &amp;&amp; c)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="Ntie" prototype="">func gepNtie(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((((a &amp;&amp; d) || (b &amp;&amp; c)) || ((a || d) &amp;&amp; (b || c))))) || (((a || b) &amp;&amp; (c &amp;&amp; d)) || ((a &amp;&amp; b) &amp;&amp; (c || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="3Off" prototype="">func gep3Off(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((((a || d) &amp;&amp; b) || (a &amp;&amp; d)))) &amp;&amp; ((a || (b || d)) &amp;&amp; (!(c)))){CRLF}}{CRLF}</helper>
+      <helper replaces="3On" prototype="">func gep3On(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((!(((((a &amp;&amp; b) || (c &amp;&amp; d)) &amp;&amp; (a || b)) &amp;&amp; ((c &amp;&amp; (!(d))) || d)))) || (a &amp;&amp; (b &amp;&amp; (c &amp;&amp; d)))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4A1" prototype="">func gepLM4A1(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || d) &amp;&amp; ((b || c) || (!(d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4A2" prototype="">func gepLM4A2(a, b, c, d bool) bool {{CRLF}{TAB}return (((a || d) &amp;&amp; (!((b &amp;&amp; d)))) || (c &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4A3" prototype="">func gepLM4A3(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || d) &amp;&amp; (b || (!((c &amp;&amp; d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4A4" prototype="">func gepLM4A4(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || d) &amp;&amp; (!(((b &amp;&amp; c) &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4A5" prototype="">func gepLM4A5(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a || d))) || ((b || c) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4A6" prototype="">func gepLM4A6(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a &amp;&amp; (!(d))) || ((b &amp;&amp; d) &amp;&amp; (!(c)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4A7" prototype="">func gepLM4A7(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a || d))) || ((b || (!(c))) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4A8" prototype="">func gepLM4A8(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || d) &amp;&amp; ((b &amp;&amp; c) || (!(d)))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4B1" prototype="">func gepLM4B1(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; d) || ((b &amp;&amp; c) &amp;&amp; (!(d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4B2" prototype="">func gepLM4B2(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; d) || ((!((b || d))) &amp;&amp; c)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4B3" prototype="">func gepLM4B3(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; d) || (!(((!(b)) || (c || d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4B4" prototype="">func gepLM4B4(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; d) || (!(((b || c) || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4B5" prototype="">func gepLM4B5(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a &amp;&amp; d))) &amp;&amp; ((b &amp;&amp; c) || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4B6" prototype="">func gepLM4B6(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((a || (!(d))) &amp;&amp; (b || d)))) &amp;&amp; (c || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4B7" prototype="">func gepLM4B7(a, b, c, d bool) bool {{CRLF}{TAB}return (((!(a)) &amp;&amp; d) || (!(((!(b)) || (c || d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4B8" prototype="">func gepLM4B8(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a &amp;&amp; d) || ((b || c) &amp;&amp; (!(d)))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4C1" prototype="">func gepLM4C1(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || b) &amp;&amp; ((!(b)) || (c || d))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4C2" prototype="">func gepLM4C2(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || b) &amp;&amp; (((!(b)) || (!(c))) || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4C3" prototype="">func gepLM4C3(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || b) &amp;&amp; ((!((b &amp;&amp; d))) || c)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4C4" prototype="">func gepLM4C4(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((!((a || b))) || ((b &amp;&amp; c) &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4C5" prototype="">func gepLM4C5(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a || b))) || (b &amp;&amp; (c || d))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4C6" prototype="">func gepLM4C6(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a || b))) || (b &amp;&amp; ((!(c)) || d))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4C7" prototype="">func gepLM4C7(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a || b))) || (b &amp;&amp; (c || (!(d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4C8" prototype="">func gepLM4C8(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || b) &amp;&amp; ((!(b)) || (c &amp;&amp; d))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4D1" prototype="">func gepLM4D1(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; b) || ((!(b)) &amp;&amp; (c &amp;&amp; d))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4D2" prototype="">func gepLM4D2(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; b) || ((!((b || c))) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4D3" prototype="">func gepLM4D3(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((!((a &amp;&amp; b))) &amp;&amp; ((b || (!(c))) || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4D4" prototype="">func gepLM4D4(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; b) || (!(((b || c) || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4D5" prototype="">func gepLM4D5(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a &amp;&amp; b))) &amp;&amp; (b || (c &amp;&amp; d))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4D6" prototype="">func gepLM4D6(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a &amp;&amp; b))) &amp;&amp; (b || ((!(c)) &amp;&amp; d))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4D7" prototype="">func gepLM4D7(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || (!(b))) &amp;&amp; ((b || (!(c))) || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4D8" prototype="">func gepLM4D8(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a &amp;&amp; b) || ((!(b)) &amp;&amp; (c || d))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4E1" prototype="">func gepLM4E1(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || c) &amp;&amp; ((b || (!(c))) || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4E2" prototype="">func gepLM4E2(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || c) &amp;&amp; ((!((b &amp;&amp; c))) || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4E3" prototype="">func gepLM4E3(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || c) &amp;&amp; (b || (!((c &amp;&amp; d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4E4" prototype="">func gepLM4E4(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || c) &amp;&amp; (!(((b &amp;&amp; c) &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4E5" prototype="">func gepLM4E5(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a || c))) || ((b || d) &amp;&amp; c)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4E6" prototype="">func gepLM4E6(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a &amp;&amp; (!(c))) || ((b &amp;&amp; c) &amp;&amp; (!(d)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4E7" prototype="">func gepLM4E7(a, b, c, d bool) bool {{CRLF}{TAB}return (((!(a)) || c) &amp;&amp; ((b || (!(c))) || (!(d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4E8" prototype="">func gepLM4E8(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || c) &amp;&amp; ((b &amp;&amp; d) || (!(c)))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4F1" prototype="">func gepLM4F1(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; c) || ((b &amp;&amp; (!(c))) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4F2" prototype="">func gepLM4F2(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; c) || ((!((b || c))) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4F3" prototype="">func gepLM4F3(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; c) || (b &amp;&amp; (!((c || d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4F4" prototype="">func gepLM4F4(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; c) || (!(((b || c) || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4F5" prototype="">func gepLM4F5(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a &amp;&amp; c))) &amp;&amp; ((b &amp;&amp; d) || c)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4F6" prototype="">func gepLM4F6(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || (!(c))) &amp;&amp; ((b || c) || (!(d)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4F7" prototype="">func gepLM4F7(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || (!(c))) &amp;&amp; ((!(b)) || (c || d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4F8" prototype="">func gepLM4F8(a, b, c, d bool) bool {{CRLF}{TAB}return (((!(a)) &amp;&amp; c) || (!(((b || c) || d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4G1" prototype="">func gepLM4G1(a, b, c, d bool) bool {{CRLF}{TAB}return (((!(a)) || (b || c)) &amp;&amp; (a || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4G2" prototype="">func gepLM4G2(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((a &amp;&amp; b) &amp;&amp; (!(c))))) &amp;&amp; (a || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4G3" prototype="">func gepLM4G3(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || d) &amp;&amp; ((!((a &amp;&amp; c))) || b)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4G4" prototype="">func gepLM4G4(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((a &amp;&amp; b) &amp;&amp; c))) &amp;&amp; (a || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4G5" prototype="">func gepLM4G5(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; (b || c)) || (!((a || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4G6" prototype="">func gepLM4G6(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; ((!(b)) || c)) || (!((a || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4G7" prototype="">func gepLM4G7(a, b, c, d bool) bool {{CRLF}{TAB}return (!((((a &amp;&amp; (!(b))) &amp;&amp; c) || ((!(a)) &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4G8" prototype="">func gepLM4G8(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((a &amp;&amp; b) &amp;&amp; c))) &amp;&amp; (a || (!(d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4H1" prototype="">func gepLM4H1(a, b, c, d bool) bool {{CRLF}{TAB}return (((!(a)) &amp;&amp; (b &amp;&amp; c)) || (a &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4H2" prototype="">func gepLM4H2(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; (!(b))) &amp;&amp; c) || (a &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4H3" prototype="">func gepLM4H3(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; d) || ((!((a || c))) &amp;&amp; b)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4H4" prototype="">func gepLM4H4(a, b, c, d bool) bool {{CRLF}{TAB}return (!((((a || b) || c) &amp;&amp; (!((a &amp;&amp; d)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4H5" prototype="">func gepLM4H5(a, b, c, d bool) bool {{CRLF}{TAB}return (((!(a)) &amp;&amp; (b &amp;&amp; c)) || (a &amp;&amp; (!(d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4H6" prototype="">func gepLM4H6(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || ((!(b)) &amp;&amp; c)) &amp;&amp; (!((a &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4H7" prototype="">func gepLM4H7(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || (b &amp;&amp; (!(c)))) &amp;&amp; (!((a &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4H8" prototype="">func gepLM4H8(a, b, c, d bool) bool {{CRLF}{TAB}return (!((((!(a)) &amp;&amp; (b || c)) || (a &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LM4I1" prototype="">func gepLM4I1(a, b, c, d bool) bool {{CRLF}{TAB}return (!((!((!(a &amp;&amp; b)) &amp;&amp; c)) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4I2" prototype="">func gepLM4I2(a, b, c, d bool) bool {{CRLF}{TAB}return (!(a &amp;&amp; (!(b &amp;&amp; (!(c &amp;&amp; d)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4I3" prototype="">func gepLM4I3(a, b, c, d bool) bool {{CRLF}{TAB}return (!((!(a &amp;&amp; (!(b &amp;&amp; c)))) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4I4" prototype="">func gepLM4I4(a, b, c, d bool) bool {{CRLF}{TAB}return (!(a &amp;&amp; (!((!(b &amp;&amp; c)) &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4I5" prototype="">func gepLM4I5(a, b, c, d bool) bool {{CRLF}{TAB}return (!((!((!(a || b)) || c)) || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4I6" prototype="">func gepLM4I6(a, b, c, d bool) bool {{CRLF}{TAB}return (!(a || (!(b || (!(c || d)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4I7" prototype="">func gepLM4I7(a, b, c, d bool) bool {{CRLF}{TAB}return (!((!(a || (!(b || c)))) || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LM4I8" prototype="">func gepLM4I8(a, b, c, d bool) bool {{CRLF}{TAB}return (!(a || (!((!(b || c)) || d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT4A" prototype="">func gepLT4A(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; b) &amp;&amp; c) || ((a || (!(b))) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="GT4A" prototype="">func gepGT4A(a, b, c, d bool) bool {{CRLF}{TAB}return (((a &amp;&amp; (!(b))) &amp;&amp; c) || (((!(a)) || b) &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE4A" prototype="">func gepLOE4A(a, b, c, d bool) bool {{CRLF}{TAB}return (((a &amp;&amp; (!(b))) || c) &amp;&amp; ((!(a)) || (b || d))){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE4A" prototype="">func gepGOE4A(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; b) || c) &amp;&amp; ((a || (!(b))) || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="ET4A" prototype="">func gepET4A(a, b, c, d bool) bool {{CRLF}{TAB}return ((((a &amp;&amp; b) || (!((a || b)))) &amp;&amp; c) || ((!((a &amp;&amp; b))) &amp;&amp; ((a || b) &amp;&amp; d))){CRLF}}{CRLF}</helper>
+      <helper replaces="NET4A" prototype="">func gepNET4A(a, b, c, d bool) bool {{CRLF}{TAB}return ((((a &amp;&amp; b) || c) || (!((a || b)))) &amp;&amp; (((a || b) &amp;&amp; (!((a &amp;&amp; b)))) || d)){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT4B" prototype="">func gepLT4B(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || ((!(b)) || (c &amp;&amp; d))) &amp;&amp; (!(((a || (!(b))) &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="GT4B" prototype="">func gepGT4B(a, b, c, d bool) bool {{CRLF}{TAB}return (((a &amp;&amp; (!(b))) &amp;&amp; (c &amp;&amp; d)) || (!(((a &amp;&amp; (!(b))) || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE4B" prototype="">func gepLOE4B(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) || b) &amp;&amp; (c &amp;&amp; d)) || (a &amp;&amp; ((!(b)) &amp;&amp; (!(d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE4B" prototype="">func gepGOE4B(a, b, c, d bool) bool {{CRLF}{TAB}return ((((a || (!(b))) &amp;&amp; c) &amp;&amp; d) || ((!((a || d))) &amp;&amp; b)){CRLF}}{CRLF}</helper>
+      <helper replaces="ET4B" prototype="">func gepET4B(a, b, c, d bool) bool {{CRLF}{TAB}return ((((a &amp;&amp; b) || (!((a || b)))) &amp;&amp; (c &amp;&amp; d)) || ((a || b) &amp;&amp; (!(((a &amp;&amp; b) || d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="NET4B" prototype="">func gepNET4B(a, b, c, d bool) bool {{CRLF}{TAB}return (!((((a &amp;&amp; b) || (!(((a || b) &amp;&amp; (c &amp;&amp; d))))) &amp;&amp; (((a || b) &amp;&amp; (!((a &amp;&amp; b)))) || d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT4C" prototype="">func gepLT4C(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; b) &amp;&amp; (c || d)) || ((!(((!(a)) &amp;&amp; b))) &amp;&amp; (!(d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="GT4C" prototype="">func gepGT4C(a, b, c, d bool) bool {{CRLF}{TAB}return (((a &amp;&amp; (!(b))) &amp;&amp; (c || d)) || (!(((a &amp;&amp; (!(b))) || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE4C" prototype="">func gepLOE4C(a, b, c, d bool) bool {{CRLF}{TAB}return ((((a &amp;&amp; (!(b))) || c) || d) &amp;&amp; ((!((a &amp;&amp; d))) || b)){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE4C" prototype="">func gepGOE4C(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; b) || (c || d)) &amp;&amp; (a || (!((b &amp;&amp; d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="ET4C" prototype="">func gepET4C(a, b, c, d bool) bool {{CRLF}{TAB}return (((((a || b) &amp;&amp; (!((a &amp;&amp; b)))) || c) || d) &amp;&amp; ((a &amp;&amp; b) || (!(((a || b) &amp;&amp; d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="NET4C" prototype="">func gepNET4C(a, b, c, d bool) bool {{CRLF}{TAB}return (!((((a &amp;&amp; b) || (!(((a || b) &amp;&amp; (c || d))))) &amp;&amp; (((a || b) &amp;&amp; (!((a &amp;&amp; b)))) || d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT4D" prototype="">func gepLT4D(a, b, c, d bool) bool {{CRLF}{TAB}return (!((((!(a)) &amp;&amp; b) || (c &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="GT4D" prototype="">func gepGT4D(a, b, c, d bool) bool {{CRLF}{TAB}return (!((((((!(a)) || b) &amp;&amp; c) &amp;&amp; d) || (a &amp;&amp; (!((b || d))))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE4D" prototype="">func gepLOE4D(a, b, c, d bool) bool {{CRLF}{TAB}return (a &amp;&amp; ((!((b || (c &amp;&amp; d)))) || (b &amp;&amp; d))){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE4D" prototype="">func gepGOE4D(a, b, c, d bool) bool {{CRLF}{TAB}return (((!((a || (c &amp;&amp; d)))) &amp;&amp; b) || (a &amp;&amp; d)){CRLF}}{CRLF}</helper>
+      <helper replaces="ET4D" prototype="">func gepET4D(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || b) &amp;&amp; (!((((a &amp;&amp; b) || (c &amp;&amp; d)) &amp;&amp; (!(((a &amp;&amp; b) &amp;&amp; d))))))){CRLF}}{CRLF}</helper>
+      <helper replaces="NET4D" prototype="">func gepNET4D(a, b, c, d bool) bool {{CRLF}{TAB}return (((a &amp;&amp; (!(b))) || (!((c &amp;&amp; d)))) &amp;&amp; ((!((a || b))) || (a &amp;&amp; (b || d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="LT4E" prototype="">func gepLT4E(a, b, c, d bool) bool {{CRLF}{TAB}return (((!(a)) &amp;&amp; b) || (a &amp;&amp; c)){CRLF}}{CRLF}</helper>
+      <helper replaces="GT4E" prototype="">func gepGT4E(a, b, c, d bool) bool {{CRLF}{TAB}return (a &amp;&amp; ((b &amp;&amp; c) || (!((b || d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="LOE4E" prototype="">func gepLOE4E(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(a)) || ((b || c) &amp;&amp; (!((b &amp;&amp; d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="GOE4E" prototype="">func gepGOE4E(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || (!(b))) &amp;&amp; (!((a &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="ET4E" prototype="">func gepET4E(a, b, c, d bool) bool {{CRLF}{TAB}return (((a &amp;&amp; (b || c)) || (!((a || b)))) &amp;&amp; (!((b &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="NET4E" prototype="">func gepNET4E(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) || c) &amp;&amp; b) || ((a &amp;&amp; (!(b))) &amp;&amp; (!(d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="Q0002" prototype="">func gepQ0002(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; (!(b))) &amp;&amp; (!(c))) &amp;&amp; d){CRLF}}{CRLF}</helper>
+      <helper replaces="Q001C" prototype="">func gepQ001C(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || (b &amp;&amp; (c || d))) || (!((b || c)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q0048" prototype="">func gepQ0048(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; (b || d)) &amp;&amp; (!((b &amp;&amp; d)))) &amp;&amp; c){CRLF}}{CRLF}</helper>
+      <helper replaces="Q0800" prototype="">func gepQ0800(a, b, c, d bool) bool {{CRLF}{TAB}return (((a &amp;&amp; (!(b))) &amp;&amp; c) &amp;&amp; d){CRLF}}{CRLF}</helper>
+      <helper replaces="Q3378" prototype="">func gepQ3378(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((a || (b &amp;&amp; d)) &amp;&amp; c))) &amp;&amp; ((a || (c &amp;&amp; d)) || b)){CRLF}}{CRLF}</helper>
+
+      <helper replaces="Q3475" prototype="">func gepQ3475(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || d) &amp;&amp; ((!((b || c))) || ((b || d) &amp;&amp; c))))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q3CB0" prototype="">func gepQ3CB0(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; d) || ((!(b)) || (!(c)))) &amp;&amp; ((a &amp;&amp; c) || b)){CRLF}}{CRLF}</helper>
+      <helper replaces="Q3DEF" prototype="">func gepQ3DEF(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((((a &amp;&amp; d) || c) &amp;&amp; (!(c))) || b))) || ((((a || c) || d) &amp;&amp; (!((a &amp;&amp; c)))) &amp;&amp; b)){CRLF}}{CRLF}</helper>
+      <helper replaces="Q3DFF" prototype="">func gepQ3DFF(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(a)) || ((!((b &amp;&amp; c))) &amp;&amp; ((b || c) || (!(d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q4200" prototype="">func gepQ4200(a, b, c, d bool) bool {{CRLF}{TAB}return ((((a &amp;&amp; c) || (!(b))) &amp;&amp; ((a &amp;&amp; d) || b)) &amp;&amp; (!((c &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="Q4C11" prototype="">func gepQ4C11(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((a || (c || d)) &amp;&amp; (!(((a &amp;&amp; ((!(b)) || (!(d)))) &amp;&amp; c)))))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q5100" prototype="">func gepQ5100(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; (b || (!(c)))) &amp;&amp; (!(d))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q5EEF" prototype="">func gepQ5EEF(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!((a || b))) || c) || ((a || d) &amp;&amp; (b || d))) &amp;&amp; (!(((a &amp;&amp; b) &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q5EFF" prototype="">func gepQ5EFF(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(a)) || (((b || c) || d) &amp;&amp; (!((b &amp;&amp; d))))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q6A6D" prototype="">func gepQ6A6D(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((!((((a || c) &amp;&amp; d) || (b &amp;&amp; (c || d))))) &amp;&amp; (!(((!(a)) &amp;&amp; ((!(b)) &amp;&amp; (!(d))))))))) &amp;&amp; (!((b &amp;&amp; (c &amp;&amp; d))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="Q6F75" prototype="">func gepQ6F75(a, b, c, d bool) bool {{CRLF}{TAB}return (!(((((!((a || b))) || b) &amp;&amp; ((a &amp;&amp; (!(c))) || d)) &amp;&amp; (((!(b)) || (!(d))) || c)))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q74C4" prototype="">func gepQ74C4(a, b, c, d bool) bool {{CRLF}{TAB}return ((((!(a)) &amp;&amp; b) || (!((c &amp;&amp; d)))) &amp;&amp; ((a &amp;&amp; b) || c)){CRLF}}{CRLF}</helper>
+      <helper replaces="Q7DA3" prototype="">func gepQ7DA3(a, b, c, d bool) bool {{CRLF}{TAB}return ((a &amp;&amp; (!(((((a &amp;&amp; c) &amp;&amp; b) || (!((b || c)))) &amp;&amp; d)))) || ((!(a)) &amp;&amp; ((!((b || c))) || (b &amp;&amp; d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="Q8304" prototype="">func gepQ8304(a, b, c, d bool) bool {{CRLF}{TAB}return (((!((((a || d) &amp;&amp; c) || b))) || (((a &amp;&amp; b) &amp;&amp; c) &amp;&amp; d)) &amp;&amp; (a || c)){CRLF}}{CRLF}</helper>
+      <helper replaces="Q8430" prototype="">func gepQ8430(a, b, c, d bool) bool {{CRLF}{TAB}return (((!((a || c))) &amp;&amp; b) || (((a &amp;&amp; c) &amp;&amp; ((!(b)) || d)) &amp;&amp; (b || (!(d))))){CRLF}}{CRLF}</helper>
+
+      <helper replaces="Q8543" prototype="">func gepQ8543(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((a &amp;&amp; d) || (((!((a &amp;&amp; d))) &amp;&amp; ((!(a)) &amp;&amp; (b || c))) || b)))) || (((((!(a)) &amp;&amp; ((b || c) &amp;&amp; (!(d)))) || (a &amp;&amp; d)) &amp;&amp; b) &amp;&amp; c)){CRLF}}{CRLF}</helper>
+      <helper replaces="Q9D80" prototype="">func gepQ9D80(a, b, c, d bool) bool {{CRLF}{TAB}return ((((a || b) &amp;&amp; c) &amp;&amp; d) || ((a &amp;&amp; (!(d))) &amp;&amp; (!((b &amp;&amp; c))))){CRLF}}{CRLF}</helper>
+      <helper replaces="QA092" prototype="">func gepQA092(a, b, c, d bool) bool {{CRLF}{TAB}return (((!((((a || b) &amp;&amp; d) || (a || c)))) &amp;&amp; (((a &amp;&amp; c) || b) || d)) || ((a || c) &amp;&amp; (b &amp;&amp; d))){CRLF}}{CRLF}</helper>
+      <helper replaces="QB36A" prototype="">func gepQB36A(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || ((b &amp;&amp; c) || d)) &amp;&amp; (!(((((!((a &amp;&amp; d))) || (!(b))) &amp;&amp; (a || (b &amp;&amp; d))) &amp;&amp; c)))){CRLF}}{CRLF}</helper>
+      <helper replaces="QCBCF" prototype="">func gepQCBCF(a, b, c, d bool) bool {{CRLF}{TAB}return ((!(((a &amp;&amp; c) || b))) || ((b || d) &amp;&amp; c)){CRLF}}{CRLF}</helper>
+
+      <helper replaces="QEEB1" prototype="">func gepQEEB1(a, b, c, d bool) bool {{CRLF}{TAB}return (((!((a || c))) || ((a &amp;&amp; c) || d)) &amp;&amp; ((a || b) || (!(d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="QEFFF" prototype="">func gepQEFFF(a, b, c, d bool) bool {{CRLF}{TAB}return ((!((a &amp;&amp; b))) || (c || d)){CRLF}}{CRLF}</helper>
+      <helper replaces="QFF7B" prototype="">func gepQFF7B(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || (!(c))) || ((!((b &amp;&amp; d))) &amp;&amp; (b || d))){CRLF}}{CRLF}</helper>
+      <helper replaces="QFFF6" prototype="">func gepQFFF6(a, b, c, d bool) bool {{CRLF}{TAB}return (a || (b || ((!((c &amp;&amp; d))) &amp;&amp; (c || d)))){CRLF}}{CRLF}</helper>
+      <helper replaces="QFFFB" prototype="">func gepQFFFB(a, b, c, d bool) bool {{CRLF}{TAB}return ((a || b) || ((!(c)) || d)){CRLF}}{CRLF}</helper>
+
+   </helpers>
+
+   <keywords>
+      <keyword>const</keyword>
+      <keyword>int</keyword>
+      <keyword>return</keyword>
+      <keyword>bool</keyword>
+      <keyword>true</keyword>
+      <keyword>false</keyword>
+   </keywords>
+   <commentmark>//</commentmark>
+   <linkingFunctions count="7">
+      <linkingFunction replaces="Nand" prototype="">func gepNand(x, y bool) bool {{CRLF}{TAB}return (!(x &amp;&amp; y)){CRLF}}{CRLF}</linkingFunction>
+      <linkingFunction replaces="Nor" prototype="">func gepNor(x, y bool) bool {{CRLF}{TAB}return (!(x || y)){CRLF}}{CRLF}</linkingFunction>
+      <linkingFunction replaces="Nxor" prototype="">func gepNxor(x, y bool) bool {{CRLF}{TAB}return ((!((x || y))) || (x &amp;&amp; y)){CRLF}}{CRLF}</linkingFunction>
+      <linkingFunction replaces="LT" prototype="">func gepLT(x, y bool) bool {{CRLF}{TAB}return ((!(x)) &amp;&amp; y){CRLF}}{CRLF}</linkingFunction>
+      <linkingFunction replaces="GT" prototype="">func gepGT(x, y bool) bool {{CRLF}{TAB}return (x &amp;&amp; (!(y))){CRLF}}{CRLF}</linkingFunction>
+      <linkingFunction replaces="LOE" prototype="">func gepLOE(x, y bool) bool {{CRLF}{TAB}return ((!(x)) || y){CRLF}}{CRLF}</linkingFunction>
+      <linkingFunction replaces="GOE" prototype="">func gepGOE(x, y bool) bool {{CRLF}{TAB}return (x || (!(y))){CRLF}}{CRLF}</linkingFunction>
+   </linkingFunctions>
+   <ddfcomment>// Add a DDF with the name {FUNCTION_SYMBOL} in {LANGUAGE}{CRLF}// and a parameter list equivalent to {PARAMETER_LIST}{CRLF}</ddfcomment>
+   <udfcomment>// Add a UDF with the name {FUNCTION_SYMBOL} in {LANGUAGE}{CRLF}</udfcomment>
+</grammar>

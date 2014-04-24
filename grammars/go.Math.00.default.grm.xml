@@ -1,0 +1,652 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE grammar SYSTEM "grammar.dtd"[]>
+<grammar name="Go" version="5" ext="go" type="">
+  <!--List of all the mathematical functions supported by GeneXproTools 5.0. All functions must be completely defined.-->
+  <!--To generate Carriage Return Line Feeds (CrLf) use the token {CRLF} (curly braces included).-->
+  <!--To generate Tabs use the token {TAB} (curly braces included).-->
+  <!--Use {CHARX} as an escape for the x in the definition of the functions.-->
+  <functions count="279">
+    <function idx="0" symbol="+" terminals="2" uniontype="{tempvarname} {symbol}= {member}">(x0+x1)</function>
+    <function idx="1" symbol="-" terminals="2" uniontype="{tempvarname} {symbol}= {member}">(x0-x1)</function>
+    <function idx="2" symbol="*" terminals="2" uniontype="{tempvarname} {symbol}= {member}">(x0*x1)</function>
+    <function idx="3" symbol="/" terminals="2" uniontype="{tempvarname} {symbol}= {member}">(x0/x1)</function>
+    <function idx="4" symbol="Mod" terminals="2" uniontype="">gepMod(x0,x1)</function>
+    <function idx="5" symbol="Pow" terminals="2" uniontype="">math.Pow(x0,x1)</function>
+    <function idx="6" symbol="Sqrt" terminals="1" uniontype="">math.Sqrt(x0)</function>
+    <function idx="7" symbol="Exp" terminals="1" uniontype="">math.E{CHARX}p(x0)</function>
+    <function idx="8" symbol="Pow10" terminals="1" uniontype="">math.Pow(10.0,x0)</function>
+    <function idx="9" symbol="Ln" terminals="1" uniontype="">math.Log(x0)</function>
+    <function idx="10" symbol="Log" terminals="1" uniontype="">math.Log10(x0)</function>
+    <function idx="83" symbol="Log2" terminals="2" uniontype="">gepLog2(x0,x1)</function>
+    <function idx="12" symbol="Floor" terminals="1" uniontype="">math.Floor(x0)</function>
+    <function idx="13" symbol="Ceil" terminals="1" uniontype="">math.Ceil(x0)</function>
+    <function idx="14" symbol="Abs" terminals="1" uniontype="">math.Abs(x0)</function>
+    <function idx="15" symbol="Inv" terminals="1" uniontype="">(1.0/(x0))</function>
+    <function idx="17" symbol="Neg" terminals="1" uniontype="">(-(x0))</function>
+    <function idx="16" symbol="Nop" terminals="1" uniontype="">(x0)</function>
+    <function idx="76" symbol="X2" terminals="1" uniontype="">math.Pow(x0,2.0)</function>
+    <function idx="77" symbol="X3" terminals="1" uniontype="">math.Pow(x0,3.0)</function>
+    <function idx="78" symbol="X4" terminals="1" uniontype="">math.Pow(x0,4.0)</function>
+    <function idx="79" symbol="X5" terminals="1" uniontype="">math.Pow(x0,5.0)</function>
+    <function idx="80" symbol="3Rt" terminals="1" uniontype="">gep3Rt(x0)</function>
+    <function idx="81" symbol="4Rt" terminals="1" uniontype="">math.Pow(x0,(1.0/4.0))</function>
+    <function idx="82" symbol="5Rt" terminals="1" uniontype="">gep5Rt(x0)</function>
+    <function idx="84" symbol="Add3" terminals="3" uniontype="">(x0+x1+x2)</function>
+    <function idx="86" symbol="Sub3" terminals="3" uniontype="">(x0-x1-x2)</function>
+    <function idx="88" symbol="Mul3" terminals="3" uniontype="">(x0*x1*x2)</function>
+    <function idx="90" symbol="Div3" terminals="3" uniontype="">(x0/x1/x2)</function>
+    <function idx="85" symbol="Add4" terminals="4" uniontype="">(x0+x1+x2+x3)</function>
+    <function idx="87" symbol="Sub4" terminals="4" uniontype="">(x0-x1-x2-x3)</function>
+    <function idx="89" symbol="Mul4" terminals="4" uniontype="">(x0*x1*x2*x3)</function>
+    <function idx="91" symbol="Div4" terminals="4" uniontype="">(x0/x1/x2/x3)</function>
+    <function idx="92" symbol="Min2" terminals="2" uniontype="{tempvarname} = gepMin2({tempvarname},{member})">gepMin2(x0,x1)</function>
+    <function idx="93" symbol="Min3" terminals="3" uniontype="">gepMin3(x0,x1,x2)</function>
+    <function idx="94" symbol="Min4" terminals="4" uniontype="">gepMin4(x0,x1,x2,x3)</function>
+    <function idx="95" symbol="Max2" terminals="2" uniontype="{tempvarname} = gepMa{CHARX}2({tempvarname},{member})">gepMa{CHARX}2(x0,x1)</function>
+    <function idx="96" symbol="Max3" terminals="3" uniontype="">gepMa{CHARX}3(x0,x1,x2)</function>
+    <function idx="97" symbol="Max4" terminals="4" uniontype="">gepMa{CHARX}4(x0,x1,x2,x3)</function>
+    <function idx="98" symbol="Avg2" terminals="2" uniontype="{tempvarname} = ({tempvarname} + {member}) / 2.0">((x0+x1)/2.0)</function>
+    <function idx="99" symbol="Avg3" terminals="3" uniontype="">((x0+x1+x2)/3.0)</function>
+    <function idx="100" symbol="Avg4" terminals="4" uniontype="">((x0+x1+x2+x3)/4.0)</function>
+    <function idx="11" symbol="Logi" terminals="1" uniontype="">gepLogi(x0)</function>
+    <function idx="101" symbol="Logi2" terminals="2" uniontype="">gepLogi2(x0,x1)</function>
+    <function idx="102" symbol="Logi3" terminals="3" uniontype="">gepLogi3(x0,x1,x2)</function>
+    <function idx="103" symbol="Logi4" terminals="4" uniontype="">gepLogi4(x0,x1,x2,x3)</function>
+    <function idx="104" symbol="Gau" terminals="1" uniontype="">gepGau(x0)</function>
+    <function idx="105" symbol="Gau2" terminals="2" uniontype="">gepGau2(x0,x1)</function>
+    <function idx="106" symbol="Gau3" terminals="3" uniontype="">gepGau3(x0,x1,x2)</function>
+    <function idx="107" symbol="Gau4" terminals="4" uniontype="">gepGau4(x0,x1,x2,x3)</function>
+    <function idx="70" symbol="Zero" terminals="1" uniontype="">(0.0)</function>
+    <function idx="71" symbol="One" terminals="1" uniontype="">(1.0)</function>
+    <function idx="72" symbol="Zero2" terminals="2" uniontype="">(0.0)</function>
+    <function idx="73" symbol="One2" terminals="2" uniontype="">(1.0)</function>
+    <function idx="74" symbol="Pi" terminals="1" uniontype="">(math.Pi)</function>
+    <function idx="75" symbol="E" terminals="1" uniontype="">(math.E)</function>
+    <function idx="18" symbol="Sin" terminals="1" uniontype="">math.Sin(x0)</function>
+    <function idx="19" symbol="Cos" terminals="1" uniontype="">math.Cos(x0)</function>
+    <function idx="20" symbol="Tan" terminals="1" uniontype="">math.Tan(x0)</function>
+    <function idx="21" symbol="Csc" terminals="1" uniontype="">(1.0/math.Sin(x0))</function>
+    <function idx="22" symbol="Sec" terminals="1" uniontype="">(1.0/math.Cos(x0))</function>
+    <function idx="23" symbol="Cot" terminals="1" uniontype="">(1.0/math.Tan(x0))</function>
+    <function idx="24" symbol="Asin" terminals="1" uniontype="">math.Asin(x0)</function>
+    <function idx="25" symbol="Acos" terminals="1" uniontype="">math.Acos(x0)</function>
+    <function idx="26" symbol="Atan" terminals="1" uniontype="">math.Atan(x0)</function>
+    <function idx="27" symbol="Acsc" terminals="1" uniontype="">gepAcsc(x0)</function>
+    <function idx="28" symbol="Asec" terminals="1" uniontype="">gepAsec(x0)</function>
+    <function idx="29" symbol="Acot" terminals="1" uniontype="">gepAcot(x0)</function>
+    <function idx="30" symbol="Sinh" terminals="1" uniontype="">math.Sinh(x0)</function>
+    <function idx="31" symbol="Cosh" terminals="1" uniontype="">math.Cosh(x0)</function>
+    <function idx="32" symbol="Tanh" terminals="1" uniontype="">math.Tanh(x0)</function>
+    <function idx="33" symbol="Csch" terminals="1" uniontype="">(1.0/math.Sinh(x0))</function>
+    <function idx="34" symbol="Sech" terminals="1" uniontype="">(1.0/math.Cosh(x0))</function>
+    <function idx="35" symbol="Coth" terminals="1" uniontype="">(1.0/math.Tanh(x0))</function>
+    <function idx="36" symbol="Asinh" terminals="1" uniontype="">gepAsinh(x0)</function>
+    <function idx="37" symbol="Acosh" terminals="1" uniontype="">gepAcosh(x0)</function>
+    <function idx="38" symbol="Atanh" terminals="1" uniontype="">gepAtanh(x0)</function>
+    <function idx="39" symbol="Acsch" terminals="1" uniontype="">gepAcsch(x0)</function>
+    <function idx="40" symbol="Asech" terminals="1" uniontype="">gepAsech(x0)</function>
+    <function idx="41" symbol="Acoth" terminals="1" uniontype="">gepAcoth(x0)</function>
+    <function idx="108" symbol="NOT" terminals="1" uniontype="">(1.0-x0)</function>
+    <function idx="42" symbol="OR1" terminals="2" uniontype="">gepOR1(x0,x1)</function>
+    <function idx="43" symbol="OR2" terminals="2" uniontype="">gepOR2(x0,x1)</function>
+    <function idx="109" symbol="OR3" terminals="2" uniontype="">gepOR3(x0,x1)</function>
+    <function idx="110" symbol="OR4" terminals="2" uniontype="">gepOR4(x0,x1)</function>
+    <function idx="111" symbol="OR5" terminals="2" uniontype="">gepOR5(x0,x1)</function>
+    <function idx="112" symbol="OR6" terminals="2" uniontype="">gepOR6(x0,x1)</function>
+    <function idx="44" symbol="AND1" terminals="2" uniontype="">gepAND1(x0,x1)</function>
+    <function idx="45" symbol="AND2" terminals="2" uniontype="">gepAND2(x0,x1)</function>
+    <function idx="113" symbol="AND3" terminals="2" uniontype="">gepAND3(x0,x1)</function>
+    <function idx="114" symbol="AND4" terminals="2" uniontype="">gepAND4(x0,x1)</function>
+    <function idx="115" symbol="AND5" terminals="2" uniontype="">gepAND5(x0,x1)</function>
+    <function idx="116" symbol="AND6" terminals="2" uniontype="">gepAND6(x0,x1)</function>
+    <function idx="46" symbol="LT2A" terminals="2" uniontype="">gepLT2A(x0,x1)</function>
+    <function idx="47" symbol="GT2A" terminals="2" uniontype="">gepGT2A(x0,x1)</function>
+    <function idx="48" symbol="LOE2A" terminals="2" uniontype="">gepLOE2A(x0,x1)</function>
+    <function idx="49" symbol="GOE2A" terminals="2" uniontype="">gepGOE2A(x0,x1)</function>
+    <function idx="50" symbol="ET2A" terminals="2" uniontype="">gepET2A(x0,x1)</function>
+    <function idx="51" symbol="NET2A" terminals="2" uniontype="">gepNET2A(x0,x1)</function>
+    <function idx="52" symbol="LT2B" terminals="2" uniontype="">gepLT2B(x0,x1)</function>
+    <function idx="53" symbol="GT2B" terminals="2" uniontype="">gepGT2B(x0,x1)</function>
+    <function idx="54" symbol="LOE2B" terminals="2" uniontype="">gepLOE2B(x0,x1)</function>
+    <function idx="55" symbol="GOE2B" terminals="2" uniontype="">gepGOE2B(x0,x1)</function>
+    <function idx="56" symbol="ET2B" terminals="2" uniontype="">gepET2B(x0,x1)</function>
+    <function idx="57" symbol="NET2B" terminals="2" uniontype="">gepNET2B(x0,x1)</function>
+    <function idx="117" symbol="LT2C" terminals="2" uniontype="">gepLT2C(x0,x1)</function>
+    <function idx="118" symbol="GT2C" terminals="2" uniontype="">gepGT2C(x0,x1)</function>
+    <function idx="119" symbol="LOE2C" terminals="2" uniontype="">gepLOE2C(x0,x1)</function>
+    <function idx="120" symbol="GOE2C" terminals="2" uniontype="">gepGOE2C(x0,x1)</function>
+    <function idx="121" symbol="ET2C" terminals="2" uniontype="">gepET2C(x0,x1)</function>
+    <function idx="122" symbol="NET2C" terminals="2" uniontype="">gepNET2C(x0,x1)</function>
+    <function idx="123" symbol="LT2D" terminals="2" uniontype="">gepLT2D(x0,x1)</function>
+    <function idx="124" symbol="GT2D" terminals="2" uniontype="">gepGT2D(x0,x1)</function>
+    <function idx="125" symbol="LOE2D" terminals="2" uniontype="">gepLOE2D(x0,x1)</function>
+    <function idx="126" symbol="GOE2D" terminals="2" uniontype="">gepGOE2D(x0,x1)</function>
+    <function idx="127" symbol="ET2D" terminals="2" uniontype="">gepET2D(x0,x1)</function>
+    <function idx="128" symbol="NET2D" terminals="2" uniontype="">gepNET2D(x0,x1)</function>
+    <function idx="129" symbol="LT2E" terminals="2" uniontype="">gepLT2E(x0,x1)</function>
+    <function idx="130" symbol="GT2E" terminals="2" uniontype="">gepGT2E(x0,x1)</function>
+    <function idx="131" symbol="LOE2E" terminals="2" uniontype="">gepLOE2E(x0,x1)</function>
+    <function idx="132" symbol="GOE2E" terminals="2" uniontype="">gepGOE2E(x0,x1)</function>
+    <function idx="133" symbol="ET2E" terminals="2" uniontype="">gepET2E(x0,x1)</function>
+    <function idx="134" symbol="NET2E" terminals="2" uniontype="">gepNET2E(x0,x1)</function>
+    <function idx="135" symbol="LT2F" terminals="2" uniontype="">gepLT2F(x0,x1)</function>
+    <function idx="136" symbol="GT2F" terminals="2" uniontype="">gepGT2F(x0,x1)</function>
+    <function idx="137" symbol="LOE2F" terminals="2" uniontype="">gepLOE2F(x0,x1)</function>
+    <function idx="138" symbol="GOE2F" terminals="2" uniontype="">gepGOE2F(x0,x1)</function>
+    <function idx="139" symbol="ET2F" terminals="2" uniontype="">gepET2F(x0,x1)</function>
+    <function idx="140" symbol="NET2F" terminals="2" uniontype="">gepNET2F(x0,x1)</function>
+    <function idx="141" symbol="LT2G" terminals="2" uniontype="">gepLT2G(x0,x1)</function>
+    <function idx="142" symbol="GT2G" terminals="2" uniontype="">gepGT2G(x0,x1)</function>
+    <function idx="143" symbol="LOE2G" terminals="2" uniontype="">gepLOE2G(x0,x1)</function>
+    <function idx="144" symbol="GOE2G" terminals="2" uniontype="">gepGOE2G(x0,x1)</function>
+    <function idx="145" symbol="ET2G" terminals="2" uniontype="">gepET2G(x0,x1)</function>
+    <function idx="146" symbol="NET2G" terminals="2" uniontype="">gepNET2G(x0,x1)</function>
+    <function idx="58" symbol="LT3A" terminals="3" uniontype="">gepLT3A(x0,x1,x2)</function>
+    <function idx="59" symbol="GT3A" terminals="3" uniontype="">gepGT3A(x0,x1,x2)</function>
+    <function idx="60" symbol="LOE3A" terminals="3" uniontype="">gepLOE3A(x0,x1,x2)</function>
+    <function idx="61" symbol="GOE3A" terminals="3" uniontype="">gepGOE3A(x0,x1,x2)</function>
+    <function idx="62" symbol="ET3A" terminals="3" uniontype="">gepET3A(x0,x1,x2)</function>
+    <function idx="63" symbol="NET3A" terminals="3" uniontype="">gepNET3A(x0,x1,x2)</function>
+    <function idx="147" symbol="LT3B" terminals="3" uniontype="">gepLT3B(x0,x1,x2)</function>
+    <function idx="148" symbol="GT3B" terminals="3" uniontype="">gepGT3B(x0,x1,x2)</function>
+    <function idx="149" symbol="LOE3B" terminals="3" uniontype="">gepLOE3B(x0,x1,x2)</function>
+    <function idx="150" symbol="GOE3B" terminals="3" uniontype="">gepGOE3B(x0,x1,x2)</function>
+    <function idx="151" symbol="ET3B" terminals="3" uniontype="">gepET3B(x0,x1,x2)</function>
+    <function idx="152" symbol="NET3B" terminals="3" uniontype="">gepNET3B(x0,x1,x2)</function>
+    <function idx="153" symbol="LT3C" terminals="3" uniontype="">gepLT3C(x0,x1,x2)</function>
+    <function idx="154" symbol="GT3C" terminals="3" uniontype="">gepGT3C(x0,x1,x2)</function>
+    <function idx="155" symbol="LOE3C" terminals="3" uniontype="">gepLOE3C(x0,x1,x2)</function>
+    <function idx="156" symbol="GOE3C" terminals="3" uniontype="">gepGOE3C(x0,x1,x2)</function>
+    <function idx="157" symbol="ET3C" terminals="3" uniontype="">gepET3C(x0,x1,x2)</function>
+    <function idx="158" symbol="NET3C" terminals="3" uniontype="">gepNET3C(x0,x1,x2)</function>
+    <function idx="159" symbol="LT3D" terminals="3" uniontype="">gepLT3D(x0,x1,x2)</function>
+    <function idx="160" symbol="GT3D" terminals="3" uniontype="">gepGT3D(x0,x1,x2)</function>
+    <function idx="161" symbol="LOE3D" terminals="3" uniontype="">gepLOE3D(x0,x1,x2)</function>
+    <function idx="162" symbol="GOE3D" terminals="3" uniontype="">gepGOE3D(x0,x1,x2)</function>
+    <function idx="163" symbol="ET3D" terminals="3" uniontype="">gepET3D(x0,x1,x2)</function>
+    <function idx="164" symbol="NET3D" terminals="3" uniontype="">gepNET3D(x0,x1,x2)</function>
+    <function idx="165" symbol="LT3E" terminals="3" uniontype="">gepLT3E(x0,x1,x2)</function>
+    <function idx="166" symbol="GT3E" terminals="3" uniontype="">gepGT3E(x0,x1,x2)</function>
+    <function idx="167" symbol="LOE3E" terminals="3" uniontype="">gepLOE3E(x0,x1,x2)</function>
+    <function idx="168" symbol="GOE3E" terminals="3" uniontype="">gepGOE3E(x0,x1,x2)</function>
+    <function idx="169" symbol="ET3E" terminals="3" uniontype="">gepET3E(x0,x1,x2)</function>
+    <function idx="170" symbol="NET3E" terminals="3" uniontype="">gepNET3E(x0,x1,x2)</function>
+    <function idx="171" symbol="LT3F" terminals="3" uniontype="">gepLT3F(x0,x1,x2)</function>
+    <function idx="172" symbol="GT3F" terminals="3" uniontype="">gepGT3F(x0,x1,x2)</function>
+    <function idx="173" symbol="LOE3F" terminals="3" uniontype="">gepLOE3F(x0,x1,x2)</function>
+    <function idx="174" symbol="GOE3F" terminals="3" uniontype="">gepGOE3F(x0,x1,x2)</function>
+    <function idx="175" symbol="ET3F" terminals="3" uniontype="">gepET3F(x0,x1,x2)</function>
+    <function idx="176" symbol="NET3F" terminals="3" uniontype="">gepNET3F(x0,x1,x2)</function>
+    <function idx="177" symbol="LT3G" terminals="3" uniontype="">gepLT3G(x0,x1,x2)</function>
+    <function idx="178" symbol="GT3G" terminals="3" uniontype="">gepGT3G(x0,x1,x2)</function>
+    <function idx="179" symbol="LOE3G" terminals="3" uniontype="">gepLOE3G(x0,x1,x2)</function>
+    <function idx="180" symbol="GOE3G" terminals="3" uniontype="">gepGOE3G(x0,x1,x2)</function>
+    <function idx="181" symbol="ET3G" terminals="3" uniontype="">gepET3G(x0,x1,x2)</function>
+    <function idx="182" symbol="NET3G" terminals="3" uniontype="">gepNET3G(x0,x1,x2)</function>
+    <function idx="183" symbol="LT3H" terminals="3" uniontype="">gepLT3H(x0,x1,x2)</function>
+    <function idx="184" symbol="GT3H" terminals="3" uniontype="">gepGT3H(x0,x1,x2)</function>
+    <function idx="185" symbol="LOE3H" terminals="3" uniontype="">gepLOE3H(x0,x1,x2)</function>
+    <function idx="186" symbol="GOE3H" terminals="3" uniontype="">gepGOE3H(x0,x1,x2)</function>
+    <function idx="187" symbol="ET3H" terminals="3" uniontype="">gepET3H(x0,x1,x2)</function>
+    <function idx="188" symbol="NET3H" terminals="3" uniontype="">gepNET3H(x0,x1,x2)</function>
+    <function idx="189" symbol="LT3I" terminals="3" uniontype="">gepLT3I(x0,x1,x2)</function>
+    <function idx="190" symbol="GT3I" terminals="3" uniontype="">gepGT3I(x0,x1,x2)</function>
+    <function idx="191" symbol="LOE3I" terminals="3" uniontype="">gepLOE3I(x0,x1,x2)</function>
+    <function idx="192" symbol="GOE3I" terminals="3" uniontype="">gepGOE3I(x0,x1,x2)</function>
+    <function idx="193" symbol="ET3I" terminals="3" uniontype="">gepET3I(x0,x1,x2)</function>
+    <function idx="194" symbol="NET3I" terminals="3" uniontype="">gepNET3I(x0,x1,x2)</function>
+    <function idx="195" symbol="LT3J" terminals="3" uniontype="">gepLT3J(x0,x1,x2)</function>
+    <function idx="196" symbol="GT3J" terminals="3" uniontype="">gepGT3J(x0,x1,x2)</function>
+    <function idx="197" symbol="LOE3J" terminals="3" uniontype="">gepLOE3J(x0,x1,x2)</function>
+    <function idx="198" symbol="GOE3J" terminals="3" uniontype="">gepGOE3J(x0,x1,x2)</function>
+    <function idx="199" symbol="ET3J" terminals="3" uniontype="">gepET3J(x0,x1,x2)</function>
+    <function idx="200" symbol="NET3J" terminals="3" uniontype="">gepNET3J(x0,x1,x2)</function>
+    <function idx="201" symbol="LT3K" terminals="3" uniontype="">gepLT3K(x0,x1,x2)</function>
+    <function idx="202" symbol="GT3K" terminals="3" uniontype="">gepGT3K(x0,x1,x2)</function>
+    <function idx="203" symbol="LOE3K" terminals="3" uniontype="">gepLOE3K(x0,x1,x2)</function>
+    <function idx="204" symbol="GOE3K" terminals="3" uniontype="">gepGOE3K(x0,x1,x2)</function>
+    <function idx="205" symbol="ET3K" terminals="3" uniontype="">gepET3K(x0,x1,x2)</function>
+    <function idx="206" symbol="NET3K" terminals="3" uniontype="">gepNET3K(x0,x1,x2)</function>
+    <function idx="207" symbol="LT3L" terminals="3" uniontype="">gepLT3L(x0,x1,x2)</function>
+    <function idx="208" symbol="GT3L" terminals="3" uniontype="">gepGT3L(x0,x1,x2)</function>
+    <function idx="209" symbol="LOE3L" terminals="3" uniontype="">gepLOE3L(x0,x1,x2)</function>
+    <function idx="210" symbol="GOE3L" terminals="3" uniontype="">gepGOE3L(x0,x1,x2)</function>
+    <function idx="211" symbol="ET3L" terminals="3" uniontype="">gepET3L(x0,x1,x2)</function>
+    <function idx="212" symbol="NET3L" terminals="3" uniontype="">gepNET3L(x0,x1,x2)</function>
+    <function idx="64" symbol="LT4A" terminals="4" uniontype="">gepLT4A(x0,x1,x2,x3)</function>
+    <function idx="65" symbol="GT4A" terminals="4" uniontype="">gepGT4A(x0,x1,x2,x3)</function>
+    <function idx="66" symbol="LOE4A" terminals="4" uniontype="">gepLOE4A(x0,x1,x2,x3)</function>
+    <function idx="67" symbol="GOE4A" terminals="4" uniontype="">gepGOE4A(x0,x1,x2,x3)</function>
+    <function idx="68" symbol="ET4A" terminals="4" uniontype="">gepET4A(x0,x1,x2,x3)</function>
+    <function idx="69" symbol="NET4A" terminals="4" uniontype="">gepNET4A(x0,x1,x2,x3)</function>
+    <function idx="213" symbol="LT4B" terminals="4" uniontype="">gepLT4B(x0,x1,x2,x3)</function>
+    <function idx="214" symbol="GT4B" terminals="4" uniontype="">gepGT4B(x0,x1,x2,x3)</function>
+    <function idx="215" symbol="LOE4B" terminals="4" uniontype="">gepLOE4B(x0,x1,x2,x3)</function>
+    <function idx="216" symbol="GOE4B" terminals="4" uniontype="">gepGOE4B(x0,x1,x2,x3)</function>
+    <function idx="217" symbol="ET4B" terminals="4" uniontype="">gepET4B(x0,x1,x2,x3)</function>
+    <function idx="218" symbol="NET4B" terminals="4" uniontype="">gepNET4B(x0,x1,x2,x3)</function>
+    <function idx="219" symbol="LT4C" terminals="4" uniontype="">gepLT4C(x0,x1,x2,x3)</function>
+    <function idx="220" symbol="GT4C" terminals="4" uniontype="">gepGT4C(x0,x1,x2,x3)</function>
+    <function idx="221" symbol="LOE4C" terminals="4" uniontype="">gepLOE4C(x0,x1,x2,x3)</function>
+    <function idx="222" symbol="GOE4C" terminals="4" uniontype="">gepGOE4C(x0,x1,x2,x3)</function>
+    <function idx="223" symbol="ET4C" terminals="4" uniontype="">gepET4C(x0,x1,x2,x3)</function>
+    <function idx="224" symbol="NET4C" terminals="4" uniontype="">gepNET4C(x0,x1,x2,x3)</function>
+    <function idx="225" symbol="LT4D" terminals="4" uniontype="">gepLT4D(x0,x1,x2,x3)</function>
+    <function idx="226" symbol="GT4D" terminals="4" uniontype="">gepGT4D(x0,x1,x2,x3)</function>
+    <function idx="227" symbol="LOE4D" terminals="4" uniontype="">gepLOE4D(x0,x1,x2,x3)</function>
+    <function idx="228" symbol="GOE4D" terminals="4" uniontype="">gepGOE4D(x0,x1,x2,x3)</function>
+    <function idx="229" symbol="ET4D" terminals="4" uniontype="">gepET4D(x0,x1,x2,x3)</function>
+    <function idx="230" symbol="NET4D" terminals="4" uniontype="">gepNET4D(x0,x1,x2,x3)</function>
+    <function idx="231" symbol="LT4E" terminals="4" uniontype="">gepLT4E(x0,x1,x2,x3)</function>
+    <function idx="232" symbol="GT4E" terminals="4" uniontype="">gepGT4E(x0,x1,x2,x3)</function>
+    <function idx="233" symbol="LOE4E" terminals="4" uniontype="">gepLOE4E(x0,x1,x2,x3)</function>
+    <function idx="234" symbol="GOE4E" terminals="4" uniontype="">gepGOE4E(x0,x1,x2,x3)</function>
+    <function idx="235" symbol="ET4E" terminals="4" uniontype="">gepET4E(x0,x1,x2,x3)</function>
+    <function idx="236" symbol="NET4E" terminals="4" uniontype="">gepNET4E(x0,x1,x2,x3)</function>
+    <function idx="237" symbol="LT4F" terminals="4" uniontype="">gepLT4F(x0,x1,x2,x3)</function>
+    <function idx="238" symbol="GT4F" terminals="4" uniontype="">gepGT4F(x0,x1,x2,x3)</function>
+    <function idx="239" symbol="LOE4F" terminals="4" uniontype="">gepLOE4F(x0,x1,x2,x3)</function>
+    <function idx="240" symbol="GOE4F" terminals="4" uniontype="">gepGOE4F(x0,x1,x2,x3)</function>
+    <function idx="241" symbol="ET4F" terminals="4" uniontype="">gepET4F(x0,x1,x2,x3)</function>
+    <function idx="242" symbol="NET4F" terminals="4" uniontype="">gepNET4F(x0,x1,x2,x3)</function>
+    <function idx="243" symbol="LT4G" terminals="4" uniontype="">gepLT4G(x0,x1,x2,x3)</function>
+    <function idx="244" symbol="GT4G" terminals="4" uniontype="">gepGT4G(x0,x1,x2,x3)</function>
+    <function idx="245" symbol="LOE4G" terminals="4" uniontype="">gepLOE4G(x0,x1,x2,x3)</function>
+    <function idx="246" symbol="GOE4G" terminals="4" uniontype="">gepGOE4G(x0,x1,x2,x3)</function>
+    <function idx="247" symbol="ET4G" terminals="4" uniontype="">gepET4G(x0,x1,x2,x3)</function>
+    <function idx="248" symbol="NET4G" terminals="4" uniontype="">gepNET4G(x0,x1,x2,x3)</function>
+    <function idx="249" symbol="LT4H" terminals="4" uniontype="">gepLT4H(x0,x1,x2,x3)</function>
+    <function idx="250" symbol="GT4H" terminals="4" uniontype="">gepGT4H(x0,x1,x2,x3)</function>
+    <function idx="251" symbol="LOE4H" terminals="4" uniontype="">gepLOE4H(x0,x1,x2,x3)</function>
+    <function idx="252" symbol="GOE4H" terminals="4" uniontype="">gepGOE4H(x0,x1,x2,x3)</function>
+    <function idx="253" symbol="ET4H" terminals="4" uniontype="">gepET4H(x0,x1,x2,x3)</function>
+    <function idx="254" symbol="NET4H" terminals="4" uniontype="">gepNET4H(x0,x1,x2,x3)</function>
+    <function idx="255" symbol="LT4I" terminals="4" uniontype="">gepLT4I(x0,x1,x2,x3)</function>
+    <function idx="256" symbol="GT4I" terminals="4" uniontype="">gepGT4I(x0,x1,x2,x3)</function>
+    <function idx="257" symbol="LOE4I" terminals="4" uniontype="">gepLOE4I(x0,x1,x2,x3)</function>
+    <function idx="258" symbol="GOE4I" terminals="4" uniontype="">gepGOE4I(x0,x1,x2,x3)</function>
+    <function idx="259" symbol="ET4I" terminals="4" uniontype="">gepET4I(x0,x1,x2,x3)</function>
+    <function idx="260" symbol="NET4I" terminals="4" uniontype="">gepNET4I(x0,x1,x2,x3)</function>
+    <function idx="261" symbol="LT4J" terminals="4" uniontype="">gepLT4J(x0,x1,x2,x3)</function>
+    <function idx="262" symbol="GT4J" terminals="4" uniontype="">gepGT4J(x0,x1,x2,x3)</function>
+    <function idx="263" symbol="LOE4J" terminals="4" uniontype="">gepLOE4J(x0,x1,x2,x3)</function>
+    <function idx="264" symbol="GOE4J" terminals="4" uniontype="">gepGOE4J(x0,x1,x2,x3)</function>
+    <function idx="265" symbol="ET4J" terminals="4" uniontype="">gepET4J(x0,x1,x2,x3)</function>
+    <function idx="266" symbol="NET4J" terminals="4" uniontype="">gepNET4J(x0,x1,x2,x3)</function>
+    <function idx="267" symbol="LT4K" terminals="4" uniontype="">gepLT4K(x0,x1,x2,x3)</function>
+    <function idx="268" symbol="GT4K" terminals="4" uniontype="">gepGT4K(x0,x1,x2,x3)</function>
+    <function idx="269" symbol="LOE4K" terminals="4" uniontype="">gepLOE4K(x0,x1,x2,x3)</function>
+    <function idx="270" symbol="GOE4K" terminals="4" uniontype="">gepGOE4K(x0,x1,x2,x3)</function>
+    <function idx="271" symbol="ET4K" terminals="4" uniontype="">gepET4K(x0,x1,x2,x3)</function>
+    <function idx="272" symbol="NET4K" terminals="4" uniontype="">gepNET4K(x0,x1,x2,x3)</function>
+    <function idx="273" symbol="LT4L" terminals="4" uniontype="">gepLT4L(x0,x1,x2,x3)</function>
+    <function idx="274" symbol="GT4L" terminals="4" uniontype="">gepGT4L(x0,x1,x2,x3)</function>
+    <function idx="275" symbol="LOE4L" terminals="4" uniontype="">gepLOE4L(x0,x1,x2,x3)</function>
+    <function idx="276" symbol="GOE4L" terminals="4" uniontype="">gepGOE4L(x0,x1,x2,x3)</function>
+    <function idx="277" symbol="ET4L" terminals="4" uniontype="">gepET4L(x0,x1,x2,x3)</function>
+    <function idx="278" symbol="NET4L" terminals="4" uniontype="">gepNET4L(x0,x1,x2,x3)</function>
+  </functions>
+  <!-- Code Structure -->
+  <order>
+    <item name="ModelComments" />
+    <item name="Open" />
+    <item name="HelpersDeclaration" />
+    <item name="Subheader" />
+    <item name="Prototypes" />
+    <item name="Header" />
+    <item name="RandomConstants" />
+    <item name="Constants" />
+    <item name="CallTransform" />
+    <item name="DataTransformationCall" />
+    <item name="HelpersAssignment" />
+    <item name="TemporaryVariable" />
+    <item name="Body" />
+    <item name="DataReverseTransformationCall" />
+    <item name="Footer" />
+    <item name="Helpers" />
+    <item name="LinkingHelpers" />
+    <item name="DDF" />
+    <item name="UDF" />
+    <item name="TransformHelper" />
+    <item name="DataTransformationHelper" />
+    <item name="DataReverseTransformationHelper" />
+    <item name="Close" />
+  </order>
+  <!-- Opening and Closing Statements -->
+  <open>
+    package gepModel{CRLF}{CRLF}
+  </open>
+  <close> </close>
+  <!-- The default header is applied to all non specified cases. {SUPPRESS_CRLF}-->
+  <headers>
+    <header type="default" replace="no">import ({CRLF}{TAB}"math"{CRLF}){CRLF}{CRLF}func gepModel(d []float64) float64 {</header>
+    <header type="CL_ProbabilityOne" replace="yes">import ({CRLF}{TAB}"math"{CRLF}){CRLF}{CRLF}func gepModel(d []float64) float64 {{CRLF}{TAB}const MODEL_AVERAGE = {MODEL_AVERAGE}{CRLF}{TAB}const MODEL_STDEV = {MODEL_STDEV}{CRLF}{TAB}const ROUNDING_THRESHOLD = ({set_ff#Threshold} - MODEL_AVERAGE) / MODEL_STDEV{CRLF}</header>
+    <header type="CL_MostLikelyClass" replace="yes">import ({CRLF}{TAB}"math"{CRLF}){CRLF}{CRLF}func gepModel(d []float64) int {{CRLF}{TAB}const ROUNDING_THRESHOLD = {set_ff#Threshold}{CRLF}</header>
+    <header type="LR_MostLikelyClass" replace="yes">import ({CRLF}{TAB}"math"{CRLF}){CRLF}{CRLF}func gepModel(d []float64) int {{CRLF}{TAB}const ROUNDING_THRESHOLD = {set_ff#Threshold}{CRLF}</header>
+    <header type="nominal" replace="no">import ({CRLF}{TAB}"math"{CRLF}{TAB}"strconv"{CRLF}){CRLF}{CRLF}func gepModel(d_string []string) float64 {</header>
+    <header type="CL_nominal_RawOutput" replace="yes">import ({CRLF}{TAB}"math"{CRLF}{TAB}"strconv"{CRLF}){CRLF}{CRLF}func gepModel(d_string []string) float64 {</header>
+    <header type="CL_nominal_ProbabilityOne" replace="yes">import ({CRLF}{TAB}"math"{CRLF}{TAB}"strconv"{CRLF}){CRLF}{CRLF}func gepModel(d_string []string) float64 {{CRLF}{TAB}const MODEL_AVERAGE = {MODEL_AVERAGE}{CRLF}{TAB}const MODEL_STDEV = {MODEL_STDEV}{CRLF}{TAB}const ROUNDING_THRESHOLD = ({set_ff#Threshold} - MODEL_AVERAGE) / MODEL_STDEV{CRLF}</header>
+    <header type="CL_nominal_MostLikelyClass" replace="yes">import ({CRLF}{TAB}"math"{CRLF}{TAB}"strconv"{CRLF}){CRLF}{CRLF}func gepModel(d_string []string) int {{CRLF}{TAB}const ROUNDING_THRESHOLD = {set_ff#Threshold}{CRLF}</header>
+    <header type="LR_nominal_RawOutput" replace="yes">import ({CRLF}{TAB}"math"{CRLF}{TAB}"strconv"{CRLF}){CRLF}{CRLF}func gepModel(d_string []string) float64 {</header>
+    <header type="LR_nominal_ProbabilityOne" replace="yes">import ({CRLF}{TAB}"math"{CRLF}{TAB}"strconv"{CRLF}){CRLF}{CRLF}func gepModel(d_string []string) float64 {</header>
+    <header type="LR_nominal_MostLikelyClass" replace="yes">import ({CRLF}{TAB}"math"{CRLF}{TAB}"strconv"{CRLF}){CRLF}{CRLF}func gepModel(d_string []string) int {{CRLF}{TAB}const ROUNDING_THRESHOLD = {set_ff#Threshold}{CRLF}</header>
+  </headers>
+  <subheaders>
+    <subheader type="default" replace="no">
+    </subheader>
+    <subheader type="CL_ProbabilityOne" replace="no">
+    </subheader>
+    <subheader type="CL_MostLikelyClass" replace="no">
+    </subheader>
+    <subheader type="LR_MostLikelyClass" replace="no">
+    </subheader>
+    <subheader type="nominal" replace="no">
+    </subheader>
+    <subheader type="CL_nominal_RawOutput" replace="no">
+    </subheader>
+    <subheader type="CL_nominal_ProbabilityOne" replace="no">
+    </subheader>
+    <subheader type="CL_nominal_MostLikelyClass" replace="no">
+    </subheader>
+    <subheader type="LR_nominal_RawOutput" replace="no">
+    </subheader>
+    <subheader type="LR_nominal_MostLikelyClass" replace="no">
+    </subheader>
+  </subheaders>
+  <randomconstants>
+    <randomconst type="default" replace="no">{TAB}const {labelname} = {labelindex}{CRLF}</randomconst>
+  </randomconstants>
+  <categories>
+    <functioncall call="{TAB}d := make([]float64, {VARIABLE_COUNT}){CRLF}{TAB}TransformCategoricalInputs(d_string, d){CRLF}" />
+    <transformfunction header="{CRLF}func atof(a string) float64 {{CRLF}{TAB}if o, err := strconv.ParseFloat(a, 64); err != nil {{CRLF}{TAB}{TAB}return 0.0{CRLF}{TAB}} else {{CRLF}{TAB}{TAB}return o{CRLF}{TAB}}{CRLF}}{CRLF}{CRLF}func TransformCategoricalInputs(input []string, output []float64) {{CRLF}{CRLF}" footer="{CRLF}}" prototype="" />
+    <switch special="ADD_1_TAB_TO_METHOD_BODY" top="switch input[{index}] {{CRLF}" bottom="}{CRLF}{CRLF}" categoricaldefault="default :{CRLF}{TAB}output[{index}] = 0.0{CRLF}" numericaldefault="default :{CRLF}{TAB}output[{index}] = atof(input[{index}]){CRLF}" />
+    <case format="case &quot;{nominal}&quot;:{CRLF}{TAB}output[{index}] = {numerical}{CRLF}" />
+    <equality format="{CRLF}output[{index}] = atof(input[{index}]){CRLF}{CRLF}" />
+  </categories>
+  <transformations>
+    <transformation name="standardization" call="{TAB}Standardize(d){CRLF}" itemformat="{TAB}const AVERAGE_{index} = {AVERAGE}{CRLF}{TAB}const STDEV_{index} = {STDEV}{CRLF}{TAB}input[{index}] = (input[{index}] - AVERAGE_{index}) / STDEV_{index}{CRLF}{CRLF}" prototype="" declarations="">{CRLF}void Standardize(input []float64) {{CRLF}{BODY}{CRLF}}{CRLF}</transformation>
+    <transformation name="normalization" call="{TAB}Normalize_01(d){CRLF}" itemformat="{TAB}const MIN_{index} = {MIN}{CRLF}{TAB}const MAX_{index} = {MAX}{CRLF}{TAB}input[{index}] = (input[{index}] - MIN_{index}) / (MAX_{index} - MIN_{index}){CRLF}{CRLF}" prototype="" declarations="">{CRLF}void Normalize_01(input []float64) {{CRLF}{BODY}{CRLF}}{CRLF}</transformation>
+    <transformation name="minMaxNormalization" call="{TAB}MinMaxNormalize(d){CRLF}" itemformat="{TAB}const MIN_{index} = {MIN}{CRLF}{TAB}const MAX_{index} = {MAX}{CRLF}{TAB}input[{index}] = (input[{index}] - MIN_{index}) / (MAX_{index} - MIN_{index}) * (NEW_MAX - NEW_MIN) + NEW_MIN{CRLF}{CRLF}" prototype="" declarations="">{CRLF}void MinMaxNormalize(input []float64) {{CRLF}{TAB}const NEW_MIN = {NEW_MIN}{CRLF}{TAB}const NEW_MAX = {NEW_MAX}{CRLF}{CRLF}{BODY}{CRLF}}{CRLF}</transformation>
+  </transformations>
+  <reversetransformations>
+    <transformation name="standardization" call="{TAB}{tempvarname} = Reverse_Standardization({tempvarname}){CRLF}" itemformat="{TAB}{TAB}// Model standardization{CRLF}{TAB}const MODEL_AVERAGE = {MODEL_AVERAGE}{CRLF}{TAB}const MODEL_STDEV = {MODEL_STDEV}{CRLF}{TAB}modelOutput = (modelOutput - MODEL_AVERAGE) / MODEL_STDEV{CRLF}{CRLF}{TAB}{TAB}// Reverse standardization{TAB}{TAB}{CRLF}{TAB}const TARGET_AVERAGE = {TARGET_AVERAGE}{CRLF}{TAB}const TARGET_STDEV = {TARGET_STDEV}{CRLF}{CRLF}{TAB}return modelOutput * TARGET_STDEV + TARGET_AVERAGE" prototype="">{CRLF}func Reverse_Standardization(modelOutput float64) float64 {{CRLF}{BODY}{CRLF}}{CRLF}</transformation>
+    <transformation name="normalization" call="{TAB}{tempvarname} = Reverse_Normalization_01({tempvarname}){CRLF}" itemformat="{TAB}{TAB}// Model normalization{CRLF}{TAB}const MODEL_MIN = {MODEL_MIN}{CRLF}{TAB}const MODEL_MAX = {MODEL_MAX}{CRLF}{TAB}modelOutput = (modelOutput - MODEL_MIN)/(MODEL_MAX - MODEL_MIN){CRLF}{CRLF}{TAB}{TAB}// Reverse normalization{CRLF}{TAB}const TARGET_MIN = {TARGET_MIN}{CRLF}{TAB}const TARGET_MAX = {TARGET_MAX}{CRLF}{CRLF}{TAB}return modelOutput * (TARGET_MAX - TARGET_MIN) + TARGET_MIN" prototype="">{CRLF}func Reverse_Normalization_01(modelOutput float64) float64 {{CRLF}{BODY}{CRLF}}{CRLF}</transformation>
+    <transformation name="minMaxNormalization" call="{TAB}{tempvarname} = Reverse_MinMaxNormalization({tempvarname}){CRLF}" itemformat="{TAB}const TARGET_MIN = {TARGET_MIN}{CRLF}{TAB}const TARGET_MAX = {TARGET_MAX}{CRLF}{CRLF}{TAB}{TAB}// Model normalization{CRLF}{TAB}const MODEL_MIN = {MODEL_MIN}{CRLF}{TAB}const MODEL_MAX = {MODEL_MAX}{CRLF}{TAB}modelOutput = ((modelOutput - MODEL_MIN)/(MODEL_MAX - MODEL_MIN)) * (NEW_MAX - NEW_MIN) + NEW_MIN{CRLF}{CRLF}{TAB}{TAB}// Reverse normalization{CRLF}{TAB}return ((modelOutput - NEW_MIN) / (NEW_MAX - NEW_MIN)) * (TARGET_MAX - TARGET_MIN) + TARGET_MIN" prototype="">{CRLF}func Reverse_MinMaxNormalization(modelOutput float64) float64 {{CRLF}{TAB}const NEW_MIN = {NEW_MIN}{CRLF}{TAB}const NEW_MAX = {NEW_MAX}{CRLF}{CRLF}{BODY}{CRLF}}{CRLF}</transformation>
+  </reversetransformations>
+  <!-- Label constants -->
+  <constants>
+    <constant type="default" replace="no" labelindex="0">{TAB}const {labelname} = {labelindex}{CRLF}</constant>
+  </constants>
+  <!-- The default temporary variable name is applied to all non specified cases. -->
+  <tempvars>
+    <tempvar type="default" typename="float64" varname="dblTemp">dblTemp := 0.0</tempvar>
+  </tempvars>
+  <endline>{CRLF}</endline>
+  <!-- Number of TABs to add to each line in the code block -->
+  <indent>1</indent>
+  <!-- parenstype can be either 0->() or 1->[]. Defines the parentheses used in arrays-->
+  <parenstype>1</parenstype>
+  <footers>
+    <footer type="default" replace="no">return {tempvarname}{CRLF}}</footer>
+    <footer type="CL_RawOutput" replace="no">return {tempvarname}{CRLF}}</footer>
+    <footer type="CL_ProbabilityOne" replace="no">// Model standardization and shift{CRLF}{TAB}{tempvarname} = ({tempvarname} - MODEL_AVERAGE) / MODEL_STDEV - ROUNDING_THRESHOLD{CRLF}{CRLF}{TAB}// Probability[1] evaluation{CRLF}{TAB}{tempvarname} = 1.0 / (1.0 + math.Exp(-{tempvarname})){CRLF}{CRLF}{TAB}return {tempvarname}{CRLF}}</footer>
+    <footer type="CL_MostLikelyClass" replace="no">if {tempvarname} &gt;= ROUNDING_THRESHOLD {{CRLF}{TAB}{TAB}return 1{CRLF}{TAB}}{CRLF}{TAB}return 0{CRLF}}</footer>
+    <footer type="LR_RawOutput" replace="no">return {tempvarname}{CRLF}}</footer>
+    <footer type="LR_ProbabilityOne" replace="no">const SLOPE = {SLOPE}{CRLF}{TAB}const INTERCEPT = {INTERCEPT}{CRLF}{CRLF}{TAB}probabilityOne := 1.0 / (1.0 + math.Exp(-(SLOPE * {tempvarname} + INTERCEPT))){CRLF}{TAB}return probabilityOne{CRLF}}</footer>
+    <footer type="LR_MostLikelyClass" replace="no">if {tempvarname} &gt;= ROUNDING_THRESHOLD {{CRLF}{TAB}{TAB}return 1{CRLF}{TAB}}{CRLF}{TAB}return 0{CRLF}}</footer>
+  </footers>
+  <helpers count="225" declaration="" assignment="">
+    <helper replaces="3Rt" prototype="">func gep3Rt(x float64) float64 {{CRLF}{TAB}if x &lt; 0.0 {{CRLF}{TAB}{TAB}return -math.Pow(-x, (1.0 / 3.0)){CRLF}{TAB}}{CRLF}{TAB}return math.Pow(x, (1.0 / 3.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="5Rt" prototype="">func gep5Rt(x float64) float64 {{CRLF}{TAB}if x &lt; 0.0 {{CRLF}{TAB}{TAB}return -math.Pow(-x, (1.0 / 5.0)){CRLF}{TAB}}{CRLF}{TAB}return math.Pow(x, (1.0 / 5.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Log2" prototype="">func gepLog2(x, y float64) float64 {{CRLF}{TAB}if y == 0.0 {{CRLF}{TAB}{TAB}return 0.0{CRLF}{TAB}}{CRLF}{TAB}return math.Log(x) / math.Log(y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Mod" prototype="">func gepMod(x, y float64) float64 {{CRLF}{TAB}// The built-in function is incorrect for cases such as -1.0 and 0.2.{CRLF}{TAB}return ((x / y) - float64(int(x/y))) * y{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Logi" prototype="">func gepLogi(x float64) float64 {{CRLF}{TAB}if math.Abs(x) &gt; 709.0 {{CRLF}{TAB}{TAB}return 1.0 / (1.0 + math.Exp(math.Abs(x)/x*709.0)){CRLF}{TAB}}{CRLF}{TAB}return 1.0 / (1.0 + math.Exp(-x)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Logi2" prototype="">func gepLogi2(x, y float64) float64 {{CRLF}{TAB}if math.Abs(x+y) &gt; 709.0 {{CRLF}{TAB}{TAB}return 1.0 / (1.0 + math.Exp(math.Abs(x+y)/(x+y)*709.0)){CRLF}{TAB}}{CRLF}{TAB}return 1.0 / (1.0 + math.Exp(-(x + y))){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Logi3" prototype="">func gepLogi3(x, y, z float64) float64 {{CRLF}{TAB}if math.Abs(x+y+z) &gt; 709.0 {{CRLF}{TAB}{TAB}return 1.0 / (1.0 + math.Exp(math.Abs(x+y+z)/(x+y+z)*709.0)){CRLF}{TAB}}{CRLF}{TAB}return 1.0 / (1.0 + math.Exp(-(x + y + z))){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Logi4" prototype="">func gepLogi4(a, b, c, d float64) float64 {{CRLF}{TAB}if math.Abs(a+b+c+d) &gt; 709.0 {{CRLF}{TAB}{TAB}return 1.0 / (1.0 + math.Exp(math.Abs(a+b+c+d)/(a+b+c+d)*709.0)){CRLF}{TAB}}{CRLF}{TAB}return 1.0 / (1.0 + math.Exp(-(a + b + c + d))){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Gau" prototype="">func gepGau(x float64) float64 {{CRLF}{TAB}return math.Exp(-math.Pow(x, 2.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Gau2" prototype="">func gepGau2(x, y float64) float64 {{CRLF}{TAB}return math.Exp(-math.Pow((x + y), 2.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Gau3" prototype="">func gepGau3(x, y, z float64) float64 {{CRLF}{TAB}return math.Exp(-math.Pow((x + y + z), 2.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Gau4" prototype="">func gepGau4(a, b, c, d float64) float64 {{CRLF}{TAB}return math.Exp(-math.Pow((a + b + c + d), 2.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Acsc" prototype="">func gepAcsc(x float64) float64 {{CRLF}{TAB}varSign := 0.0{CRLF}{TAB}if x &lt; 0.0 {{CRLF}{TAB}{TAB}varSign = -1.0{CRLF}{TAB}} else {{CRLF}{TAB}{TAB}if x &gt; 0.0 {{CRLF}{TAB}{TAB}{TAB}varSign = 1.0{CRLF}{TAB}{TAB}} else {{CRLF}{TAB}{TAB}{TAB}varSign = 0.0{CRLF}{TAB}{TAB}}{CRLF}{TAB}}{CRLF}{TAB}return math.Atan(varSign / math.Sqrt(x*x-1.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Asec" prototype="">func gepAsec(x float64) float64 {{CRLF}{TAB}varSign := 0.0{CRLF}{TAB}if x &lt; 0.0 {{CRLF}{TAB}{TAB}varSign = -1.0{CRLF}{TAB}} else {{CRLF}{TAB}{TAB}if x &gt; 0.0 {{CRLF}{TAB}{TAB}{TAB}varSign = 1.0{CRLF}{TAB}{TAB}} else {{CRLF}{TAB}{TAB}{TAB}varSign = 0.0{CRLF}{TAB}{TAB}}{CRLF}{TAB}}{CRLF}{CRLF}{TAB}if math.Abs(x) == 1.0 {{CRLF}{TAB}{TAB}if x == -1.0 {{CRLF}{TAB}{TAB}{TAB}return 4.0 * math.Atan(1.0){CRLF}{TAB}{TAB}}{CRLF}{TAB}{TAB}return 0.0{CRLF}{TAB}}{CRLF}{TAB}return 2.0*math.Atan(1.0) - math.Atan(varSign/math.Sqrt(x*x-1.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Acot" prototype="">func gepAcot(x float64) float64 {{CRLF}{TAB}return math.Atan(1.0 / x){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Asinh" prototype="">func gepAsinh(x float64) float64 {{CRLF}{TAB}return math.Log(x + math.Sqrt(x*x+1.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Acosh" prototype="">func gepAcosh(x float64) float64 {{CRLF}{TAB}return math.Log(x + math.Sqrt(x*x-1.0)){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Atanh" prototype="">func gepAtanh(x float64) float64 {{CRLF}{TAB}return math.Log((1.0+x)/(1.0-x)) / 2.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Acsch" prototype="">func gepAcsch(x float64) float64 {{CRLF}{TAB}varSign := 0.0{CRLF}{TAB}if x &lt; 0.0 {{CRLF}{TAB}{TAB}varSign = -1.0{CRLF}{TAB}} else {{CRLF}{TAB}{TAB}if x &gt; 0.0 {{CRLF}{TAB}{TAB}{TAB}varSign = 1.0{CRLF}{TAB}{TAB}} else {{CRLF}{TAB}{TAB}{TAB}varSign = 0.0{CRLF}{TAB}{TAB}}{CRLF}{TAB}}{CRLF}{TAB}return math.Log((varSign*math.Sqrt(x*x+1.0) + 1.0) / x){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Asech" prototype="">func gepAsech(x float64) float64 {{CRLF}{TAB}return math.Log((math.Sqrt(-x*x+1.0) + 1.0) / x){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Acoth" prototype="">func gepAcoth(x float64) float64 {{CRLF}{TAB}return math.Log((x+1.0)/(x-1.0)) / 2.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Min2" prototype="">func gepMin2(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return x{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Min3" prototype="">func gepMin3(x, y, z float64) float64 {{CRLF}{TAB}varTemp := x{CRLF}{TAB}if varTemp &gt; y {{CRLF}{TAB}{TAB}varTemp = y{CRLF}{TAB}}{CRLF}{TAB}if varTemp &gt; z {{CRLF}{TAB}{TAB}varTemp = z{CRLF}{TAB}}{CRLF}{TAB}return varTemp{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Min4" prototype="">func gepMin4(a, b, c, d float64) float64 {{CRLF}{TAB}varTemp := a{CRLF}{TAB}if varTemp &gt; b {{CRLF}{TAB}{TAB}varTemp = b{CRLF}{TAB}}{CRLF}{TAB}if varTemp &gt; c {{CRLF}{TAB}{TAB}varTemp = c{CRLF}{TAB}}{CRLF}{TAB}if varTemp &gt; d {{CRLF}{TAB}{TAB}varTemp = d{CRLF}{TAB}}{CRLF}{TAB}return varTemp{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Max2" prototype="">func gepMax2(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return x{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Max3" prototype="">func gepMax3(x, y, z float64) float64 {{CRLF}{TAB}varTemp := x{CRLF}{TAB}if varTemp &lt; y {{CRLF}{TAB}{TAB}varTemp = y{CRLF}{TAB}}{CRLF}{TAB}if varTemp &lt; z {{CRLF}{TAB}{TAB}varTemp = z{CRLF}{TAB}}{CRLF}{TAB}return varTemp{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="Max4" prototype="">func gepMax4(a, b, c, d float64) float64 {{CRLF}{TAB}varTemp := a{CRLF}{TAB}if varTemp &lt; b {{CRLF}{TAB}{TAB}varTemp = b{CRLF}{TAB}}{CRLF}{TAB}if varTemp &lt; c {{CRLF}{TAB}{TAB}varTemp = c{CRLF}{TAB}}{CRLF}{TAB}if varTemp &lt; d {{CRLF}{TAB}{TAB}varTemp = d{CRLF}{TAB}}{CRLF}{TAB}return varTemp{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="OR1" prototype="">func gepOR1(x, y float64) float64 {{CRLF}{TAB}if (x &lt; 0.0) || (y &lt; 0.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="OR2" prototype="">func gepOR2(x, y float64) float64 {{CRLF}{TAB}if (x &gt;= 0.0) || (y &gt;= 0.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="OR3" prototype="">func gepOR3(x, y float64) float64 {{CRLF}{TAB}if (x &lt;= 0.0) || (y &lt;= 0.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="OR4" prototype="">func gepOR4(x, y float64) float64 {{CRLF}{TAB}if (x &lt; 1.0) || (y &lt; 1.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="OR5" prototype="">func gepOR5(x, y float64) float64 {{CRLF}{TAB}if (x &gt;= 1.0) || (y &gt;= 1.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="OR6" prototype="">func gepOR6(x, y float64) float64 {{CRLF}{TAB}if (x &lt;= 1.0) || (y &lt;= 1.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="AND1" prototype="">func gepAND1(x, y float64) float64 {{CRLF}{TAB}if (x &lt; 0.0) &amp;&amp; (y &lt; 0.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="AND2" prototype="">func gepAND2(x, y float64) float64 {{CRLF}{TAB}if (x &gt;= 0.0) &amp;&amp; (y &gt;= 0.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="AND3" prototype="">func gepAND3(x, y float64) float64 {{CRLF}{TAB}if (x &lt;= 0.0) &amp;&amp; (y &lt;= 0.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="AND4" prototype="">func gepAND4(x, y float64) float64 {{CRLF}{TAB}if (x &lt; 1.0) &amp;&amp; (y &lt; 1.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="AND5" prototype="">func gepAND5(x, y float64) float64 {{CRLF}{TAB}if (x &gt;= 1.0) &amp;&amp; (y &gt;= 1.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="AND6" prototype="">func gepAND6(x, y float64) float64 {{CRLF}{TAB}if (x &lt;= 1.0) &amp;&amp; (y &lt;= 1.0) {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT2A" prototype="">func gepLT2A(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return x{CRLF}{TAB}}{CRLF}{TAB}return y{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT2A" prototype="">func gepGT2A(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return x{CRLF}{TAB}}{CRLF}{TAB}return y{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE2A" prototype="">func gepLOE2A(x, y float64) float64 {{CRLF}{TAB}if x &lt;= y {{CRLF}{TAB}{TAB}return x{CRLF}{TAB}}{CRLF}{TAB}return y{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE2A" prototype="">func gepGOE2A(x, y float64) float64 {{CRLF}{TAB}if x &gt;= y {{CRLF}{TAB}{TAB}return x{CRLF}{TAB}}{CRLF}{TAB}return y{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET2A" prototype="">func gepET2A(x, y float64) float64 {{CRLF}{TAB}if x == y {{CRLF}{TAB}{TAB}return x{CRLF}{TAB}}{CRLF}{TAB}return y{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET2A" prototype="">func gepNET2A(x, y float64) float64 {{CRLF}{TAB}if x != y {{CRLF}{TAB}{TAB}return x{CRLF}{TAB}}{CRLF}{TAB}return y{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT2B" prototype="">func gepLT2B(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT2B" prototype="">func gepGT2B(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE2B" prototype="">func gepLOE2B(x, y float64) float64 {{CRLF}{TAB}if x &lt;= y {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE2B" prototype="">func gepGOE2B(x, y float64) float64 {{CRLF}{TAB}if x &gt;= y {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET2B" prototype="">func gepET2B(x, y float64) float64 {{CRLF}{TAB}if x == y {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET2B" prototype="">func gepNET2B(x, y float64) float64 {{CRLF}{TAB}if x != y {{CRLF}{TAB}{TAB}return 1.0{CRLF}{TAB}}{CRLF}{TAB}return 0.0{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT2C" prototype="">func gepLT2C(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT2C" prototype="">func gepGT2C(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE2C" prototype="">func gepLOE2C(x, y float64) float64 {{CRLF}{TAB}if x &lt;= y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE2C" prototype="">func gepGOE2C(x, y float64) float64 {{CRLF}{TAB}if x &gt;= y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET2C" prototype="">func gepET2C(x, y float64) float64 {{CRLF}{TAB}if x == y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET2C" prototype="">func gepNET2C(x, y float64) float64 {{CRLF}{TAB}if x != y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT2D" prototype="">func gepLT2D(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT2D" prototype="">func gepGT2D(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE2D" prototype="">func gepLOE2D(x, y float64) float64 {{CRLF}{TAB}if x &lt;= y {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE2D" prototype="">func gepGOE2D(x, y float64) float64 {{CRLF}{TAB}if x &gt;= y {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET2D" prototype="">func gepET2D(x, y float64) float64 {{CRLF}{TAB}if x == y {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET2D" prototype="">func gepNET2D(x, y float64) float64 {{CRLF}{TAB}if x != y {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT2E" prototype="">func gepLT2E(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT2E" prototype="">func gepGT2E(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE2E" prototype="">func gepLOE2E(x, y float64) float64 {{CRLF}{TAB}if x &lt;= y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE2E" prototype="">func gepGOE2E(x, y float64) float64 {{CRLF}{TAB}if x &gt;= y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET2E" prototype="">func gepET2E(x, y float64) float64 {{CRLF}{TAB}if x == y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET2E" prototype="">func gepNET2E(x, y float64) float64 {{CRLF}{TAB}if x != y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT2F" prototype="">func gepLT2F(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT2F" prototype="">func gepGT2F(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE2F" prototype="">func gepLOE2F(x, y float64) float64 {{CRLF}{TAB}if x &lt;= y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE2F" prototype="">func gepGOE2F(x, y float64) float64 {{CRLF}{TAB}if x &gt;= y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET2F" prototype="">func gepET2F(x, y float64) float64 {{CRLF}{TAB}if x == y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET2F" prototype="">func gepNET2F(x, y float64) float64 {{CRLF}{TAB}if x != y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT2G" prototype="">func gepLT2G(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT2G" prototype="">func gepGT2G(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE2G" prototype="">func gepLOE2G(x, y float64) float64 {{CRLF}{TAB}if x &lt;= y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE2G" prototype="">func gepGOE2G(x, y float64) float64 {{CRLF}{TAB}if x &gt;= y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET2G" prototype="">func gepET2G(x, y float64) float64 {{CRLF}{TAB}if x == y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET2G" prototype="">func gepNET2G(x, y float64) float64 {{CRLF}{TAB}if x != y {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3A" prototype="">func gepLT3A(x, y, z float64) float64 {{CRLF}{TAB}if x &lt; 0.0 {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3A" prototype="">func gepGT3A(x, y, z float64) float64 {{CRLF}{TAB}if x &gt; 0.0 {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3A" prototype="">func gepLOE3A(x, y, z float64) float64 {{CRLF}{TAB}if x &lt;= 0.0 {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3A" prototype="">func gepGOE3A(x, y, z float64) float64 {{CRLF}{TAB}if x &gt;= 0.0 {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3A" prototype="">func gepET3A(x, y, z float64) float64 {{CRLF}{TAB}if x == 0.0 {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3A" prototype="">func gepNET3A(x, y, z float64) float64 {{CRLF}{TAB}if x != 0.0 {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3B" prototype="">func gepLT3B(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3B" prototype="">func gepGT3B(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3B" prototype="">func gepLOE3B(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3B" prototype="">func gepGOE3B(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3B" prototype="">func gepET3B(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3B" prototype="">func gepNET3B(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return z{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3C" prototype="">func gepLT3C(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3C" prototype="">func gepGT3C(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3C" prototype="">func gepLOE3C(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3C" prototype="">func gepGOE3C(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3C" prototype="">func gepET3C(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3C" prototype="">func gepNET3C(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3D" prototype="">func gepLT3D(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3D" prototype="">func gepGT3D(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3D" prototype="">func gepLOE3D(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3D" prototype="">func gepGOE3D(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3D" prototype="">func gepET3D(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3D" prototype="">func gepNET3D(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3E" prototype="">func gepLT3E(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3E" prototype="">func gepGT3E(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3E" prototype="">func gepLOE3E(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3E" prototype="">func gepGOE3E(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3E" prototype="">func gepET3E(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3E" prototype="">func gepNET3E(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3F" prototype="">func gepLT3F(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3F" prototype="">func gepGT3F(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3F" prototype="">func gepLOE3F(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3F" prototype="">func gepGOE3F(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3F" prototype="">func gepET3F(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3F" prototype="">func gepNET3F(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x + y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3G" prototype="">func gepLT3G(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3G" prototype="">func gepGT3G(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3G" prototype="">func gepLOE3G(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3G" prototype="">func gepGOE3G(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3G" prototype="">func gepET3G(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3G" prototype="">func gepNET3G(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x + z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3H" prototype="">func gepLT3H(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3H" prototype="">func gepGT3H(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3H" prototype="">func gepLOE3H(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3H" prototype="">func gepGOE3H(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3H" prototype="">func gepET3H(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3H" prototype="">func gepNET3H(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x - z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3I" prototype="">func gepLT3I(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3I" prototype="">func gepGT3I(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3I" prototype="">func gepLOE3I(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3I" prototype="">func gepGOE3I(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3I" prototype="">func gepET3I(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3I" prototype="">func gepNET3I(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3J" prototype="">func gepLT3J(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3J" prototype="">func gepGT3J(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3J" prototype="">func gepLOE3J(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3J" prototype="">func gepGOE3J(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3J" prototype="">func gepET3J(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3J" prototype="">func gepNET3J(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x * y){CRLF}{TAB}}{CRLF}{TAB}return (x / z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3K" prototype="">func gepLT3K(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3K" prototype="">func gepGT3K(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3K" prototype="">func gepLOE3K(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3K" prototype="">func gepGOE3K(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3K" prototype="">func gepET3K(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3K" prototype="">func gepNET3K(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT3L" prototype="">func gepLT3L(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt; z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT3L" prototype="">func gepGT3L(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt; z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE3L" prototype="">func gepLOE3L(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &lt;= z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE3L" prototype="">func gepGOE3L(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) &gt;= z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET3L" prototype="">func gepET3L(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) == z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET3L" prototype="">func gepNET3L(x, y, z float64) float64 {{CRLF}{TAB}if (x + y) != z {{CRLF}{TAB}{TAB}return (x + y + z){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(x * y * z){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4A" prototype="">func gepLT4A(a, b, c, d float64) float64 {{CRLF}{TAB}if a &lt; b {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4A" prototype="">func gepGT4A(a, b, c, d float64) float64 {{CRLF}{TAB}if a &gt; b {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4A" prototype="">func gepLOE4A(a, b, c, d float64) float64 {{CRLF}{TAB}if a &lt;= b {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4A" prototype="">func gepGOE4A(a, b, c, d float64) float64 {{CRLF}{TAB}if a &gt;= b {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4A" prototype="">func gepET4A(a, b, c, d float64) float64 {{CRLF}{TAB}if a == b {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4A" prototype="">func gepNET4A(a, b, c, d float64) float64 {{CRLF}{TAB}if a != b {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4B" prototype="">func gepLT4B(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4B" prototype="">func gepGT4B(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4B" prototype="">func gepLOE4B(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4B" prototype="">func gepGOE4B(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4B" prototype="">func gepET4B(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4B" prototype="">func gepNET4B(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return c{CRLF}{TAB}}{CRLF}{TAB}return d{CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4C" prototype="">func gepLT4C(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4C" prototype="">func gepGT4C(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4C" prototype="">func gepLOE4C(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4C" prototype="">func gepGOE4C(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4C" prototype="">func gepET4C(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4C" prototype="">func gepNET4C(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4D" prototype="">func gepLT4D(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4D" prototype="">func gepGT4D(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4D" prototype="">func gepLOE4D(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4D" prototype="">func gepGOE4D(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4D" prototype="">func gepET4D(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4D" prototype="">func gepNET4D(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4E" prototype="">func gepLT4E(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4E" prototype="">func gepGT4E(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4E" prototype="">func gepLOE4E(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4E" prototype="">func gepGOE4E(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4E" prototype="">func gepET4E(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4E" prototype="">func gepNET4E(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4F" prototype="">func gepLT4F(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4F" prototype="">func gepGT4F(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4F" prototype="">func gepLOE4F(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4F" prototype="">func gepGOE4F(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4F" prototype="">func gepET4F(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4F" prototype="">func gepNET4F(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return (a + b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4G" prototype="">func gepLT4G(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4G" prototype="">func gepGT4G(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4G" prototype="">func gepLOE4G(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4G" prototype="">func gepGOE4G(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4G" prototype="">func gepET4G(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4G" prototype="">func gepNET4G(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c + d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4H" prototype="">func gepLT4H(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4H" prototype="">func gepGT4H(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4H" prototype="">func gepLOE4H(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4H" prototype="">func gepGOE4H(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4H" prototype="">func gepET4H(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4H" prototype="">func gepNET4H(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c - d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4I" prototype="">func gepLT4I(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4I" prototype="">func gepGT4I(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4I" prototype="">func gepLOE4I(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4I" prototype="">func gepGOE4I(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4I" prototype="">func gepET4I(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4I" prototype="">func gepNET4I(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4J" prototype="">func gepLT4J(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4J" prototype="">func gepGT4J(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4J" prototype="">func gepLOE4J(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4J" prototype="">func gepGOE4J(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4J" prototype="">func gepET4J(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4J" prototype="">func gepNET4J(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return (a * b){CRLF}{TAB}}{CRLF}{TAB}return (c / d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4K" prototype="">func gepLT4K(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return math.Sin(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4K" prototype="">func gepGT4K(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return math.Sin(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4K" prototype="">func gepLOE4K(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return math.Sin(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4K" prototype="">func gepGOE4K(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return math.Sin(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4K" prototype="">func gepET4K(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return math.Sin(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4K" prototype="">func gepNET4K(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return math.Sin(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Sin(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LT4L" prototype="">func gepLT4L(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt; (c + d) {{CRLF}{TAB}{TAB}return math.Atan(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GT4L" prototype="">func gepGT4L(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt; (c + d) {{CRLF}{TAB}{TAB}return math.Atan(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="LOE4L" prototype="">func gepLOE4L(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &lt;= (c + d) {{CRLF}{TAB}{TAB}return math.Atan(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="GOE4L" prototype="">func gepGOE4L(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) &gt;= (c + d) {{CRLF}{TAB}{TAB}return math.Atan(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="ET4L" prototype="">func gepET4L(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) == (c + d) {{CRLF}{TAB}{TAB}return math.Atan(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(c * d){CRLF}}{CRLF}{CRLF}</helper>
+    <helper replaces="NET4L" prototype="">func gepNET4L(a, b, c, d float64) float64 {{CRLF}{TAB}if (a + b) != (c + d) {{CRLF}{TAB}{TAB}return math.Atan(a * b){CRLF}{TAB}}{CRLF}{TAB}return math.Atan(c * d){CRLF}}{CRLF}{CRLF}</helper>
+  </helpers>
+  <keywords>
+    <keyword>float64</keyword>
+    <keyword>int</keyword>
+    <keyword>if</keyword>
+    <keyword>else</keyword>
+    <keyword>return</keyword>
+    <keyword>const</keyword>
+    <keyword>import</keyword>
+    <keyword>switch</keyword>
+    <keyword>case</keyword>
+    <keyword>default</keyword>
+    <keyword>break</keyword>
+    <keyword>void</keyword>
+    <keyword>char</keyword>
+    <keyword>func</keyword>
+  </keywords>
+  <commentmark>//</commentmark>
+  <linkingFunctions count="2">
+    <linkingFunction replaces="Min2" prototype="">func gepMin2(x, y float64) float64 {{CRLF}{TAB}if x &gt; y {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return x{CRLF}}{CRLF}}{CRLF}</linkingFunction>
+    <linkingFunction replaces="Max2" prototype="">func gepMax2(x, y float64) float64 {{CRLF}{TAB}if x &lt; y {{CRLF}{TAB}{TAB}return y{CRLF}{TAB}}{CRLF}{TAB}return x{CRLF}}{CRLF}{CRLF}</linkingFunction>
+  </linkingFunctions>
+  <ddfcomment>// Add a DDF with the name {FUNCTION_SYMBOL} in {LANGUAGE}{CRLF}// and a parameter list equivalent to {PARAMETER_LIST}{CRLF}</ddfcomment>
+  <udfcomment>// Add a UDF with the name {FUNCTION_SYMBOL} in {LANGUAGE}{CRLF}</udfcomment>
+  <testing>
+    <prototype paramsformat="float64 x{INDEX}">float64 {name}({params}) {{CRLF}{TAB}return {body}{CRLF}}{CRLF}{CRLF}</prototype>
+    <method callformat="printf(&quot;%f\n&quot;, {method}({params})){CRLF}" listformat="{data}">import ({CRLF}{TAB}"math"{CRLF}){CRLF}{HELPERS}{CRLF}{CRLF}{FUNCTIONS}{CRLF}{CRLF}func main() {{CRLF}{CALLS}{CRLF}}{CRLF}</method>
+  </testing>
+</grammar>
