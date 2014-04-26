@@ -1,4 +1,4 @@
-package math_nodes
+package mathNodes
 
 import (
 	"testing"

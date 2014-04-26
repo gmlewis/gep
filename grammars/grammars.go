@@ -1,4 +1,4 @@
-// The grammars package parses XML GEP grammar representations for a particular output language.
+// Package grammars parses XML GEP grammar representations for a particular output language.
 // It can then be used to generate code from Karva expressions for that language.
 package grammars
 
@@ -235,7 +235,7 @@ func getPath(filename string) string {
 	return filepath.Join(dir, "src", grammarPath, filename)
 }
 
-// LoadGoMathGrammer loads the floating-point math grammer for Go as the target language.
+// LoadGoMathGrammar loads the floating-point math grammer for Go as the target language.
 func LoadGoMathGrammar() (*Grammar, error) {
 	path := getPath("go.Math.00.default.grm.xml")
 	return loadGrammar(path)

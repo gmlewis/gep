@@ -1,5 +1,5 @@
-// The bool_nodes package defines the Boolean function collections available for the GEP algorithm.
-package bool_nodes
+// Package boolNodes defines the Boolean function collections available for the GEP algorithm.
+package boolNodes
 
 import (
 	"log"

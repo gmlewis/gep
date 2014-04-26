@@ -1,4 +1,4 @@
-// The genome package provides the basis for a single GEP genome.
+// Package genome provides the basis for a single GEP genome.
 // A genome consists of one or more genes.
 package genome
 

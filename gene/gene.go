@@ -1,4 +1,4 @@
-// The gene package provides the basis for a single gene in GEP.
+// Package gene provides the basis for a single gene in GEP.
 package gene
 
 import (

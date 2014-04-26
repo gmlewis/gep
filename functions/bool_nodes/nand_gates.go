@@ -1,4 +1,4 @@
-package bool_nodes
+package boolNodes
 
 import (
 	"github.com/gmlewis/gep/functions"

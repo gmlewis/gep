@@ -1,5 +1,5 @@
-// The math_nodes package defines the floating-point function collection available for the GEP algorithm.
-package math_nodes
+// Package mathNodes defines the floating-point function collection available for the GEP algorithm.
+package mathNodes
 
 import (
 	"log"

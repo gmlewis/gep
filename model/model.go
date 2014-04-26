@@ -1,4 +1,4 @@
-// The model package provides the complete representation of the model for a given GEP problem.
+// Package model provides the complete representation of the model for a given GEP problem.
 package model
 
 import (

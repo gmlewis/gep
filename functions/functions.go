@@ -1,4 +1,4 @@
-// The functions page provides a map of available functions for the GEP algorithm.
+// Package functions provides a map of available functions for the GEP algorithm.
 package functions
 
 // FuncMap is a map from the symbol name of a function to its defining FuncNode.
