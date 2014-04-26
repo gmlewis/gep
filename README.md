@@ -1,4 +1,4 @@
-* Gene Expression Programming (GEP) in Go
+# Gene Expression Programming (GEP) in Go
 
 This is an independent implementation of the Gene Expression Programming (GEP)
 machine learning algorithm created by Dr. Cândida Ferreira.
@@ -16,7 +16,7 @@ For the full book written on the topic, it is available here:
 
 ----------------------------------------------------------------------
 
-* NAND Function Experiment
+# NAND Function Experiment
 
 To build and run this code, it may help to understand this presentation,
 specifically about Go workspaces: http://talks.golang.org/2012/tutorial.slide#9
@@ -41,7 +41,7 @@ user 0m0.000s
 sys  0m0.020s
 ```
 
-* Symbolic Regression Experiment
+# Symbolic Regression Experiment
 
 To run the Symbolic Regression experiment:
 
@@ -58,7 +58,7 @@ sys  0m0.000s
 
 ----------------------------------------------------------------------
 
-* Unit Tests
+# Unit Tests
 
 To run unit tests, you can do this:
 
@@ -68,7 +68,7 @@ $ go test github.com/gmlewis/gep/...
 
 ----------------------------------------------------------------------
 
-* Grammars
+# Grammars
 
 While converting the C++ grammars to Go grammars, it was useful to load
 in the XML files, parse them, and then dump them out to compare input
