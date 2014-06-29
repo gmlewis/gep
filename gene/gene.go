@@ -101,8 +101,8 @@ func (g *Gene) getBoolArgOrder(nodes functions.FuncMap) [][]int {
 }
 
 // EvalBool evaluates the gene as a boolean expression and returns the result.
-// in represents the boolean inputs available to the gene.
-// nodes is the map of available boolean functions to the gene.
+// "in" represents the boolean inputs available to the gene.
+// "nodes" is the map of available boolean functions to the gene.
 func (g *Gene) EvalBool(in []bool, nodes functions.FuncMap) bool {
 	if g.bf == nil {
 		argOrder := g.getBoolArgOrder(nodes)

@@ -1,6 +1,7 @@
 package gene
 
 import (
+	"reflect"
 	"testing"
 
 	bn "github.com/gmlewis/gep/functions/bool_nodes"
@@ -46,5 +47,16 @@ func TestMath(t *testing.T) {
 		if r != n.out {
 			t.Errorf("%v: math.EvalFloat64(%#v, MathNodes) => %v, want %v", i, n.in, r, n.out)
 		}
+	}
+}
+
+func TestGetBoolArgOrder(t *testing.T) {
+	nand := New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0")
+	got := nand.getBoolArgOrder(bn.BoolAllGates)
+	want := [][]int{
+		{1, 2}, {3, 4}, {5}, {6}, {7, 8}, {9, 10}, {11, 12}, nil, nil, nil, nil, nil, nil, nil, nil,
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("nand.GetBoolArgOrder() got %#v, want %#v", got, want)
 	}
 }

@@ -48,5 +48,5 @@ func main() {
 	}
 	e := model.New(funcs, bn.BoolAllGates, 30, 7, 1, 2, "Or", validateNand)
 	s := e.Evolve(1000)
-	fmt.Printf("nand solution: %v, score=%v\n", s, validateNand(s))
+	fmt.Printf("nand solution: %#v, score=%v\n", s, validateNand(s))
 }

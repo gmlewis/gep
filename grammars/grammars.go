@@ -8,6 +8,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/gmlewis/gep/functions"
 )
 
 const grammarPath = "github.com/gmlewis/gep/grammars"
@@ -16,20 +18,43 @@ const grammarPath = "github.com/gmlewis/gep/grammars"
 type Functions struct {
 	Count     int        `xml:"count,attr"`
 	Functions []Function `xml:"function"`
+
+	// Lookup table of function symbol name to function definition
+	FuncMap functions.FuncMap
 }
 
 // Function represents a single function.
 type Function struct {
 	// Idx is the index of the function in the XML grammar.
 	Idx int `xml:"idx,attr"`
-	// Symbol is the Karva symbol used to represent the function.
-	Symbol string `xml:"symbol,attr"`
-	// Terminals specifies the number of input terminals to the function.
-	Terminals int `xml:"terminals,attr"`
+	// SymbolName is the Karva symbol used to represent the function.
+	SymbolName string `xml:"symbol,attr"`
+	// TerminalCount specifies the number of input terminals to the function.
+	TerminalCount int `xml:"terminals,attr"`
 	// Uniontype (optional) determines how the diadic function is rendered.
 	Uniontype string `xml:"uniontype,attr"`
 	// Chardata is the action function rendering for the given language.
 	Chardata string `xml:",chardata"`
+}
+
+// Symbol returns the symbol name of the function.
+func (f *Function) Symbol() string {
+	return f.SymbolName
+}
+
+// Terminals returns the terminal count of the function.
+func (f *Function) Terminals() int {
+	return f.TerminalCount
+}
+
+// BoolFunction allows FuncMap to implement interace functions.FuncMap.
+func (f *Function) BoolFunction(a, b, c, d bool) bool {
+	return false
+}
+
+// Float64Function allows FuncMap to implement interace functions.FuncMap.
+func (f *Function) Float64Function(a, b, c, d float64) float64 {
+	return 0.0
 }
 
 // Replacement determines how a function can be replaced.
@@ -227,6 +252,13 @@ func loadGrammar(path string) (*Grammar, error) {
 		log.Printf("error unmarshaling %q: %q\n", path, err)
 		return nil, err
 	}
+
+	// Build the function map lookups for fast access
+	v.Functions.FuncMap = make(functions.FuncMap, len(v.Functions.Functions))
+	for i, f := range v.Functions.Functions {
+		v.Functions.FuncMap[f.SymbolName] = &v.Functions.Functions[i]
+	}
+
 	return v, nil
 }
 
