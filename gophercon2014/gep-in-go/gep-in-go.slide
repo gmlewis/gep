@@ -74,24 +74,24 @@ Key features:
 
 * GEP in Go - Logic Example - Fitness function
 
-.code nand.go /^var.nandTests/,/^}$/
-.code nand.go /^func.validateNand/,/^}/
+.code example1/nand.go /^var.nandTests/,/^}$/
+.code example1/nand.go /^func.validateNand/,/^}/
 
 
 * GEP in Go - Logic Example
 
-.play nand.go /^func.main/+1,/^}/-1
+.play example1/nand.go /^func.main/+1,/^}/-1
 
 
 * GEP in Go - Symbolic regression example - Fitness function
 
-.code symbolic_regression.go /^var.srTests/,/11110/
-.code symbolic_regression.go /^func.validateFunc/,/^}/
+.code example2/symbolic_regression.go /^var.srTests/,/11110/
+.code example2/symbolic_regression.go /^func.validateFunc/,/^}/
 
 
 * GEP in Go - Symbolic regression example
 
-.play symbolic_regression.go /^func.main/+1,/^}/-1
+.play example2/symbolic_regression.go /^func.main/+1,/^}/-1
 
 
 * Next steps
