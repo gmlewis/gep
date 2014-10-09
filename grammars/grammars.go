@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gmlewis/gep/functions"
 )
@@ -263,8 +264,19 @@ func loadGrammar(path string) (*Grammar, error) {
 }
 
 func getPath(filename string) string {
-	dir := os.Getenv("GOPATH")
-	return filepath.Join(dir, "src", grammarPath, filename)
+	// Support Travis CI automated builds by searching for files
+	dirs := strings.Split(os.Getenv("GOPATH"), ":")
+	for _, dir := range dirs {
+		name := filepath.Join(dir, "src", grammarPath, filename)
+		if _, err := os.Stat(name); err == nil {
+			return name
+		}
+	}
+	name := filepath.Join(grammarPath, filename)
+	if _, err := os.Stat(name); err == nil {
+		return name
+	}
+	return filename
 }
 
 // LoadGoMathGrammar loads the floating-point math grammer for Go as the target language.
