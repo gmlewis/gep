@@ -36,12 +36,24 @@ To run the NAND gate GEP experiment:
 ```
 $ go get github.com/gmlewis/gep/experiments/nand
 $ time $GOPATH/bin/nand
-Stopping after generation #0
-nand solution: Not.And.And.Or.d0.And.And.d0.d0.d1.d0.d0.d1.d1.d0, score=1000
+Stopping after generation #1
 
-real 0m0.022s
-user 0m0.000s
-sys  0m0.020s
+// gepModel is auto-generated Go source code for the
+// nand solution karva expression:
+// "Not.And.And.Or.And.d1.And.d0.d1.d1.d0.d1.d1.d1.d0", score=1000
+package gepModel
+
+func gepModel(d []bool) bool {
+	blTemp := false
+
+	blTemp = (!(((d[1] && d[1]) && d[1]) && ((d[0] && d[1]) || d[0])))
+
+	return blTemp
+}
+
+real	0m0.012s
+user	0m0.008s
+sys	0m0.003s
 ```
 
 # Symbolic Regression Experiment
@@ -51,19 +63,35 @@ To run the Symbolic Regression experiment:
 ```
 $ go get github.com/gmlewis/gep/experiments/symbolic_regression
 $ time $GOPATH/bin/symbolic_regression
-Stopping after generation #2462
-(a^4 + a^3 + a^2 + a) solution: *.+.+./.*.*.d0.d0.d0.d0.d0.d0.d0, score=9965.59143500096
+Stopping after generation #9187
 
-real 0m0.186s
-user 0m0.180s
-sys  0m0.000s
+// gepModel is auto-generated Go source code for the
+// (a^4 + a^3 + a^2 + a) solution karva expression:
+// "*.+.+.*./.*.d0.d0.d0.d0.d0.d0.d0", score=9965.59143500096
+package gepModel
+
+import (
+	"math"
+)
+
+func gepModel(d []float64) float64 {
+	dblTemp := 0.0
+
+	dblTemp = (((d[0] * d[0]) + (d[0] / d[0])) * ((d[0] * d[0]) + d[0]))
+
+	return dblTemp
+}
+
+real	0m0.481s
+user	0m0.477s
+sys	0m0.004s
 ```
 
 ----------------------------------------------------------------------
 
 # Unit Tests
 
-To run unit tests, you can do this:
+To run unit tests, type:
 
 ```
 $ go test github.com/gmlewis/gep/...

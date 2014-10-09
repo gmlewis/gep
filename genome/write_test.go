@@ -33,3 +33,33 @@ func gepModel(d []bool) bool {
 		t.Errorf("gen.Write() got %v, want %v", b.String(), want)
 	}
 }
+
+func TestWriteMath(t *testing.T) {
+	want := `package gepModel
+
+import (
+	"math"
+)
+
+func gepModel(d []float64) float64 {
+	dblTemp := 0.0
+
+	dblTemp = (((d[0] / d[0]) + (d[0] * d[0])) * ((d[0] * d[0]) + d[0]))
+
+	return dblTemp
+}
+`
+
+	g1 := gene.New("*.+.+./.*.*.d0.d0.d0.d0.d0.d0.d0")
+	gn := New([]gene.Gene{g1}, "+")
+	grammar, err := grammars.LoadGoMathGrammar()
+	if err != nil {
+		t.Fatalf("unable to LoadGoMathGrammar(): %v", err)
+	}
+
+	b := new(bytes.Buffer)
+	gn.Write(b, grammar)
+	if b.String() != want {
+		t.Errorf("gen.Write() got %v, want %v", b.String(), want)
+	}
+}

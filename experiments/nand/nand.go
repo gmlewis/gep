@@ -6,12 +6,15 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
+	"os"
 	"time"
 
 	bn "github.com/gmlewis/gep/functions/bool_nodes"
 	"github.com/gmlewis/gep/gene"
 	"github.com/gmlewis/gep/genome"
+	"github.com/gmlewis/gep/grammars"
 	"github.com/gmlewis/gep/model"
 )
 
@@ -48,5 +51,13 @@ func main() {
 	}
 	e := model.New(funcs, bn.BoolAllGates, 30, 7, 1, 2, "Or", validateNand)
 	s := e.Evolve(1000)
-	fmt.Printf("nand solution: %#v, score=%v\n", s, validateNand(s))
+
+	// Write out the Go source code for the solution.
+	gr, err := grammars.LoadGoBooleanAllGatesGrammar()
+	if err != nil {
+		log.Printf("unable to load Boolean grammar: %v\n", err)
+	}
+	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
+	fmt.Printf("// nand solution karva expression:\n// %q, score=%v\n", s, validateNand(s))
+	s.Write(os.Stdout, gr)
 }

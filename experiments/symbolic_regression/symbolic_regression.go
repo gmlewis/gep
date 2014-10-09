@@ -6,13 +6,16 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"math/rand"
+	"os"
 	"time"
 
 	mn "github.com/gmlewis/gep/functions/math_nodes"
 	"github.com/gmlewis/gep/gene"
 	"github.com/gmlewis/gep/genome"
+	"github.com/gmlewis/gep/grammars"
 	"github.com/gmlewis/gep/model"
 )
 
@@ -61,5 +64,13 @@ func main() {
 	}
 	e := model.New(funcs, mn.Math, 30, 6, 1, 1, "+", validateFunc)
 	s := e.Evolve(10000)
-	fmt.Printf("(a^4 + a^3 + a^2 + a) solution: %v, score=%v\n", s, validateFunc(s))
+
+	// Write out the Go source code for the solution.
+	gr, err := grammars.LoadGoMathGrammar()
+	if err != nil {
+		log.Printf("unable to load Boolean grammar: %v\n", err)
+	}
+	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
+	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %q, score=%v\n", s, validateFunc(s))
+	s.Write(os.Stdout, gr)
 }
