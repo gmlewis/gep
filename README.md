@@ -10,9 +10,12 @@ Here is a concise summary of GEP:
 
 - http://www.gene-expression-programming.com/webpapers/GEP.pdf
 
-For the full book written on the topic, it is available here:
+The definitive book about GEP is available here:
 
 - http://www.springer.com/3-540-32796-7
+
+## Status
+[![Build Status](https://travis-ci.org/gmlewis/gep.png)](https://travis-ci.org/gmlewis/gep)
 
 ----------------------------------------------------------------------
 
