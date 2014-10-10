@@ -282,11 +282,28 @@ func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) 
 // Mutate mutates a gene by performing a single random symbol exchange within the gene.
 func (g *Gene) Mutate() {
 	position := rand.Intn(len(g.Symbols))
+	if g.numTerminals < 2 {
+		position %= g.headSize // Force choice to be within the head
+	}
 	if position < g.headSize {
-		symbol := g.choiceSlice[rand.Intn(len(g.choiceSlice))]
+		if len(g.choiceSlice) < 2 {
+			log.Printf("error: must have choice of more than one function\n")
+			return
+		}
+		symbol := g.Symbols[position]
+		for symbol == g.Symbols[position] { // Force new symbol to be different from old one
+			n := rand.Intn(len(g.choiceSlice))
+			symbol = g.choiceSlice[n]
+		}
+		// fmt.Printf("\nChanging symbol #%v from %q to %q\n", position, g.Symbols[position], symbol)
 		g.Symbols[position] = symbol
 	} else { // Must choose strictly from terminals
-		terminal := g.choiceSlice[rand.Intn(g.numTerminals)]
+		terminal := g.Symbols[position]
+		for terminal == g.Symbols[position] { // Force new terminal to be different from old one
+			n := rand.Intn(g.numTerminals)
+			terminal = g.choiceSlice[n]
+		}
+		// fmt.Printf("\nChanging terminal #%v from %q to %q\n", position, g.Symbols[position], terminal)
 		g.Symbols[position] = terminal
 	}
 	// Invalidate the cached function

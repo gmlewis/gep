@@ -69,7 +69,10 @@ func (g Genome) String() string {
 // Mutate mutates a genome by performing numMutations random symbol exchanges within the genome.
 func (g *Genome) Mutate(numMutations int) {
 	for i := 0; i < numMutations; i++ {
-		gene := &g.Genes[rand.Intn(len(g.Genes))]
+		n := rand.Intn(len(g.Genes))
+		gene := &g.Genes[n]
+		// fmt.Printf("\nMutating gene #%v, before:\n%v\n", n, gene)
 		gene.Mutate()
+		// fmt.Printf("after:\n%v\n", gene)
 	}
 }
