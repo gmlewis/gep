@@ -310,3 +310,18 @@ func (g *Gene) Mutate() {
 	g.bf = nil
 	g.mf = nil
 }
+
+// Dup duplicates the gene into the provided destination gene.
+func (g *Gene) Dup(dst *Gene) {
+	if g == nil || dst == nil {
+		log.Printf("gene.Dup error: src and dst must be non-nil\n")
+		return
+	}
+	dst.Symbols = g.Symbols[:]
+	dst.Constants = g.Constants[:]
+	dst.bf = g.bf
+	dst.mf = g.mf
+	dst.headSize = g.headSize
+	dst.choiceSlice = g.choiceSlice[:]
+	dst.numTerminals = g.numTerminals
+}

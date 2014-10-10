@@ -112,7 +112,7 @@ func main() {
 	}
 	numIn := len(multiTests[0].in)
 	e := model.New(funcs, bn.BoolAllGates, 30, 8, 4, numIn, "And", validateMulti)
-	s := e.Evolve(10000)
+	s := e.Evolve(20000)
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()

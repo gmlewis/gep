@@ -76,3 +76,17 @@ func (g *Genome) Mutate(numMutations int) {
 		// fmt.Printf("after:\n%v\n", gene)
 	}
 }
+
+// Dup duplicates the genome into the provided destination genome.
+func (g *Genome) Dup(dst *Genome) {
+	if g == nil || dst == nil {
+		log.Printf("denome.Dup error: src and dst must be non-nil\n")
+		return
+	}
+	dst.Genes = make([]gene.Gene, len(g.Genes))
+	for i, v := range g.Genes {
+		v.Dup(&dst.Genes[i])
+	}
+	dst.LinkFunc = g.LinkFunc
+	dst.Score = g.Score
+}

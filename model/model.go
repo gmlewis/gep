@@ -60,6 +60,9 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 			fmt.Printf("Stopping after generation #%v\n", i)
 			return bestGenome
 		}
+		// fmt.Printf("Best genome (score %v): %v\n", bestGenome.Score, *bestGenome)
+		saveCopy := &genome.Genome{}
+		bestGenome.Dup(saveCopy)
 		g.replication() // Section 3.3.1, book page 75
 		g.mutation()    // Section 3.3.2, book page 77
 		// g.isTransposition()
@@ -69,7 +72,7 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 		// g.twoPointRecombination()
 		// g.geneRecombination()
 		// Now that replication is done, restore the best genome (aka "elitism")
-		g.Genomes[0] = *bestGenome
+		g.Genomes[0] = *saveCopy
 	}
 	fmt.Printf("Stopping after generation #%v\n", iterations)
 	return g.getBest()
