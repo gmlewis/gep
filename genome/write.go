@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"go/format"
+
 	"github.com/gmlewis/gep/functions"
 	"github.com/gmlewis/gep/grammars"
 )
@@ -56,20 +58,21 @@ func (d *dump) generateCode() ([]byte, error) {
 		d.subs["tempvarname"] = t.Varname
 		d.write(d.gr.Endline)
 	}
-	// Generate the expression
+	// Generate the expression, keeping track of any helper functions that are needed.
+	helpers := make(grammars.HelperMap)
 	s, ok := d.gr.Functions.FuncMap[d.genome.LinkFunc]
 	if !ok {
 		return nil, fmt.Errorf("unable to find grammar linking function: %v\n", s.Symbol())
 	}
 	glf, ok := s.(*grammars.Function)
 	exps := []string{""}
-	for _, e := range d.genome.Genes {
+	for i, e := range d.genome.Genes {
 		// d.write(fmt.Sprintf("// GML: d.genome.Genes: e=%#v\n", e))
-		exp, err := e.Expression(d.gr)
+		exp, err := e.Expression(d.gr, helpers)
 		if err != nil {
 			return nil, err
 		}
-		if len(d.genome.Genes) > 1 {
+		if i > 0 {
 			// d.write(fmt.Sprintf("// GML: len(d.genome.Genes)=%v\n", len(d.genome.Genes)))
 			merge := strings.Replace(glf.Uniontype, "{tempvarname}", d.subs["tempvarname"], -1)
 			merge = strings.Replace(merge, "{member}", exp, -1)
@@ -78,8 +81,8 @@ func (d *dump) generateCode() ([]byte, error) {
 			// d.write(fmt.Sprintf("// GML: len(d.genome.Genes)=%v\n", len(d.genome.Genes)))
 			exps = append(exps, d.subs["tempvarname"]+" = "+exp)
 		}
-		exps = append(exps, "") // blank line
 	}
+	exps = append(exps, "") // blank line
 	fmt.Fprintln(d.w, strings.Join(exps, "\n"))
 	for _, f := range d.gr.Footers {
 		if f.Type != "default" {
@@ -88,6 +91,17 @@ func (d *dump) generateCode() ([]byte, error) {
 		// d.write(fmt.Sprintf("// GML: d.gr.Footers=%#v\n", f))
 		d.write(f.Chardata)
 		d.write(d.gr.Endline)
+	}
+	if len(helpers) > 0 { // Write out the helpers
+		keys := make([]string, 0, len(helpers))
+		for k, _ := range helpers {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			d.write(d.gr.Endline)
+			d.write(helpers[k])
+		}
 	}
 
 	clean, err := format.Source(buf.Bytes())

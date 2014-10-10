@@ -1,7 +1,8 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE grammar SYSTEM "grammar.dtd">
 <grammar name="Go" version="5" ext="go" type="All Gates">
-   <!--List of all the Boolean functions supported by GeneXproTools 4.0. All functions must be completely defined.-->
+   <!--*******************************************Contributed by Glenn Lewis*******************************************-->
+   <!--List of all the Boolean functions supported by GeneXproTools 5.0. All functions must be completely defined.-->
    <!--To generate Carriage Return Line Feeds (CrLf) use the token {CRLF} (curly braces included).-->
    <!--To generate Tabs use the token {TAB} (curly braces included).-->
    <!--Use {CHARX} as an escape for the x in the definition of the functions.-->
@@ -11,7 +12,7 @@
       <function idx="10002" symbol="Or" terminals="2" uniontype="{tempvarname} = {tempvarname} || {member}">(x0 || x1)</function>
       <function idx="10003" symbol="Nand" terminals="2" uniontype="{tempvarname} = gepNand({tempvarname},{member})">gepNand(x0,x1)</function>
       <function idx="10004" symbol="Nor" terminals="2" uniontype="{tempvarname} = gepNor({tempvarname},{member})">gepNor(x0,x1)</function>
-      <function idx="10005" symbol="Xor" terminals="2" uniontype="{tempvarname} = {tempvarname} ^ {member}">gepXor(x0 , x1)</function>
+      <function idx="10005" symbol="Xor" terminals="2" uniontype="{tempvarname} = {tempvarname} != {member}">(x0 != x1)</function>
       <function idx="10006" symbol="Nxor" terminals="2" uniontype="{tempvarname} = gepN{CHARX}or({tempvarname},{member})">gepN{CHARX}or(x0,x1)</function>
 
       <function idx="10007" symbol="And3" terminals="3" uniontype="">gepAnd3(x0,x1,x2)</function>
@@ -310,43 +311,26 @@
       <function idx="10256" symbol="QFFF6" terminals="4" uniontype="">gepQFFF6(x0,x1,x2,x3)</function>
       <function idx="10257" symbol="QFFFB" terminals="4" uniontype="">gepQFFFB(x0,x1,x2,x3)</function>
 
+  </functions>
 
-</functions>
-   
-   <!-- Code Structure -->
-    <order>
-        <item name="ModelComments" />
-        <item name="Open">
-	</item>
-        <item name="Subheader">
-	</item>
-        <item name="Prototypes">
-	</item>
-        <item name="Header">
-	</item>
-        <item name="RandomConstants">
-	</item>
-        <item name="Constants">
-	</item>
-        <item name="TemporaryVariable">
-	</item>
-        <item name="Body">
-	</item>
-        <item name="Footer">
-	</item>
-        <item name="Helpers">
-	</item>
-        <item name="LinkingHelpers">
-	</item>
-        <item name="DDF">
-	</item>
-        <item name="UDF">
-	</item>
-        <item name="Close">
-	</item>
-    </order>
-    
-   <!-- Opening and Closing Statements -->
+  <!-- Code Structure -->
+  <order>
+    <item name="ModelComments" />
+    <item name="Open"></item>
+    <item name="Header"></item>
+    <item name="RandomConstants"></item>
+    <item name="Constants"></item>
+    <item name="TemporaryVariable"></item>
+    <item name="Body"></item>
+    <item name="Footer"></item>
+    <item name="Helpers"></item>
+    <item name="LinkingHelpers"></item>
+    <item name="DDF"></item>
+    <item name="UDF"></item>
+    <item name="Close"></item>
+  </order>
+
+  <!-- Opening and Closing Statements -->
    <open>package gepModel{CRLF}{CRLF}</open>
    <close></close>
    
@@ -385,7 +369,7 @@
     
    <!-- The default temporary variable name is applied to all non specified cases. -->
    <tempvars>
-      <tempvar type="default" typename="bool" varname="blTemp">blTemp := false</tempvar>
+      <tempvar type="default" typename="bool" varname="y">y := false</tempvar>
    </tempvars>
    <endline>{CRLF}</endline>
    <!-- Number of TABs to add to each line in the code block -->
@@ -399,7 +383,6 @@
    <helpers count="245" declaration="" assignment="">
       <helper replaces="Nand" prototype="">func gepNand(x, y bool) bool {{CRLF}{TAB}return (!(x &amp;&amp; y)){CRLF}}{CRLF}</helper>
       <helper replaces="Nor" prototype="">func gepNor(x, y bool) bool {{CRLF}{TAB}return (!(x || y)){CRLF}}{CRLF}</helper>
-      <helper replaces="Xor" prototype="">func gepXor(x, y bool) bool {{CRLF}{TAB}return ((x || y) &amp;&amp; !(x &amp;&amp; y)){CRLF}}{CRLF}</helper>
       <helper replaces="Nxor" prototype="">func gepNxor(x, y bool) bool {{CRLF}{TAB}return ((!((x || y))) || (x &amp;&amp; y)){CRLF}}{CRLF}</helper>
 
       <helper replaces="And3" prototype="">func gepAnd3(x, y, z bool) bool {{CRLF}{TAB}return (x &amp;&amp; y &amp;&amp; z){CRLF}}{CRLF}</helper>
@@ -691,17 +674,19 @@
    </helpers>
 
    <keywords>
+      <keyword>package</keyword>
+      <keyword>func</keyword>
       <keyword>const</keyword>
-      <keyword>int</keyword>
       <keyword>return</keyword>
       <keyword>bool</keyword>
       <keyword>true</keyword>
       <keyword>false</keyword>
    </keywords>
    <commentmark>//</commentmark>
-   <linkingFunctions count="7">
+   <linkingFunctions count="8">
       <linkingFunction replaces="Nand" prototype="">func gepNand(x, y bool) bool {{CRLF}{TAB}return (!(x &amp;&amp; y)){CRLF}}{CRLF}</linkingFunction>
       <linkingFunction replaces="Nor" prototype="">func gepNor(x, y bool) bool {{CRLF}{TAB}return (!(x || y)){CRLF}}{CRLF}</linkingFunction>
+      <linkingFunction replaces="Xor" prototype="">func gepXor(x, y bool) bool {{CRLF}{TAB}return ((x || y) &amp;&amp; !(x &amp;&amp; y)){CRLF}}{CRLF}</linkingFunction>
       <linkingFunction replaces="Nxor" prototype="">func gepNxor(x, y bool) bool {{CRLF}{TAB}return ((!((x || y))) || (x &amp;&amp; y)){CRLF}}{CRLF}</linkingFunction>
       <linkingFunction replaces="LT" prototype="">func gepLT(x, y bool) bool {{CRLF}{TAB}return ((!(x)) &amp;&amp; y){CRLF}}{CRLF}</linkingFunction>
       <linkingFunction replaces="GT" prototype="">func gepGT(x, y bool) bool {{CRLF}{TAB}return (x &amp;&amp; (!(y))){CRLF}}{CRLF}</linkingFunction>

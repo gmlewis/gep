@@ -2,6 +2,7 @@ package gene
 
 import (
 	"testing"
+
 	"github.com/gmlewis/gep/grammars"
 )
 
@@ -13,11 +14,15 @@ func TestExpression(t *testing.T) {
 		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
 	}
 
-	got, err := g.Expression(grammar)
+	helpers := make(grammars.HelperMap)
+	got, err := g.Expression(grammar, helpers)
 	if err != nil {
 		t.Fatalf("g.Expression error: %v", err)
 	}
 	if got != want {
 		t.Errorf("g.Expression got %q, want %q", got, want)
+	}
+	if len(helpers) != 0 {
+		t.Errorf("helpers got length %v, want 0", len(helpers))
 	}
 }

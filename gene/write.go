@@ -8,7 +8,7 @@ import (
 	"github.com/gmlewis/gep/grammars"
 )
 
-func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Grammar) (string, error) {
+func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Grammar, helpers grammars.HelperMap) (string, error) {
 	if symbolIndex > len(g.Symbols) {
 		return "", fmt.Errorf("bad symbolIndex %v for symbols: %v\n", symbolIndex, g.Symbols)
 	}
@@ -19,9 +19,15 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 			return "", fmt.Errorf("unable to cast symbol %v to grammar function", sym)
 		}
 		exp := f.Chardata
+		// Look up the SymbolName in the grammar's Helpers list to see if there is a replacement.
+		if _, ok := helpers[f.SymbolName]; !ok {
+			if v, ok := grammar.Helpers.HelperMap[f.SymbolName]; ok {
+				helpers[f.SymbolName] = v
+			}
+		}
 		args := argOrder[symbolIndex]
 		for i := 0; i < f.Terminals(); i++ {
-			e, err := g.buildExp(args[i], argOrder, grammar)
+			e, err := g.buildExp(args[i], argOrder, grammar, helpers)
 			if err != nil {
 				return "", err
 			}
@@ -41,8 +47,9 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 }
 
 // Expression builds up the expression tree and returns the resulting string.
-func (g *Gene) Expression(grammar *grammars.Grammar) (string, error) {
+// While building, it keeps track of any helper functions that are needed.
+func (g *Gene) Expression(grammar *grammars.Grammar, helpers grammars.HelperMap) (string, error) {
 	argOrder := g.getBoolArgOrder(grammar.Functions.FuncMap)
-	s, err := g.buildExp(0, argOrder, grammar)
+	s, err := g.buildExp(0, argOrder, grammar, helpers)
 	return s, err
 }

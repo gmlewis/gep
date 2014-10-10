@@ -1,7 +1,8 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE grammar SYSTEM "grammar.dtd">
 <grammar name="Go" version="5" ext="go" type="Mux System">
-   <!--List of all the Boolean functions supported by GeneXproTools 4.0. All functions must be completely defined.-->
+   <!--*******************************************Contributed by Glenn Lewis*******************************************-->
+   <!--List of all the Boolean functions supported by GeneXproTools 5.0. All functions must be completely defined.-->
    <!--To generate Carriage Return Line Feeds (CrLf) use the token {CRLF} (curly braces included).-->
    <!--To generate Tabs use the token {TAB} (curly braces included).-->
    <!--Use {CHARX} as an escape for the x in the definition of the functions.-->
@@ -315,30 +316,18 @@
    <!-- Code Structure -->
     <order>
         <item name="ModelComments" />
-	<item name="Open">
-	</item>
-        <item name="Prototypes">
-	</item>
-        <item name="Header">
-	</item>
-        <item name="RandomConstants">
-	</item>
-        <item name="Constants">
-	</item>
-        <item name="TemporaryVariable">
-	</item>
-        <item name="Body">
-	</item>
-        <item name="Footer">
-	</item>
-        <item name="BasicFunctions">
-	</item>
-        <item name="DDF">
-	</item>
-        <item name="UDF">
-	</item>
-        <item name="Close">
-	</item>
+        <item name="Open"></item>
+        <item name="Prototypes"></item>
+        <item name="Header"></item>
+        <item name="RandomConstants"></item>
+        <item name="Constants"></item>
+        <item name="TemporaryVariable"></item>
+        <item name="Body"></item>
+        <item name="Footer"></item>
+        <item name="BasicFunctions"></item>
+        <item name="DDF"></item>
+        <item name="UDF"></item>
+        <item name="Close"></item>
     </order>
     
    <!-- Opening and Closing Statements -->
@@ -376,7 +365,7 @@
     
    <!-- The default temporary variable name is applied to all non specified cases. -->
    <tempvars>
-      <tempvar type="default" typename="bool" varname="blTemp">blTemp := false</tempvar>
+      <tempvar type="default" typename="bool" varname="y">y := false</tempvar>
    </tempvars>
    <endline>{CRLF}</endline>
    <!-- Number of TABs to add to each line in the code block -->
@@ -388,12 +377,13 @@
    </footers>
    <helpers count="0" declaration="" assignment=""></helpers>
    <keywords>
-      <keyword>const</keyword>
-      <keyword>int</keyword>
-      <keyword>return</keyword>
-      <keyword>bool</keyword>
-      <keyword>true</keyword>
-      <keyword>false</keyword>
+     <keyword>package</keyword>
+     <keyword>func</keyword>
+     <keyword>const</keyword>
+     <keyword>return</keyword>
+     <keyword>bool</keyword>
+     <keyword>true</keyword>
+     <keyword>false</keyword>
    </keywords>
    <commentmark>//</commentmark>
 

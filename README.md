@@ -112,9 +112,6 @@ $ go get github.com/gmlewis/gep/experiments/load_grammars
 $ $GOPATH/bin/load_grammars
 ```
 
-Please note that the grammars here are not current... I need to
-download the latest from Gepsoft and replace these.
-
 ----------------------------------------------------------------------
 
 Enjoy!

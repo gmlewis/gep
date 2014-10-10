@@ -159,12 +159,18 @@ type OrderItem struct {
 	Name string `xml:"name,attr"`
 }
 
+// HelperMap maps helper replacement functions to their definitions.
+type HelperMap map[string]string
+
 // Helpers represents helper functions for the target language.
 type Helpers struct {
 	Count       int      `xml:"count,attr"`
 	Declaration string   `xml:"declaration,attr"`
 	Assignment  string   `xml:"assignment,attr"`
 	Helpers     []Helper `xml:"helper"`
+
+	// Lookup table of helper symbol name to helper definition
+	HelperMap HelperMap
 }
 
 // Keyword is a reserved keyword in the target language.
@@ -258,6 +264,12 @@ func loadGrammar(path string) (*Grammar, error) {
 	v.Functions.FuncMap = make(functions.FuncMap, len(v.Functions.Functions))
 	for i, f := range v.Functions.Functions {
 		v.Functions.FuncMap[f.SymbolName] = &v.Functions.Functions[i]
+	}
+
+	// Build the helpers map lookups for fast access
+	v.Helpers.HelperMap = make(HelperMap, len(v.Helpers.Helpers))
+	for _, h := range v.Helpers.Helpers {
+		v.Helpers.HelperMap[h.Replaces] = h.Chardata
 	}
 
 	return v, nil
