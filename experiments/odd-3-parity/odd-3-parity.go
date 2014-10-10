@@ -52,7 +52,8 @@ func main() {
 		{"And", 20},
 		{"Or", 20},
 	}
-	e := model.New(funcs, bn.BoolAllGates, 30, 7, 3, 3, "And", validateParity)
+	numIn := len(parityTests[0].in)
+	e := model.New(funcs, bn.BoolAllGates, 30, 7, 3, numIn, "And", validateParity)
 	s := e.Evolve(1000)
 
 	// Write out the Go source code for the solution.

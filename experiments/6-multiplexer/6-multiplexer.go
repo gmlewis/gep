@@ -110,7 +110,8 @@ func main() {
 		{"Nand", 20},
 		{"Nor", 20},
 	}
-	e := model.New(funcs, bn.BoolAllGates, 30, 8, 4, 6, "And", validateMulti)
+	numIn := len(multiTests[0].in)
+	e := model.New(funcs, bn.BoolAllGates, 30, 8, 4, numIn, "And", validateMulti)
 	s := e.Evolve(50000)
 
 	// Write out the Go source code for the solution.

@@ -29,7 +29,7 @@ type Generation struct {
 // numGenomes is the number of genomes to use to populate this generation of the model.
 // headSize is the number of head symbols to use in a genome.
 // numGenesPerGenome is the number of genes to use per genome.
-// numTerminals is the number of terminals to use within each gene.
+// numTerminals is the number of terminals (inputs) to use within each gene.
 // linkFunc is the linking function used to combine the genes within a genome.
 // sf is the scoring (or fitness) function.
 func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGenesPerGenome, numTerminals int, linkFunc string, sf ScoringFunc) *Generation {

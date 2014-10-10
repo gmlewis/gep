@@ -26,11 +26,12 @@ type Gene struct {
 	// Symbols is the slice of strings being used in this gene's expression.
 	Symbols []string
 	// Constants is the slice of floats available for use by this gene.
-	Constants    []float64
-	bf           func([]bool) bool
-	mf           func([]float64) float64
-	headSize     int
-	choiceSlice  []string
+	Constants   []float64
+	bf          func([]bool) bool
+	mf          func([]float64) float64
+	headSize    int
+	choiceSlice []string
+	// numTerminals is the number of inputs to the genetic program.
 	numTerminals int
 }
 

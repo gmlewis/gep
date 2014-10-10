@@ -49,7 +49,8 @@ func main() {
 		{"And", 5},
 		{"Or", 5},
 	}
-	e := model.New(funcs, bn.BoolAllGates, 30, 7, 1, 2, "Or", validateNand)
+	numIn := len(nandTests[0].in)
+	e := model.New(funcs, bn.BoolAllGates, 30, 7, 1, numIn, "Or", validateNand)
 	s := e.Evolve(1000)
 
 	// Write out the Go source code for the solution.

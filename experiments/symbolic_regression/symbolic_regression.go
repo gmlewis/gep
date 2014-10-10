@@ -62,7 +62,8 @@ func main() {
 		{"*", 1},
 		{"/", 1},
 	}
-	e := model.New(funcs, mn.Math, 30, 6, 1, 1, "+", validateFunc)
+	numIn := len(srTests[0].in)
+	e := model.New(funcs, mn.Math, 30, 6, 1, numIn, "+", validateFunc)
 	s := e.Evolve(10000)
 
 	// Write out the Go source code for the solution.

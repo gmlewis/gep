@@ -21,7 +21,7 @@ type Functions struct {
 	Functions []Function `xml:"function"`
 
 	// Lookup table of function symbol name to function definition
-	FuncMap functions.FuncMap
+	FuncMap functions.FuncMap `xml:"-"`
 }
 
 // Function represents a single function.
@@ -170,7 +170,7 @@ type Helpers struct {
 	Helpers     []Helper `xml:"helper"`
 
 	// Lookup table of helper symbol name to helper definition
-	HelperMap HelperMap
+	HelperMap HelperMap `xml:"-"`
 }
 
 // Keyword is a reserved keyword in the target language.
