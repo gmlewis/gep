@@ -76,6 +76,7 @@ func (d *dump) generateCode() ([]byte, error) {
 			// d.write(fmt.Sprintf("// GML: len(d.genome.Genes)=%v\n", len(d.genome.Genes)))
 			merge := strings.Replace(glf.Uniontype, "{tempvarname}", d.subs["tempvarname"], -1)
 			merge = strings.Replace(merge, "{member}", exp, -1)
+			merge = strings.Replace(merge, "{symbol}", glf.SymbolName, -1)
 			exps = append(exps, merge)
 		} else {
 			// d.write(fmt.Sprintf("// GML: len(d.genome.Genes)=%v\n", len(d.genome.Genes)))

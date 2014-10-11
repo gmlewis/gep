@@ -24,6 +24,7 @@ var srTests = []struct {
 	in  []float64
 	out float64
 }{
+	{[]float64{0}, 0},
 	{[]float64{2.81}, 95.2425},
 	{[]float64{6}, 1554},
 	{[]float64{7.043}, 2866.55},
@@ -34,6 +35,8 @@ var srTests = []struct {
 	{[]float64{14}, 41370},
 	{[]float64{15}, 54240},
 	{[]float64{20}, 168420},
+	{[]float64{100}, 101010100},
+	{[]float64{-100}, 99009900},
 }
 
 func init() {
@@ -60,10 +63,9 @@ func main() {
 		{"+", 1},
 		{"-", 1},
 		{"*", 1},
-		{"/", 1},
 	}
 	numIn := len(srTests[0].in)
-	e := model.New(funcs, mn.Math, 30, 6, 1, numIn, "+", validateFunc)
+	e := model.New(funcs, mn.Math, 30, 8, 4, numIn, "+", validateFunc)
 	s := e.Evolve(10000)
 
 	// Write out the Go source code for the solution.

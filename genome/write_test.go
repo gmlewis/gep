@@ -44,14 +44,20 @@ import (
 func gepModel(d []float64) float64 {
 	y := 0.0
 
-	y = (((d[0] / d[0]) + (d[0] * d[0])) * ((d[0] * d[0]) + d[0]))
+	y = (d[0] * d[0])
+	y += d[0]
+	y += (d[0] * (d[0] * d[0]))
+	y += (((d[0] * d[0]) * d[0]) * d[0])
 
 	return y
 }
 `
 
-	g1 := gene.New("*.+.+./.*.*.d0.d0.d0.d0.d0.d0.d0")
-	gn := New([]gene.Gene{g1}, "+")
+	g1 := gene.New("*.d0.d0.*.d0.*.*.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0")
+	g2 := gene.New("d0.*.d0.*.*.d0.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0")
+	g3 := gene.New("*.d0.*.d0.d0.*.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0")
+	g4 := gene.New("*.*.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0")
+	gn := New([]gene.Gene{g1, g2, g3, g4}, "+")
 	grammar, err := grammars.LoadGoMathGrammar()
 	if err != nil {
 		t.Fatalf("unable to LoadGoMathGrammar(): %v", err)
@@ -100,6 +106,6 @@ func gepNor(x, y bool) bool {
 	b := new(bytes.Buffer)
 	gn.Write(b, grammar)
 	if b.String() != want {
-		t.Errorf("gen.Write() got %q, want %q", b.String(), want)
+		t.Errorf("gen.Write() got %v, want %v", b.String(), want)
 	}
 }

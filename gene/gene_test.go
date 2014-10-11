@@ -1,6 +1,7 @@
 package gene
 
 import (
+	"math"
 	"reflect"
 	"testing"
 
@@ -33,19 +34,53 @@ func TestNand(t *testing.T) {
 	validateNand(t, nand)
 }
 
-var mathTests = []struct {
+type mathTest struct {
 	in  []float64
 	out float64
+}
+
+var mathTests = []struct {
+	gene  string
+	tests []mathTest
 }{
-	{[]float64{1.0, 2.0}, 3.0},
+	{
+		gene: "+.d0.d1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0",
+		tests: []mathTest{
+			mathTest{in: []float64{1.0, 2.0}, out: 3.0},
+		},
+	},
+	{
+		gene: "-.+.+.-.-.*.d0.d0.d0.d0.d0.d0.d0",
+		tests: []mathTest{
+			mathTest{in: []float64{0}, out: 0},
+			mathTest{in: []float64{2.81}, out: -10.7061},
+			mathTest{in: []float64{6}, out: -42},
+			mathTest{in: []float64{7.043}, out: -56.646849},
+			mathTest{in: []float64{8}, out: -72},
+			mathTest{in: []float64{10}, out: -110},
+			mathTest{in: []float64{11.38}, out: -140.8844},
+			mathTest{in: []float64{12}, out: -156},
+			mathTest{in: []float64{14}, out: -210},
+			mathTest{in: []float64{15}, out: -240},
+			mathTest{in: []float64{20}, out: -420},
+		},
+	},
+	{
+		gene: "-.*.*.*.d0./.d0.d0.d0.d0.d0.d0.d0",
+		tests: []mathTest{
+			mathTest{in: []float64{20.0}, out: 7980.0},
+		},
+	},
 }
 
 func TestMath(t *testing.T) {
-	math := New("+.d0.d1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0")
-	for i, n := range mathTests {
-		r := math.EvalMath(n.in)
-		if r != n.out {
-			t.Errorf("%v: math.EvalFloat64(%#v, MathNodes) => %v, want %v", i, n.in, r, n.out)
+	for _, v := range mathTests {
+		g := New(v.gene)
+		for i, n := range v.tests {
+			r := g.EvalMath(n.in)
+			if math.Abs(r-n.out) > 1e-10 {
+				t.Errorf("%v[%v]: math.Eval(%#v) => %v, want %v", v.gene, i, n.in, r, n.out)
+			}
 		}
 	}
 }

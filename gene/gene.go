@@ -319,8 +319,8 @@ func (g *Gene) Dup(dst *Gene) {
 	}
 	dst.Symbols = g.Symbols[:]
 	dst.Constants = g.Constants[:]
-	dst.bf = g.bf
-	dst.mf = g.mf
+	dst.bf = nil // invalidate cached functions
+	dst.mf = nil
 	dst.headSize = g.headSize
 	dst.choiceSlice = g.choiceSlice[:]
 	dst.numTerminals = g.numTerminals
