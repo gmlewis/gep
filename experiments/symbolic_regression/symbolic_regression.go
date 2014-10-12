@@ -24,7 +24,7 @@ var srTests = []struct {
 	in  []float64
 	out float64
 }{
-	{[]float64{0}, 0},
+	// {[]float64{0}, 0},
 	{[]float64{2.81}, 95.2425},
 	{[]float64{6}, 1554},
 	{[]float64{7.043}, 2866.55},
@@ -47,15 +47,16 @@ func validateFunc(g *genome.Genome) float64 {
 	result := 0.0
 	for _, n := range srTests {
 		r := g.EvalMath(n.in)
+		// fmt.Printf("r=%v, n.in=%v, n.out=%v, g=%v\n", r, n.in, n.out, g)
 		if math.IsInf(r, 0) {
 			return 0.0
 		}
 		fitness := math.Abs(r - n.out)
 		fitness = 1000.0 / (1.0 + fitness) // fitness is normalized and max value is 1000
+		// fmt.Printf("r=%v, n.in=%v, n.out=%v, fitness=%v, g=%v\n", r, n.in, n.out, fitness, g)
 		result += fitness
 	}
-	// return result / float64(len(srTests)) // Does not converge
-	return result
+	return result / float64(len(srTests))
 }
 
 func main() {

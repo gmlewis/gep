@@ -18,7 +18,7 @@ type ScoringFunc func(g *genome.Genome) float64
 
 // Generation represents one complete generation of the model.
 type Generation struct {
-	Genomes     []genome.Genome
+	Genomes     []*genome.Genome
 	Funcs       []gene.FuncWeight
 	ScoringFunc ScoringFunc
 }
@@ -34,14 +34,14 @@ type Generation struct {
 // sf is the scoring (or fitness) function.
 func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGenesPerGenome, numTerminals int, linkFunc string, sf ScoringFunc) *Generation {
 	r := &Generation{
-		Genomes:     make([]genome.Genome, numGenomes, numGenomes),
+		Genomes:     make([]*genome.Genome, numGenomes, numGenomes),
 		Funcs:       fs,
 		ScoringFunc: sf,
 	}
 	n := maxArity(fs, fm)
 	tailSize := headSize*(n-1) + 1
 	for i := range r.Genomes {
-		genes := make([]gene.Gene, numGenesPerGenome, numGenesPerGenome)
+		genes := make([]*gene.Gene, numGenesPerGenome, numGenesPerGenome)
 		for j := range genes {
 			genes[j] = gene.RandomNew(headSize, tailSize, numTerminals, fs)
 		}
@@ -61,8 +61,7 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 			return bestGenome
 		}
 		// fmt.Printf("Best genome (score %v): %v\n", bestGenome.Score, *bestGenome)
-		saveCopy := &genome.Genome{}
-		bestGenome.Dup(saveCopy)
+		saveCopy := bestGenome.Dup()
 		g.replication() // Section 3.3.1, book page 75
 		g.mutation()    // Section 3.3.2, book page 77
 		// g.isTransposition()
@@ -72,7 +71,7 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 		// g.twoPointRecombination()
 		// g.geneRecombination()
 		// Now that replication is done, restore the best genome (aka "elitism")
-		g.Genomes[0] = *saveCopy
+		g.Genomes[0] = saveCopy
 	}
 	fmt.Printf("Stopping after generation #%v\n", iterations)
 	return g.getBest()
@@ -81,13 +80,12 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 func (g *Generation) replication() {
 	// roulette wheel selection - see www.youtube.com/watch?v=aHLslaWO-AQ
 	maxWeight := 0.0
-	for i := range g.Genomes {
-		genome := &g.Genomes[i]
-		if genome.Score > maxWeight {
-			maxWeight = genome.Score
+	for _, v := range g.Genomes {
+		if v.Score > maxWeight {
+			maxWeight = v.Score
 		}
 	}
-	result := make([]genome.Genome, 0, len(g.Genomes))
+	result := make([]*genome.Genome, 0, len(g.Genomes))
 	index := rand.Intn(len(g.Genomes))
 	beta := 0.0
 	for i := 0; i < len(g.Genomes); i++ {
@@ -96,7 +94,7 @@ func (g *Generation) replication() {
 			beta -= g.Genomes[index].Score
 			index = (index + 1) % len(g.Genomes)
 		}
-		result = append(result, g.Genomes[index])
+		result = append(result, g.Genomes[index].Dup())
 	}
 	g.Genomes = result
 }
@@ -119,11 +117,11 @@ func (g *Generation) mutation() {
 // getBest evaluates all genomes and returns a pointer to the best one.
 func (g *Generation) getBest() *genome.Genome {
 	bestScore := 0.0
-	bestGenome := &g.Genomes[0]
+	bestGenome := g.Genomes[0]
 	for i := 0; i < len(g.Genomes); i++ {
-		g.Genomes[i].Score = g.ScoringFunc(&g.Genomes[i])
+		g.Genomes[i].Score = g.ScoringFunc(g.Genomes[i])
 		if g.Genomes[i].Score > bestScore {
-			bestGenome = &g.Genomes[i]
+			bestGenome = g.Genomes[i]
 			bestScore = g.Genomes[i].Score
 		}
 	}

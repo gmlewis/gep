@@ -36,16 +36,16 @@ type Gene struct {
 }
 
 // New creates a new gene based on the Karva string representation.
-func New(x string) Gene {
+func New(x string) *Gene {
 	parts := strings.Split(x, ".")
-	return Gene{Symbols: parts}
+	return &Gene{Symbols: parts}
 }
 
 // RandomNew generates a new, random gene for further manipulation by the GEP
 // algorithm. The headSize, tailSize, and numTerminals determine the respective
 // properties of the gene, and functions provide the available functions and
 // their respective weights to be used in the creation of the gene.
-func RandomNew(headSize, tailSize, numTerminals int, functions []FuncWeight) Gene {
+func RandomNew(headSize, tailSize, numTerminals int, functions []FuncWeight) *Gene {
 	totalWeight := numTerminals
 	for _, f := range functions {
 		totalWeight += f.Weight
@@ -60,7 +60,7 @@ func RandomNew(headSize, tailSize, numTerminals int, functions []FuncWeight) Gen
 		}
 	}
 	choices := rand.Perm(totalWeight)
-	r := Gene{
+	r := &Gene{
 		Symbols:      make([]string, 0, headSize+tailSize),
 		headSize:     headSize,
 		choiceSlice:  choiceSlice,
@@ -312,16 +312,65 @@ func (g *Gene) Mutate() {
 }
 
 // Dup duplicates the gene into the provided destination gene.
-func (g *Gene) Dup(dst *Gene) {
-	if g == nil || dst == nil {
+func (g *Gene) Dup() *Gene {
+	if g == nil {
 		log.Printf("gene.Dup error: src and dst must be non-nil\n")
-		return
+		return nil
 	}
-	dst.Symbols = g.Symbols[:]
-	dst.Constants = g.Constants[:]
-	dst.bf = nil // invalidate cached functions
-	dst.mf = nil
-	dst.headSize = g.headSize
-	dst.choiceSlice = g.choiceSlice[:]
-	dst.numTerminals = g.numTerminals
+	r := &Gene{
+		Symbols:      make([]string, len(g.Symbols)),
+		Constants:    make([]float64, len(g.Constants)),
+		bf:           g.bf,
+		mf:           g.mf,
+		headSize:     g.headSize,
+		choiceSlice:  make([]string, len(g.choiceSlice)),
+		numTerminals: g.numTerminals,
+	}
+	for i := range g.Symbols {
+		r.Symbols[i] = g.Symbols[i]
+	}
+	for i := range g.Constants {
+		r.Constants[i] = g.Constants[i]
+	}
+	for i := range g.choiceSlice {
+		r.choiceSlice[i] = g.choiceSlice[i]
+	}
+	return r
+}
+
+func CheckEqual(g1 *Gene, g2 *Gene) error {
+	if g1 == nil || g2 == nil {
+		return fmt.Errorf("gene.CheckEqual error: g1 and g2 must be non-nil")
+	}
+	if len(g1.Symbols) != len(g2.Symbols) {
+		return fmt.Errorf("len(g1.Symbols)=%v != len(g2.Symbols)=%v", len(g1.Symbols), len(g2.Symbols))
+	}
+	for i, v1 := range g1.Symbols {
+		if v1 != g2.Symbols[i] {
+			return fmt.Errorf("g1.Symbols[%v]=%v != g2.Symbols[%v]=%v", i, v1, i, g2.Symbols[i])
+		}
+	}
+	if len(g1.Constants) != len(g2.Constants) {
+		return fmt.Errorf("len(g1.Constants)=%v != len(g2.Constants)=%v", len(g1.Constants), len(g2.Constants))
+	}
+	for i, v1 := range g1.Constants {
+		if v1 != g2.Constants[i] {
+			return fmt.Errorf("g1.Constants[%v]=%v != g2.Constants[%v]=%v", i, v1, i, g2.Constants[i])
+		}
+	}
+	if len(g1.choiceSlice) != len(g2.choiceSlice) {
+		return fmt.Errorf("len(g1.choiceSlice)=%v != len(g2.choiceSlice)=%v", len(g1.choiceSlice), len(g2.choiceSlice))
+	}
+	for i, v1 := range g1.choiceSlice {
+		if v1 != g2.choiceSlice[i] {
+			return fmt.Errorf("g1.choiceSlice[%v]=%v != g2.choiceSlice[%v]=%v", i, v1, i, g2.choiceSlice[i])
+		}
+	}
+	if g1.headSize != g2.headSize {
+		return fmt.Errorf("g1.headSize=%v != g2.headSize=%v", g1.headSize, g2.headSize)
+	}
+	if g1.numTerminals != g2.numTerminals {
+		return fmt.Errorf("g1.numTerminals=%v != g2.numTerminals=%v", g1.numTerminals, g2.numTerminals)
+	}
+	return nil
 }

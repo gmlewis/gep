@@ -1,6 +1,7 @@
 package genome
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -82,7 +83,7 @@ var sixMultiplexerTests = []struct {
 	{[]bool{true, true, true, true, true, true}, true},
 }
 
-func validateSixMultiplexer(t *testing.T, g Genome) {
+func validateSixMultiplexer(t *testing.T, g *Genome) {
 	for i, n := range sixMultiplexerTests {
 		r := g.EvalBool(n.in, bn.BoolAllGates)
 		if r != n.out {
@@ -92,7 +93,7 @@ func validateSixMultiplexer(t *testing.T, g Genome) {
 }
 
 func TestSixMultiplexer(t *testing.T) {
-	mux := New([]gene.Gene{
+	mux := New([]*gene.Gene{
 		gene.New("Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2"),
 		gene.New("Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3"),
 		gene.New("Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0"),
@@ -116,7 +117,7 @@ var odd3ParityTests = []struct {
 	{[]bool{true, true, true}, true},
 }
 
-func validateOdd3Parity(t *testing.T, g Genome) {
+func validateOdd3Parity(t *testing.T, g *Genome) {
 	for i, n := range odd3ParityTests {
 		r := g.EvalBool(n.in, bn.BoolAllGates)
 		if r != n.out {
@@ -126,7 +127,7 @@ func validateOdd3Parity(t *testing.T, g Genome) {
 }
 
 func TestOdd3Parity(t *testing.T) {
-	mux := New([]gene.Gene{
+	mux := New([]*gene.Gene{
 		gene.New("Or.Or.d1.And.Or.d0.And.d2.d0.d2.d1.d1.d1.d0.d1"),
 		gene.New("Not.And.And.Not.Or.And.And.d0.d1.d2.d2.d1.d0.d2.d2"),
 		gene.New("Or.Or.Or.And.And.Not.Not.d1.d2.d0.d2.d1.d0.d0.d2"),
@@ -269,7 +270,7 @@ var odd7ParityTests = []struct {
 	{[]bool{true, true, true, true, true, true, true}, true},
 }
 
-func validateOdd7Parity(t *testing.T, g Genome) {
+func validateOdd7Parity(t *testing.T, g *Genome) {
 	for i, n := range odd7ParityTests {
 		r := g.EvalBool(n.in, bn.BoolAllGates)
 		if r != n.out {
@@ -279,7 +280,7 @@ func validateOdd7Parity(t *testing.T, g Genome) {
 }
 
 func TestOdd7Parity(t *testing.T) {
-	mux := New([]gene.Gene{
+	mux := New([]*gene.Gene{
 		gene.New("Nor.Nand.d4.Or.Or.Xor.Or.Xor.d1.d4.d1.d0.d5.d2.d2.d1.d1"),
 		gene.New("And.Or.Nor.Nand.Xor.Xor.Xor.Nor.d5.d0.d4.d3.d3.d6.d5.d5.d1"),
 		gene.New("Xor.Xor.Xor.Xor.Nand.Or.Nand.Nor.d0.d2.d2.d4.d1.d1.d3.d1.d3"),
@@ -318,7 +319,7 @@ var maunaLoaCO2Tests = []struct {
 	{[]float64{313.84, 313.34, 314.81, 315.59, 316.43, 316.97, 317.58, 319.03, 320.03, 319.59, 318.18}, 315.91},
 }
 
-func validateMaunaLoaCO2(t *testing.T, g Genome) {
+func validateMaunaLoaCO2(t *testing.T, g *Genome) {
 	for i, n := range maunaLoaCO2Tests {
 		r := g.EvalMath(n.in)
 		e := math.Abs(r - n.out)
@@ -394,7 +395,7 @@ func TestMaunaLoaCO2(t *testing.T) {
 		4.03668324839015,
 		-3.56907559434797,
 	}
-	gn := New([]gene.Gene{g1, g2, g3, g4, g5}, "Avg2")
+	gn := New([]*gene.Gene{g1, g2, g3, g4, g5}, "Avg2")
 	validateMaunaLoaCO2(t, gn)
 }
 
@@ -504,7 +505,7 @@ var irisPlantsTests = []struct {
 	{[]float64{5.6, 2.8, 4.9, 2}, 1},
 }
 
-func validateIrisPlants(t *testing.T, g Genome) {
+func validateIrisPlants(t *testing.T, g *Genome) {
 	for i, n := range irisPlantsTests {
 		r := g.EvalMath(n.in)
 		e := math.Abs(r - n.out)
@@ -554,7 +555,7 @@ func TestIrisPlants(t *testing.T) {
 		-2.74391918698691,
 		1.35288552507096,
 	}
-	gn := New([]gene.Gene{g1, g2, g3}, "+")
+	gn := New([]*gene.Gene{g1, g2, g3}, "+")
 	validateIrisPlants(t, gn)
 }
 
@@ -574,7 +575,7 @@ var emotivEEGTests = []struct {
 	{[]float64{4434.35886592476, 4325.64091986531, 3959.99990316537, 3655.38452599881, 3859.99990561069, 4224.61528131007, 4393.33322590233, 4650.25629654282, 4308.71784335606, 4076.41015672903, 4266.66656233306, 4291.7947668468, 4095.3845152394, 4144.10246276604}, 1},
 }
 
-func validateEmotivEEG(t *testing.T, g Genome) {
+func validateEmotivEEG(t *testing.T, g *Genome) {
 	for i, n := range emotivEEGTests {
 		r := g.EvalMath(n.in)
 		e := math.Abs(r - n.out)
@@ -637,7 +638,7 @@ func TestEmotivEEG(t *testing.T) {
 		8.32840449232459,
 		1.25095370342112,
 	}
-	gn := New([]gene.Gene{g1, g2, g3, g4}, "+")
+	gn := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	validateEmotivEEG(t, gn)
 }
 
@@ -711,7 +712,7 @@ var fuelConsumptionTests = []struct {
 	{[]float64{4, 104, 95, 2375, 17.5, 70, 2}, 25},
 }
 
-func validateFuelConsumption(t *testing.T, g Genome) {
+func validateFuelConsumption(t *testing.T, g *Genome) {
 	for i, n := range fuelConsumptionTests {
 		r := g.EvalMath(n.in)
 		e := math.Abs(r - n.out)
@@ -721,7 +722,7 @@ func validateFuelConsumption(t *testing.T, g Genome) {
 	}
 }
 
-func TestFuelConsumption(t *testing.T) {
+func newFuelConsumption() *Genome {
 	g1 := gene.New("+.d2.-.+./.Atan./.*.c4.d0.d5.d0.d0.d0.d5.d2.d0")
 	g2 := gene.New("c7.+.+.+.Avg2.d4.d6.-.d4.c7.d1.d2.c2.d6.c8.d6.d2")
 	g3 := gene.New("Min2.-.+.d6.*.*.Ln.Tanh.c4.c4.d0.c4.d6.d4.d4.c2.c4")
@@ -774,6 +775,81 @@ func TestFuelConsumption(t *testing.T) {
 		3.30928445387127,
 		-8.11151463362529,
 	}
-	gn := New([]gene.Gene{g1, g2, g3, g4}, "+")
+	return New([]*gene.Gene{g1, g2, g3, g4}, "+")
+}
+
+func TestFuelConsumption(t *testing.T) {
+	gn := newFuelConsumption()
 	validateFuelConsumption(t, gn)
+}
+
+func checkEqual(g1 *Genome, g2 *Genome) error {
+	if g1 == nil || g2 == nil {
+		return fmt.Errorf("genome.checkEqual error: g1 and g2 must be non-nil")
+	}
+	if len(g1.Genes) != len(g2.Genes) {
+		return fmt.Errorf("len(g1.Genes)=%v != len(g2.Genes)=%v", len(g1.Genes), len(g2.Genes))
+	}
+	for i := range g1.Genes {
+		if err := gene.CheckEqual(g1.Genes[i], g2.Genes[i]); err != nil {
+			return fmt.Errorf("g1.Genes[%v] != g2.Genes[%v]: %v", i, i, err)
+		}
+	}
+	if g1.LinkFunc != g2.LinkFunc {
+		return fmt.Errorf("g1.LinkFunc=%v != g2.LinkFunc=%v", g1.LinkFunc, g2.LinkFunc)
+	}
+	if g1.Score != g2.Score {
+		return fmt.Errorf("g1.Score=%v != g2.Score=%v", g1.Score, g2.Score)
+	}
+	return nil
+}
+
+func TestDup(t *testing.T) {
+	mux := New([]*gene.Gene{
+		gene.New("Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2"),
+		gene.New("Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3"),
+		gene.New("Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0"),
+		gene.New("Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1"),
+	},
+		"And")
+	validateSixMultiplexer(t, mux) // Force evaluation
+	gn := mux.Dup()
+	if err := checkEqual(gn, mux); err != nil {
+		t.Errorf("TestDup after Dup failed: gn != mux: %v\n", err)
+	}
+	validateSixMultiplexer(t, gn) // Force evaluation
+	validateSixMultiplexer(t, mux)
+
+	gn = newFuelConsumption()
+	validateFuelConsumption(t, gn) // Force evaluation
+	mux = gn.Dup()
+	if err := checkEqual(gn, mux); err != nil {
+		t.Errorf("TestDup after Dup failed: gn != mux: %v\n", err)
+	}
+	validateFuelConsumption(t, gn) // Force evaluation
+	validateFuelConsumption(t, mux)
+}
+
+func TestMutate(t *testing.T) {
+	headSize := 7
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 5
+	funcs := []gene.FuncWeight{
+		{"Not", 1},
+		{"And", 5},
+		{"Or", 5},
+	}
+	mux := New([]*gene.Gene{
+		gene.RandomNew(headSize, tailSize, numTerminals, funcs),
+		gene.RandomNew(headSize, tailSize, numTerminals, funcs),
+		gene.RandomNew(headSize, tailSize, numTerminals, funcs),
+		gene.RandomNew(headSize, tailSize, numTerminals, funcs),
+	},
+		"And")
+	gn := mux.Dup()
+	mux.Mutate(1)
+	if err := checkEqual(gn, mux); err == nil {
+		t.Errorf("TestMutate failed: gn == mux\n")
+	}
 }

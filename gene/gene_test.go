@@ -18,7 +18,7 @@ var nandTests = []struct {
 	{[]bool{true, true}, false},
 }
 
-func validateNand(t *testing.T, g Gene) {
+func validateNand(t *testing.T, g *Gene) {
 	for i, n := range nandTests {
 		r := g.EvalBool(n.in, bn.BoolAllGates)
 		if r != n.out {
@@ -73,14 +73,18 @@ var mathTests = []struct {
 	},
 }
 
+func validateMath(t *testing.T, g *Gene, in []float64, out float64) {
+	r := g.EvalMath(in)
+	if math.Abs(r-out) > 1e-10 {
+		t.Errorf("%v: math.Eval(%#v) => %v, want %v", g, in, r, out)
+	}
+}
+
 func TestMath(t *testing.T) {
 	for _, v := range mathTests {
 		g := New(v.gene)
-		for i, n := range v.tests {
-			r := g.EvalMath(n.in)
-			if math.Abs(r-n.out) > 1e-10 {
-				t.Errorf("%v[%v]: math.Eval(%#v) => %v, want %v", v.gene, i, n.in, r, n.out)
-			}
+		for _, n := range v.tests {
+			validateMath(t, g, n.in, n.out)
 		}
 	}
 }
@@ -93,5 +97,44 @@ func TestGetBoolArgOrder(t *testing.T) {
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("nand.GetBoolArgOrder() got %#v, want %#v", got, want)
+	}
+}
+
+func TestDup(t *testing.T) {
+	nand := New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0")
+	validateNand(t, nand) // Force evaluation
+	g1 := nand.Dup()
+	if err := CheckEqual(g1, nand); err != nil {
+		t.Errorf("TestDup after Dup failed: g1 != nand: %v\n", err)
+	}
+	validateNand(t, nand) // Force evaluation
+	validateNand(t, g1)
+
+	g1 = New(mathTests[0].gene)
+	test := mathTests[0].tests[0]
+	validateMath(t, g1, test.in, test.out) // Force evaluation
+	nand = g1.Dup()
+	if err := CheckEqual(g1, nand); err != nil {
+		t.Errorf("TestDup after Dup failed: g1 != nand: %v\n", err)
+	}
+	validateMath(t, g1, test.in, test.out) // Force evaluation
+	validateMath(t, nand, test.in, test.out)
+}
+
+func TestMutate(t *testing.T) {
+	headSize := 7
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 5
+	funcs := []FuncWeight{
+		{"Not", 1},
+		{"And", 5},
+		{"Or", 5},
+	}
+	g1 := RandomNew(headSize, tailSize, numTerminals, funcs)
+	gn := g1.Dup()
+	g1.Mutate()
+	if err := CheckEqual(gn, g1); err == nil {
+		t.Errorf("TestMutate failed: g1 == mux\n")
 	}
 }

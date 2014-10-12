@@ -16,14 +16,14 @@ import (
 // It also provides the linking function and the score that results
 // from evaluating the genome against the fitness function.
 type Genome struct {
-	Genes    []gene.Gene
+	Genes    []*gene.Gene
 	LinkFunc string
 	Score    float64
 }
 
 // New creates a new genome from the given genes and linking function.
-func New(genes []gene.Gene, linkFunc string) Genome {
-	return Genome{Genes: genes, LinkFunc: linkFunc}
+func New(genes []*gene.Gene, linkFunc string) *Genome {
+	return &Genome{Genes: genes, LinkFunc: linkFunc}
 }
 
 // EvalBool evaluates the genome as a boolean expression and returns the result.
@@ -70,23 +70,25 @@ func (g Genome) String() string {
 func (g *Genome) Mutate(numMutations int) {
 	for i := 0; i < numMutations; i++ {
 		n := rand.Intn(len(g.Genes))
-		gene := &g.Genes[n]
-		// fmt.Printf("\nMutating gene #%v, before:\n%v\n", n, gene)
-		gene.Mutate()
-		// fmt.Printf("after:\n%v\n", gene)
+		// fmt.Printf("\nMutating gene #%v, before:\n%v\n", n, g.Genes[n])
+		g.Genes[n].Mutate()
+		// fmt.Printf("after:\n%v\n", g.Genes[n])
 	}
 }
 
 // Dup duplicates the genome into the provided destination genome.
-func (g *Genome) Dup(dst *Genome) {
-	if g == nil || dst == nil {
+func (g *Genome) Dup() *Genome {
+	if g == nil {
 		log.Printf("denome.Dup error: src and dst must be non-nil\n")
-		return
+		return nil
 	}
-	dst.Genes = make([]gene.Gene, len(g.Genes))
-	for i, v := range g.Genes {
-		v.Dup(&dst.Genes[i])
+	dst := &Genome{
+		Genes:    make([]*gene.Gene, len(g.Genes)),
+		LinkFunc: g.LinkFunc,
+		Score:    g.Score,
 	}
-	dst.LinkFunc = g.LinkFunc
-	dst.Score = g.Score
+	for i := range g.Genes {
+		dst.Genes[i] = g.Genes[i].Dup()
+	}
+	return dst
 }
