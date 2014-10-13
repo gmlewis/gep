@@ -5,22 +5,18 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"runtime"
 
 	"github.com/gmlewis/gep/functions"
 	"github.com/gmlewis/gep/gene"
 	"github.com/gmlewis/gep/genome"
 )
 
-// ScoringFunc is the function that is used to evaluate the fitness of the model.
-// Typically, a return value of 0 means that the function is nowhere close to being
-// a valid solution and a return value of 1000 (or higher) means a perfect solution.
-type ScoringFunc func(g *genome.Genome) float64
-
 // Generation represents one complete generation of the model.
 type Generation struct {
 	Genomes     []*genome.Genome
 	Funcs       []gene.FuncWeight
-	ScoringFunc ScoringFunc
+	ScoringFunc genome.ScoringFunc
 }
 
 // New creates a new random generation of the model.
@@ -32,7 +28,7 @@ type Generation struct {
 // numTerminals is the number of terminals (inputs) to use within each gene.
 // linkFunc is the linking function used to combine the genes within a genome.
 // sf is the scoring (or fitness) function.
-func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGenesPerGenome, numTerminals int, linkFunc string, sf ScoringFunc) *Generation {
+func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGenesPerGenome, numTerminals int, linkFunc string, sf genome.ScoringFunc) *Generation {
 	r := &Generation{
 		Genomes:     make([]*genome.Genome, numGenomes, numGenomes),
 		Funcs:       fs,
@@ -52,6 +48,7 @@ func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGe
 
 // Evolve runs the GEP algorithm for the given number of iterations, or until a score of 1000 (or more) is reached.
 func (g *Generation) Evolve(iterations int) *genome.Genome {
+	runtime.GOMAXPROCS(runtime.NumCPU()) // Use all CPUs
 	// Algorithm flow diagram, figure 3.1, book page 56
 	for i := 0; i < iterations; i++ {
 		// fmt.Printf("Iteration #%v...\n", i)
@@ -118,11 +115,15 @@ func (g *Generation) mutation() {
 func (g *Generation) getBest() *genome.Genome {
 	bestScore := 0.0
 	bestGenome := g.Genomes[0]
-	for i := 0; i < len(g.Genomes); i++ {
-		g.Genomes[i].Score = g.ScoringFunc(g.Genomes[i])
-		if g.Genomes[i].Score > bestScore {
-			bestGenome = g.Genomes[i]
-			bestScore = g.Genomes[i].Score
+	c := make(chan *genome.Genome)
+	for i := 0; i < len(g.Genomes); i++ { // Evaluate genomes concurrently
+		go g.Genomes[i].Evaluate(g.ScoringFunc, c)
+	}
+	for i := 0; i < len(g.Genomes); i++ { // Collect and return the highest scoring Genome
+		gn := <-c
+		if gn.Score > bestScore {
+			bestGenome = gn
+			bestScore = gn.Score
 		}
 	}
 	return bestGenome

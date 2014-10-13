@@ -92,3 +92,14 @@ func (g *Genome) Dup() *Genome {
 	}
 	return dst
 }
+
+// ScoringFunc is the function that is used to evaluate the fitness of the model.
+// Typically, a return value of 0 means that the function is nowhere close to being
+// a valid solution and a return value of 1000 (or higher) means a perfect solution.
+type ScoringFunc func(g *Genome) float64
+
+// Evaluate scores a genome and sends the result to a channel.
+func (g *Genome) Evaluate(sf ScoringFunc, c chan<- *Genome) {
+	g.Score = sf(g)
+	c <- g
+}
