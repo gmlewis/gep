@@ -103,3 +103,15 @@ func (g *Genome) Evaluate(sf ScoringFunc, c chan<- *Genome) {
 	g.Score = sf(g)
 	c <- g
 }
+
+// Return n, the count of the number of times a specific symbol appears in the gene.
+// For example, a gene that include a "/" operation might be scored lower than
+// a gene implemented with only "-" and "+".
+
+func (g *Genome) CountSymbol(symbol string) int {
+	count := 0
+	for i := range g.Genes {
+		count += g.Genes[i].CountSymbol(symbol)
+	}
+	return count
+}
