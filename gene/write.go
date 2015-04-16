@@ -2,6 +2,7 @@ package gene
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 
@@ -34,12 +35,24 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 			exp = strings.Replace(exp, "x"+strconv.Itoa(i), e, -1)
 		}
 		return exp, nil
-	} else { // No named symbol found - look for d0, d1, ...
+	} else { // No named symbol found - look for d0, d1, ... or constants c0, c1, ...
 		if sym[0:1] == "d" {
-			if index, err := strconv.ParseInt(sym[1:], 10, 32); err != nil {
+			if index, err := strconv.Atoi(sym[1:]); err != nil {
 				return "", fmt.Errorf("unable to parse variable index: sym=%v\n", sym)
 			} else {
+				if n := g.numTerminals - len(g.Constants); index > n {
+					log.Fatalf("terminal symbol name %q exceeds number of terminals (%v)", sym, n)
+				}
 				return fmt.Sprintf("d[%v]", index), nil
+			}
+		} else if sym[0:1] == "c" {
+			if index, err := strconv.Atoi(sym[1:]); err != nil {
+				return "", fmt.Errorf("unable to parse constant index: sym=%v\n", sym)
+			} else {
+				if index > len(g.Constants) {
+					log.Fatalf("constant symbol name %q exceeds length of constant slice (%v)", sym, len(g.Constants))
+				}
+				return fmt.Sprintf("%f", g.Constants[index]), nil
 			}
 		}
 	}

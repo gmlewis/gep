@@ -841,10 +841,10 @@ func TestMutate(t *testing.T) {
 		{"Or", 5},
 	}
 	mux := New([]*gene.Gene{
-		gene.RandomNew(headSize, tailSize, numTerminals, funcs),
-		gene.RandomNew(headSize, tailSize, numTerminals, funcs),
-		gene.RandomNew(headSize, tailSize, numTerminals, funcs),
-		gene.RandomNew(headSize, tailSize, numTerminals, funcs),
+		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs),
+		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs),
+		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs),
+		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs),
 	},
 		"And")
 	gn := mux.Dup()

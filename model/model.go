@@ -26,9 +26,10 @@ type Generation struct {
 // headSize is the number of head symbols to use in a genome.
 // numGenesPerGenome is the number of genes to use per genome.
 // numTerminals is the number of terminals (inputs) to use within each gene.
+// numConstants is the number of constants (inputs) to use within each gene.
 // linkFunc is the linking function used to combine the genes within a genome.
 // sf is the scoring (or fitness) function.
-func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGenesPerGenome, numTerminals int, linkFunc string, sf genome.ScoringFunc) *Generation {
+func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGenesPerGenome, numTerminals, numConstants int, linkFunc string, sf genome.ScoringFunc) *Generation {
 	r := &Generation{
 		Genomes:     make([]*genome.Genome, numGenomes, numGenomes),
 		Funcs:       fs,
@@ -39,7 +40,7 @@ func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGe
 	for i := range r.Genomes {
 		genes := make([]*gene.Gene, numGenesPerGenome, numGenesPerGenome)
 		for j := range genes {
-			genes[j] = gene.RandomNew(headSize, tailSize, numTerminals, fs)
+			genes[j] = gene.RandomNew(headSize, tailSize, numTerminals, numConstants, fs)
 		}
 		r.Genomes[i] = genome.New(genes, linkFunc)
 	}

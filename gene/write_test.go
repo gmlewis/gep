@@ -26,3 +26,25 @@ func TestExpression(t *testing.T) {
 		t.Errorf("helpers got length %v, want 0", len(helpers))
 	}
 }
+
+func TestConstants(t *testing.T) {
+	want := "(d[0]+0.500000)"
+	g := New("+.d0.c1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0")
+	g.Constants = []float64{0.1, 0.5}
+	grammar, err := grammars.LoadGoMathGrammar()
+	if err != nil {
+		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
+	}
+
+	helpers := make(grammars.HelperMap)
+	got, err := g.Expression(grammar, helpers)
+	if err != nil {
+		t.Fatalf("g.Expression error: %v", err)
+	}
+	if got != want {
+		t.Errorf("g.Expression got %q, want %q", got, want)
+	}
+	if len(helpers) != 0 {
+		t.Errorf("helpers got length %v, want 0", len(helpers))
+	}
+}

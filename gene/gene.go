@@ -32,20 +32,49 @@ type Gene struct {
 	headSize    int
 	choiceSlice []string
 	// numTerminals is the number of inputs to the genetic program.
+	// It is important to retain this information in order to correctly
+	// distinguish between terminals (inputs and constants) and
+	// functions in the choiceSlice.  The first numTerminals entries
+	// are entirely inputs ("d*") and constants ("c*") whereas all
+	// choices following that are strictly function symbols.
 	numTerminals int
 }
 
 // New creates a new gene based on the Karva string representation.
 func New(x string) *Gene {
 	parts := strings.Split(x, ".")
-	return &Gene{Symbols: parts}
+	numConstants, numTerminals := 0, 0
+	for _, sym := range parts {
+		if sym[0:1] == "d" {
+			index, err := strconv.Atoi(sym[1:])
+			if err != nil {
+				log.Fatalf("unable to parse variable index %q: %v", sym, err)
+			}
+			if index >= numTerminals {
+				numTerminals = index + 1
+			}
+		} else if sym[0:1] == "c" {
+			index, err := strconv.Atoi(sym[1:])
+			if err != nil {
+				log.Fatalf("unable to parse constant index %q: %v", sym, err)
+			}
+			if index >= numConstants {
+				numConstants = index + 1
+			}
+		}
+	}
+	return &Gene{
+		Symbols:      parts,
+		Constants:    make([]float64, numConstants),
+		numTerminals: numTerminals + numConstants,
+	}
 }
 
 // RandomNew generates a new, random gene for further manipulation by the GEP
-// algorithm. The headSize, tailSize, and numTerminals determine the respective
+// algorithm. The headSize, tailSize, numTerminals, and numConstants determine the respective
 // properties of the gene, and functions provide the available functions and
 // their respective weights to be used in the creation of the gene.
-func RandomNew(headSize, tailSize, numTerminals int, functions []FuncWeight) *Gene {
+func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []FuncWeight) *Gene {
 	totalWeight := numTerminals
 	for _, f := range functions {
 		totalWeight += f.Weight
@@ -53,6 +82,11 @@ func RandomNew(headSize, tailSize, numTerminals int, functions []FuncWeight) *Ge
 	choiceSlice := make([]string, 0, totalWeight)
 	for i := 0; i < numTerminals; i++ {
 		choiceSlice = append(choiceSlice, fmt.Sprintf("d%v", i))
+	}
+	var constants []float64
+	for i := 0; i < numConstants; i++ {
+		choiceSlice = append(choiceSlice, fmt.Sprintf("c%v", i))
+		constants = append(constants, rand.Float64())
 	}
 	for _, f := range functions {
 		for i := 0; i < f.Weight; i++ {
@@ -62,17 +96,18 @@ func RandomNew(headSize, tailSize, numTerminals int, functions []FuncWeight) *Ge
 	choices := rand.Perm(totalWeight)
 	r := &Gene{
 		Symbols:      make([]string, 0, headSize+tailSize),
+		Constants:    constants,
 		headSize:     headSize,
 		choiceSlice:  choiceSlice,
-		numTerminals: numTerminals,
+		numTerminals: numTerminals + numConstants,
 	}
-	for i := 0; i < headSize; i++ {
+	for i := 0; i < headSize; i++ { // head is made up of any symbol (function, input, or constant)
 		choice := choices[i%len(choices)]
 		r.Symbols = append(r.Symbols, choiceSlice[choice])
 	}
-	for i := 0; i < tailSize; i++ {
+	for i := 0; i < tailSize; i++ { // tail is strictly made up of terminals (input or constant)
 		choice := choices[i%len(choices)]
-		r.Symbols = append(r.Symbols, choiceSlice[choice%numTerminals])
+		r.Symbols = append(r.Symbols, choiceSlice[choice%r.numTerminals])
 	}
 	return r
 }
@@ -158,11 +193,11 @@ func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int, nodes functions.
 		}
 	} else { // No named symbol found - look for d0, d1, ...
 		if sym[0:1] == "d" {
-			if index, err := strconv.ParseInt(sym[1:], 10, 32); err != nil {
+			if index, err := strconv.Atoi(sym[1:]); err != nil {
 				log.Printf("unable to parse variable index: sym=%v\n", sym)
 			} else {
 				return func(in []bool) bool {
-					if index >= int64(len(in)) {
+					if index >= len(in) {
 						log.Printf("error evaluating gene %v: index %v >= d length (%v)\n", sym, index, len(in))
 						return false
 					}
@@ -250,24 +285,24 @@ func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) 
 		}
 	} else { // No named symbol found - look for d0, d1, ...
 		if sym[0:1] == "d" {
-			if index, err := strconv.ParseInt(sym[1:], 10, 32); err != nil {
-				log.Printf("unable to parse variable index: sym=%v\n", sym)
+			if index, err := strconv.Atoi(sym[1:]); err != nil {
+				log.Printf("unable to parse variable index: sym=%q\n", sym)
 			} else {
 				return func(in []float64) float64 {
-					if index >= int64(len(in)) {
-						log.Printf("error evaluating gene %v: index %v >= d length (%v)\n", sym, index, len(in))
+					if index >= len(in) {
+						log.Printf("error evaluating gene %q: index %v >= d length (%v)\n", sym, index, len(in))
 						return 0.0
 					}
 					return in[index]
 				}
 			}
 		} else if sym[0:1] == "c" {
-			if index, err := strconv.ParseInt(sym[1:], 10, 32); err != nil {
+			if index, err := strconv.Atoi(sym[1:]); err != nil {
 				log.Printf("unable to parse constant index: sym=%v\n", sym)
 			} else {
 				return func(in []float64) float64 {
-					if index >= int64(len(g.Constants)) {
-						log.Printf("error evaluating gene %v: index %v >= c length (%v)\n", sym, index, len(g.Constants))
+					if index >= len(g.Constants) {
+						log.Printf("error evaluating gene %q: index %v >= c length (%v)\n", sym, index, len(g.Constants))
 						return 0.0
 					}
 					return g.Constants[index]
@@ -275,7 +310,7 @@ func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) 
 			}
 		}
 	}
-	log.Printf("unable to return function: sym=%v\n", sym)
+	log.Printf("unable to return function: sym=%q\n", sym)
 	return func(in []float64) float64 { return 0.0 }
 }
 
