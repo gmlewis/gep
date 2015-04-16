@@ -19,11 +19,24 @@ type Genome struct {
 	Genes    []*gene.Gene
 	LinkFunc string
 	Score    float64
+	// SymbolCount maps the symbol name to the count of the number
+	// of times the symbol is actually used in the generated function.
+	// Note that this count is typically different from the number
+	// of times the symbol appears in the Karva expression.  This can be
+	// a handy metric to assist in the fitness evaluation of a Genome.
+	// This also includes the number of times the LinkFunc is called.
+	SymbolCount map[string]int
 }
 
 // New creates a new genome from the given genes and linking function.
 func New(genes []*gene.Gene, linkFunc string) *Genome {
 	return &Genome{Genes: genes, LinkFunc: linkFunc}
+}
+
+func merge(dst *map[string]int, src map[string]int) {
+	for k, v := range src {
+		(*dst)[k] += v
+	}
 }
 
 // EvalBool evaluates the genome as a boolean expression and returns the result.
@@ -32,12 +45,23 @@ func New(genes []*gene.Gene, linkFunc string) *Genome {
 func (g *Genome) EvalBool(in []bool, fm functions.FuncMap) bool {
 	lf, ok := fm[g.LinkFunc]
 	if !ok {
-		log.Printf("Unable to find linking function: %v\n", g.LinkFunc)
+		log.Printf("Unable to find linking function: %v", g.LinkFunc)
 		return false
+	}
+	var count map[string]int
+	if g.SymbolCount == nil {
+		count = make(map[string]int)
+		count[g.LinkFunc] = len(g.Genes) - 1
 	}
 	result := g.Genes[0].EvalBool(in, fm)
 	for i := 1; i < len(g.Genes); i++ {
 		result = lf.BoolFunction(result, g.Genes[i].EvalBool(in, fm), false, false)
+		if count != nil {
+			merge(&count, g.Genes[i].SymbolCount)
+		}
+	}
+	if count != nil {
+		g.SymbolCount = count
 	}
 	return result
 }
@@ -47,12 +71,23 @@ func (g *Genome) EvalBool(in []bool, fm functions.FuncMap) bool {
 func (g *Genome) EvalMath(in []float64) float64 {
 	lf, ok := mn.Math[g.LinkFunc]
 	if !ok {
-		log.Printf("Unable to find linking function: %v\n", g.LinkFunc)
+		log.Printf("Unable to find linking function: %v", g.LinkFunc)
 		return 0.0
+	}
+	var count map[string]int
+	if g.SymbolCount == nil {
+		count = make(map[string]int)
+		count[g.LinkFunc] = len(g.Genes) - 1
 	}
 	result := g.Genes[0].EvalMath(in)
 	for i := 1; i < len(g.Genes); i++ {
 		result = lf.Float64Function(result, g.Genes[i].EvalMath(in), 0.0, 0.0)
+		if count != nil {
+			merge(&count, g.Genes[i].SymbolCount)
+		}
+	}
+	if count != nil {
+		g.SymbolCount = count
 	}
 	return result
 }
@@ -79,7 +114,7 @@ func (g *Genome) Mutate(numMutations int) {
 // Dup duplicates the genome into the provided destination genome.
 func (g *Genome) Dup() *Genome {
 	if g == nil {
-		log.Printf("denome.Dup error: src and dst must be non-nil\n")
+		log.Printf("denome.Dup error: src and dst must be non-nil")
 		return nil
 	}
 	dst := &Genome{

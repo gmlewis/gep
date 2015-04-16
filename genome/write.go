@@ -95,7 +95,7 @@ func (d *dump) generateCode() ([]byte, error) {
 	}
 	if len(helpers) > 0 { // Write out the helpers
 		keys := make([]string, 0, len(helpers))
-		for k, _ := range helpers {
+		for k := range helpers {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)

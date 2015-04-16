@@ -30,8 +30,28 @@ func validateNand(t *testing.T, g *Gene) {
 func TestNand(t *testing.T) {
 	nand := New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0")
 	validateNand(t, nand)
+	w := map[string]int{
+		"And": 3,
+		"Not": 2,
+		"Or":  2,
+		"d0":  2,
+		"d1":  4,
+	}
+	if !reflect.DeepEqual(nand.SymbolCount, w) {
+		t.Errorf("Gene %q SymbolCount=%v, want %v", nand, nand.SymbolCount, w)
+	}
 	nand = New("Or.And.Not.d0.Not.And.Or.d0.d0.d1.d1.d0.d1.d1.d1")
 	validateNand(t, nand)
+	w = map[string]int{
+		"And": 2,
+		"Not": 2,
+		"Or":  2,
+		"d0":  3,
+		"d1":  2,
+	}
+	if !reflect.DeepEqual(nand.SymbolCount, w) {
+		t.Errorf("Gene %q SymbolCount=%v, want %v", nand, nand.SymbolCount, w)
+	}
 }
 
 type mathTest struct {
@@ -42,11 +62,17 @@ type mathTest struct {
 var mathTests = []struct {
 	gene  string
 	tests []mathTest
+	count map[string]int
 }{
 	{
 		gene: "+.d0.d1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0",
 		tests: []mathTest{
 			mathTest{in: []float64{1.0, 2.0}, out: 3.0},
+		},
+		count: map[string]int{
+			"+":  1,
+			"d0": 1,
+			"d1": 1,
 		},
 	},
 	{
@@ -64,11 +90,23 @@ var mathTests = []struct {
 			mathTest{in: []float64{15}, out: -240},
 			mathTest{in: []float64{20}, out: -420},
 		},
+		count: map[string]int{
+			"+":  2,
+			"-":  3,
+			"*":  1,
+			"d0": 7,
+		},
 	},
 	{
 		gene: "-.*.*.*.d0./.d0.d0.d0.d0.d0.d0.d0",
 		tests: []mathTest{
 			mathTest{in: []float64{20.0}, out: 7980.0},
+		},
+		count: map[string]int{
+			"-":  1,
+			"*":  3,
+			"/":  1,
+			"d0": 6,
 		},
 	},
 }
@@ -81,10 +119,13 @@ func validateMath(t *testing.T, g *Gene, in []float64, out float64) {
 }
 
 func TestMath(t *testing.T) {
-	for _, v := range mathTests {
-		g := New(v.gene)
-		for _, n := range v.tests {
+	for _, test := range mathTests {
+		g := New(test.gene)
+		for _, n := range test.tests {
 			validateMath(t, g, n.in, n.out)
+		}
+		if !reflect.DeepEqual(g.SymbolCount, test.count) {
+			t.Errorf("Gene %q SymbolCount=%v, want %v", g, g.SymbolCount, test.count)
 		}
 	}
 }

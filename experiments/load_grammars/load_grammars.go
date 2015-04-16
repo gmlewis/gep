@@ -26,7 +26,7 @@ func main() {
 
 	v, err := xml.MarshalIndent(grammar, "", "   ")
 	if err != nil {
-		log.Printf("unable to marshal math grammar: %v\n", err)
+		log.Printf("unable to marshal math grammar: %v", err)
 	}
 
 	fmt.Println(string(v))

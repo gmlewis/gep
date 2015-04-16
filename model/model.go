@@ -139,7 +139,7 @@ func maxArity(fs []gene.FuncWeight, fm functions.FuncMap) int {
 				r = fn.Terminals()
 			}
 		} else {
-			log.Printf("unable to find symbol %v in function map\n", f.Symbol)
+			log.Printf("unable to find symbol %v in function map", f.Symbol)
 		}
 	}
 	return r

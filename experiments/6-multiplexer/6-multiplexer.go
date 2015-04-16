@@ -117,7 +117,7 @@ func main() {
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
-		log.Printf("unable to load Boolean grammar: %v\n", err)
+		log.Printf("unable to load Boolean grammar: %v", err)
 	}
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
 	fmt.Printf("// 6-multiplexer solution karva expression:\n// %q, score=%v\n", s, validateMulti(s))
