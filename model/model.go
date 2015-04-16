@@ -102,7 +102,7 @@ func (g *Generation) mutation() {
 	for i := 0; i < numGenomes; i++ {
 		// Pick a random genome
 		genomeNum := rand.Intn(len(g.Genomes))
-		genome := &g.Genomes[genomeNum]
+		genome := g.Genomes[genomeNum]
 		// Determine the total number of mutations to perform within the genome
 		numMutations := 1 + rand.Intn(2)
 		// fmt.Printf("\nMutating genome #%v %v times, before:\n%v\n", genomeNum, numMutations, genome)
