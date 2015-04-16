@@ -53,7 +53,7 @@ func main() {
 		{"*", 1},
 		{"/", 1},
 	}
-	e := model.New(funcs, mn.Math, 30, 6, 1, 1, "+", validateFunc)
+	e := model.New(funcs, mn.Math, 30, 6, 1, 1, 0, "+", validateFunc)
 	s := e.Evolve(10000)
 	fmt.Printf("(a^4 + a^3 + a^2 + a) solution: %v, score=%v\n", s, validateFunc(s))
 }

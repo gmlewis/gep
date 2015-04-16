@@ -131,7 +131,7 @@ func TestMutate(t *testing.T) {
 		{"And", 5},
 		{"Or", 5},
 	}
-	g1 := RandomNew(headSize, tailSize, numTerminals, funcs)
+	g1 := RandomNew(headSize, tailSize, numTerminals, 0, funcs)
 	gn := g1.Dup()
 	g1.Mutate()
 	if err := CheckEqual(gn, g1); err == nil {

@@ -173,7 +173,7 @@ func main() {
 		{"Or", 20},
 	}
 	numIn := len(parityTests[0].in)
-	e := model.New(funcs, bn.BoolAllGates, 30, 8, 4, numIn, "Xor", validateParity)
+	e := model.New(funcs, bn.BoolAllGates, 30, 8, 4, numIn, 0, "Xor", validateParity)
 	s := e.Evolve(10000)
 
 	// Write out the Go source code for the solution.
