@@ -26,9 +26,16 @@ type Gene struct {
 	// Symbols is the slice of strings being used in this gene's expression.
 	Symbols []string
 	// Constants is the slice of floats available for use by this gene.
-	Constants   []float64
-	bf          func([]bool) bool
-	mf          func([]float64) float64
+	Constants []float64
+	// SymbolCount maps the symbol name to the count of the number
+	// of times the symbol is actually used in the generated function.
+	// Note that this count is typically different from the number
+	// of times the symbol appears in the Karva expression.  This can be
+	// a handy metric to assist in the fitness evaluation of a Gene.
+	// This map is calculated when the function is (bf or mf) is created.
+	SymbolCount map[string]int
+	bf          func([]bool) bool       // boolean generated function
+	mf          func([]float64) float64 // math generated function
 	headSize    int
 	choiceSlice []string
 	// numTerminals is the number of inputs to the genetic program.
@@ -142,72 +149,91 @@ func (g *Gene) getBoolArgOrder(nodes functions.FuncMap) [][]int {
 func (g *Gene) EvalBool(in []bool, nodes functions.FuncMap) bool {
 	if g.bf == nil {
 		argOrder := g.getBoolArgOrder(nodes)
-		g.bf = g.buildBoolTree(0, argOrder, nodes)
+		g.bf, g.SymbolCount = g.buildBoolTree(0, argOrder, nodes)
 	}
 	return g.bf(in)
 }
 
-func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int, nodes functions.FuncMap) func([]bool) bool {
+func merge(dst *map[string]int, src map[string]int) {
+	for k, v := range src {
+		(*dst)[k] += v
+	}
+}
+
+func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int, nodes functions.FuncMap) (func([]bool) bool, map[string]int) {
+	count := make(map[string]int)
 	// log.Infof("buildBoolTree(%v, %#v, ...)", symbolIndex, argOrder)
-	if symbolIndex > len(g.Symbols) {
-		log.Printf("bad symbolIndex %v for symbols: %v\n", symbolIndex, g.Symbols)
-		return func(a []bool) bool { return false }
+	if symbolIndex >= len(g.Symbols) {
+		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
+		return func(a []bool) bool { return false }, count
 	}
 	sym := g.Symbols[symbolIndex]
+	count[sym]++
 	if s, ok := nodes[sym]; ok {
 		switch s.Terminals() {
 		case 0:
 			return func(in []bool) bool {
 				return s.BoolFunction(false, false, false, false)
-			}
+			}, count
 		case 1:
 			args := argOrder[symbolIndex]
-			f := g.buildBoolTree(args[0], argOrder, nodes)
+			f, c := g.buildBoolTree(args[0], argOrder, nodes)
+			merge(&count, c)
 			return func(in []bool) bool {
 				return s.BoolFunction(f(in), false, false, false)
-			}
+			}, count
 		case 2:
 			args := argOrder[symbolIndex]
-			left := g.buildBoolTree(args[0], argOrder, nodes)
-			right := g.buildBoolTree(args[1], argOrder, nodes)
+			left, lc := g.buildBoolTree(args[0], argOrder, nodes)
+			merge(&count, lc)
+			right, rc := g.buildBoolTree(args[1], argOrder, nodes)
+			merge(&count, rc)
 			return func(in []bool) bool {
 				return s.BoolFunction(left(in), right(in), false, false)
-			}
+			}, count
 		case 3:
 			args := argOrder[symbolIndex]
-			f1 := g.buildBoolTree(args[0], argOrder, nodes)
-			f2 := g.buildBoolTree(args[1], argOrder, nodes)
-			f3 := g.buildBoolTree(args[2], argOrder, nodes)
+			f1, c1 := g.buildBoolTree(args[0], argOrder, nodes)
+			merge(&count, c1)
+			f2, c2 := g.buildBoolTree(args[1], argOrder, nodes)
+			merge(&count, c2)
+			f3, c3 := g.buildBoolTree(args[2], argOrder, nodes)
+			merge(&count, c3)
 			return func(in []bool) bool {
 				return s.BoolFunction(f1(in), f2(in), f3(in), false)
-			}
+			}, count
 		case 4:
 			args := argOrder[symbolIndex]
-			f1 := g.buildBoolTree(args[0], argOrder, nodes)
-			f2 := g.buildBoolTree(args[1], argOrder, nodes)
-			f3 := g.buildBoolTree(args[2], argOrder, nodes)
-			f4 := g.buildBoolTree(args[3], argOrder, nodes)
+			f1, c1 := g.buildBoolTree(args[0], argOrder, nodes)
+			merge(&count, c1)
+			f2, c2 := g.buildBoolTree(args[1], argOrder, nodes)
+			merge(&count, c2)
+			f3, c3 := g.buildBoolTree(args[2], argOrder, nodes)
+			merge(&count, c3)
+			f4, c4 := g.buildBoolTree(args[3], argOrder, nodes)
+			merge(&count, c4)
 			return func(in []bool) bool {
 				return s.BoolFunction(f1(in), f2(in), f3(in), f4(in))
-			}
+			}, count
 		}
 	} else { // No named symbol found - look for d0, d1, ...
 		if sym[0:1] == "d" {
 			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse variable index: sym=%v\n", sym)
+				log.Printf("unable to parse variable index: sym=%q", sym)
 			} else {
 				return func(in []bool) bool {
 					if index >= len(in) {
-						log.Printf("error evaluating gene %v: index %v >= d length (%v)\n", sym, index, len(in))
+						log.Printf("error evaluating gene symbol %q: index %v >= d length (%v)", sym, index, len(in))
 						return false
 					}
 					return in[index]
-				}
+				}, count
 			}
 		}
+		// Note that constants c0, c1, ... don't make sense for bool expressions
 	}
-	log.Printf("unable to return function: sym=%v\n", sym)
-	return func(in []bool) bool { return false }
+	log.Printf("unable to return function: unknown gene symbol %q", sym)
+	return func(in []bool) bool { return false }, count
 }
 
 func (g *Gene) getMathArgOrder() [][]int {
@@ -234,84 +260,96 @@ func (g *Gene) getMathArgOrder() [][]int {
 func (g *Gene) EvalMath(in []float64) float64 {
 	if g.mf == nil {
 		argOrder := g.getMathArgOrder()
-		g.mf = g.buildMathTree(0, argOrder)
+		g.mf, g.SymbolCount = g.buildMathTree(0, argOrder)
 	}
 	return g.mf(in)
 }
 
-func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) float64 {
+func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) (func([]float64) float64, map[string]int) {
+	count := make(map[string]int)
 	// log.Infof("buildMathTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex > len(g.Symbols) {
-		log.Printf("bad symbolIndex %v for symbols: %v\n", symbolIndex, g.Symbols)
-		return func(a []float64) float64 { return 0.0 }
+		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
+		return func(a []float64) float64 { return 0.0 }, count
 	}
 	sym := g.Symbols[symbolIndex]
+	count[sym]++
 	if s, ok := mn.Math[sym]; ok {
 		switch s.Terminals() {
 		case 0:
 			return func(in []float64) float64 {
 				return s.Float64Function(0.0, 0.0, 0.0, 0.0)
-			}
+			}, count
 		case 1:
 			args := argOrder[symbolIndex]
-			f := g.buildMathTree(args[0], argOrder)
+			f, c := g.buildMathTree(args[0], argOrder)
+			merge(&count, c)
 			return func(in []float64) float64 {
 				return s.Float64Function(f(in), 0.0, 0.0, 0.0)
-			}
+			}, count
 		case 2:
 			args := argOrder[symbolIndex]
-			left := g.buildMathTree(args[0], argOrder)
-			right := g.buildMathTree(args[1], argOrder)
+			left, lc := g.buildMathTree(args[0], argOrder)
+			merge(&count, lc)
+			right, rc := g.buildMathTree(args[1], argOrder)
+			merge(&count, rc)
 			return func(in []float64) float64 {
 				return s.Float64Function(left(in), right(in), 0.0, 0.0)
-			}
+			}, count
 		case 3:
 			args := argOrder[symbolIndex]
-			f1 := g.buildMathTree(args[0], argOrder)
-			f2 := g.buildMathTree(args[1], argOrder)
-			f3 := g.buildMathTree(args[2], argOrder)
+			f1, c1 := g.buildMathTree(args[0], argOrder)
+			merge(&count, c1)
+			f2, c2 := g.buildMathTree(args[1], argOrder)
+			merge(&count, c2)
+			f3, c3 := g.buildMathTree(args[2], argOrder)
+			merge(&count, c3)
 			return func(in []float64) float64 {
 				return s.Float64Function(f1(in), f2(in), f3(in), 0.0)
-			}
+			}, count
 		case 4:
 			args := argOrder[symbolIndex]
-			f1 := g.buildMathTree(args[0], argOrder)
-			f2 := g.buildMathTree(args[1], argOrder)
-			f3 := g.buildMathTree(args[2], argOrder)
-			f4 := g.buildMathTree(args[3], argOrder)
+			f1, c1 := g.buildMathTree(args[0], argOrder)
+			merge(&count, c1)
+			f2, c2 := g.buildMathTree(args[1], argOrder)
+			merge(&count, c2)
+			f3, c3 := g.buildMathTree(args[2], argOrder)
+			merge(&count, c3)
+			f4, c4 := g.buildMathTree(args[3], argOrder)
+			merge(&count, c4)
 			return func(in []float64) float64 {
 				return s.Float64Function(f1(in), f2(in), f3(in), f4(in))
-			}
+			}, count
 		}
 	} else { // No named symbol found - look for d0, d1, ...
 		if sym[0:1] == "d" {
 			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse variable index: sym=%q\n", sym)
+				log.Printf("unable to parse variable index: sym=%q", sym)
 			} else {
 				return func(in []float64) float64 {
 					if index >= len(in) {
-						log.Printf("error evaluating gene %q: index %v >= d length (%v)\n", sym, index, len(in))
+						log.Printf("error evaluating gene %q: index %v >= d length (%v)", sym, index, len(in))
 						return 0.0
 					}
 					return in[index]
-				}
+				}, count
 			}
 		} else if sym[0:1] == "c" {
 			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse constant index: sym=%v\n", sym)
+				log.Printf("unable to parse constant index: sym=%v", sym)
 			} else {
 				return func(in []float64) float64 {
 					if index >= len(g.Constants) {
-						log.Printf("error evaluating gene %q: index %v >= c length (%v)\n", sym, index, len(g.Constants))
+						log.Printf("error evaluating gene %q: index %v >= c length (%v)", sym, index, len(g.Constants))
 						return 0.0
 					}
 					return g.Constants[index]
-				}
+				}, count
 			}
 		}
 	}
-	log.Printf("unable to return function: sym=%q\n", sym)
-	return func(in []float64) float64 { return 0.0 }
+	log.Printf("unable to return function: unknown gene symbol %q", sym)
+	return func(in []float64) float64 { return 0.0 }, count
 }
 
 // Mutate mutates a gene by performing a single random symbol exchange within the gene.
@@ -322,7 +360,7 @@ func (g *Gene) Mutate() {
 	}
 	if position < g.headSize {
 		if len(g.choiceSlice) < 2 {
-			log.Printf("error: must have choice of more than one function\n")
+			log.Printf("error: must have choice of more than one function")
 			return
 		}
 		symbol := g.Symbols[position]
@@ -349,7 +387,7 @@ func (g *Gene) Mutate() {
 // Dup duplicates the gene into the provided destination gene.
 func (g *Gene) Dup() *Gene {
 	if g == nil {
-		log.Printf("gene.Dup error: src and dst must be non-nil\n")
+		log.Printf("gene.Dup error: src and dst must be non-nil")
 		return nil
 	}
 	r := &Gene{
@@ -373,6 +411,7 @@ func (g *Gene) Dup() *Gene {
 	return r
 }
 
+// CheckEqual is used for testing purposes only (exported to use in genome_test.go).
 func CheckEqual(g1 *Gene, g2 *Gene) error {
 	if g1 == nil || g2 == nil {
 		return fmt.Errorf("gene.CheckEqual error: g1 and g2 must be non-nil")

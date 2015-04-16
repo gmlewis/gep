@@ -72,7 +72,7 @@ func main() {
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoMathGrammar()
 	if err != nil {
-		log.Printf("unable to load Boolean grammar: %v\n", err)
+		log.Printf("unable to load Boolean grammar: %v", err)
 	}
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
 	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %q, score=%v\n", s, validateFunc(s))

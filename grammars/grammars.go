@@ -250,13 +250,13 @@ func loadGrammar(path string) (*Grammar, error) {
 
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Printf("unable to read file %q: %q\n", path, err)
+		log.Printf("unable to read file %q: %q", path, err)
 		return nil, err
 	}
 
 	err = xml.Unmarshal(data, &v)
 	if err != nil {
-		log.Printf("error unmarshaling %q: %q\n", path, err)
+		log.Printf("error unmarshaling %q: %q", path, err)
 		return nil, err
 	}
 
