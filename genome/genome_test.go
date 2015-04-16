@@ -853,3 +853,31 @@ func TestMutate(t *testing.T) {
 		t.Errorf("TestMutate failed: gn == mux\n")
 	}
 }
+
+func TestCountSymbol1(t *testing.T) {
+	g := gene.New("Max2.-./.Min2.-.-.-.d10.-.Max2.d0.d10.d10.c4.c0.d6.c6.c0.c9.d10.d10")
+	var count int
+
+	count = g.CountSymbol("Max2")
+	if count != 2 {
+		t.Errorf("count was %v", count)
+	}
+
+	count = g.CountSymbol("Min2")
+	if count != 1 {
+		t.Errorf("count was %v", count)
+	}
+
+	count = g.CountSymbol("Not")
+	if count != 0 {
+		t.Errorf("count was %v", count)
+	}
+
+	// CountSymbol can also be used to test how many times a specific terminal is used
+
+	count = g.CountSymbol("d10")
+	if count != 5 {
+		t.Errorf("count was %v", count)
+	}
+
+}

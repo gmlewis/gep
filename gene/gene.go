@@ -409,3 +409,17 @@ func CheckEqual(g1 *Gene, g2 *Gene) error {
 	}
 	return nil
 }
+
+// Return n, the count of the number of times a specific symbol appears in the gene.
+// For example, a gene that include a "/" operation might be scored lower than
+// a gene implemented with only "-" and "+".
+
+func (g *Gene) CountSymbol(symbol string) int {
+	count := 0
+	for _, s := range g.Symbols {
+		if symbol == s {
+			count += 1
+		}
+	}
+	return count
+}
