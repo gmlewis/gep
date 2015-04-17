@@ -103,20 +103,10 @@ func TestSixMultiplexer(t *testing.T) {
 		"And")
 	validateSixMultiplexer(t, mux)
 	w := map[string]int{
-		"And":  7,
-		"Nand": 6,
-		"Nor":  5,
-		"Not":  1,
-		"Or":   6,
-		"d0":   6,
-		"d1":   5,
-		"d2":   2,
-		"d3":   4,
-		"d4":   5,
-		"d5":   2,
+		"Or": 7, "d1": 7, "d4": 6, "d3": 5, "d5": 2, "And": 9, "d0": 7, "d2": 4, "Nor": 7, "Not": 3, "Nand": 7,
 	}
-	if !reflect.DeepEqual(mux.SymbolCount, w) {
-		t.Errorf("Genome %q SymbolCount=%v, want %v", mux, mux.SymbolCount, w)
+	if !reflect.DeepEqual(mux.SymbolMap, w) {
+		t.Errorf("Genome %q SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
 	}
 }
 
@@ -152,15 +142,10 @@ func TestOdd3Parity(t *testing.T) {
 		"And")
 	validateOdd3Parity(t, mux)
 	w := map[string]int{
-		"And": 8,
-		"Not": 4,
-		"Or":  4,
-		"d0":  4,
-		"d1":  4,
-		"d2":  4,
+		"d1": 6, "Or": 7, "Not": 4, "And": 10, "d2": 6, "d0": 6,
 	}
-	if !reflect.DeepEqual(mux.SymbolCount, w) {
-		t.Errorf("Genome %q SymbolCount=%v, want %v", mux, mux.SymbolCount, w)
+	if !reflect.DeepEqual(mux.SymbolMap, w) {
+		t.Errorf("Genome %q SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
 	}
 }
 
@@ -317,22 +302,10 @@ func TestOdd7Parity(t *testing.T) {
 		"Xor")
 	validateOdd7Parity(t, mux)
 	w := map[string]int{
-		"And":  5,
-		"Nand": 3,
-		"Nor":  4,
-		"Not":  1,
-		"Or":   2,
-		"Xor":  12,
-		"d0":   2,
-		"d1":   6,
-		"d2":   3,
-		"d3":   4,
-		"d4":   2,
-		"d5":   6,
-		"d6":   3,
+		"Nor": 5, "Or": 5, "d2": 5, "d4": 4, "d0": 3, "d6": 3, "And": 5, "Xor": 14, "d5": 7, "Nand": 4, "d1": 8, "d3": 4, "Not": 1,
 	}
-	if !reflect.DeepEqual(mux.SymbolCount, w) {
-		t.Errorf("Genome %q SymbolCount=%v, want %v", mux, mux.SymbolCount, w)
+	if !reflect.DeepEqual(mux.SymbolMap, w) {
+		t.Errorf("Genome %q SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
 	}
 }
 
@@ -444,39 +417,13 @@ func TestMaunaLoaCO2(t *testing.T) {
 	gn := New([]*gene.Gene{g1, g2, g3, g4, g5}, "Avg2")
 	validateMaunaLoaCO2(t, gn)
 	w := map[string]int{
-		"*":     3,
-		"+":     3,
-		"-":     9,
-		"/":     2,
-		"3Rt":   1,
-		"5Rt":   2,
-		"Avg2":  5,
-		"Floor": 1,
-		"Ln":    1,
-		"Max2":  5,
-		"Min2":  6,
-		"NOT":   1,
-		"X4":    1,
-		"c0":    3,
-		"c1":    2,
-		"c3":    1,
-		"c4":    2,
-		"c5":    1,
-		"c6":    1,
-		"c7":    1,
-		"c8":    2,
-		"c9":    2,
-		"d0":    3,
-		"d1":    2,
-		"d10":   5,
-		"d3":    1,
-		"d4":    1,
-		"d5":    2,
-		"d6":    2,
-		"d8":    2,
+		"-": 10, "d9": 1, "d0": 3, "c3": 1, "c0": 3, "c4": 3, "Min2": 6, "3Rt": 2,
+		"d5": 4, "+": 5, "d4": 1, "X4": 1, "c1": 2, "/": 2, "*": 4, "Max2": 6,
+		"d1": 2, "c8": 2, "c9": 2, "d10": 9, "5Rt": 2, "Ln": 1, "NOT": 1, "Avg2": 9,
+		"Floor": 1, "d8": 2, "d6": 2, "c5": 1, "d3": 2, "c6": 2, "c7": 1,
 	}
-	if !reflect.DeepEqual(gn.SymbolCount, w) {
-		t.Errorf("Genome %q SymbolCount=%v, want %v", gn, gn.SymbolCount, w)
+	if !reflect.DeepEqual(gn.SymbolMap, w) {
+		t.Errorf("Genome %q SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
 	}
 }
 
@@ -639,21 +586,11 @@ func TestIrisPlants(t *testing.T) {
 	gn := New([]*gene.Gene{g1, g2, g3}, "+")
 	validateIrisPlants(t, gn)
 	w := map[string]int{
-		"+":     2,
-		"3Rt":   1,
-		"AND1":  1,
-		"AND2":  2,
-		"Avg2":  1,
-		"GOE2A": 1,
-		"GOE2C": 1,
-		"c1":    1,
-		"c6":    1,
-		"d0":    2,
-		"d2":    2,
-		"d3":    2,
+		"GOE2C": 1, "Avg2": 1, "c1": 1, "d0": 2, "+": 2, "d2": 4, "d3": 2, "AND1": 1, "c6": 1,
+		"AND2": 2, "3Rt": 1, "GOE2A": 1, "Sqrt": 1, "GOE2E": 1,
 	}
-	if !reflect.DeepEqual(gn.SymbolCount, w) {
-		t.Errorf("Genome %q SymbolCount=%v, want %v", gn, gn.SymbolCount, w)
+	if !reflect.DeepEqual(gn.SymbolMap, w) {
+		t.Errorf("Genome %q SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
 	}
 }
 
@@ -739,24 +676,11 @@ func TestEmotivEEG(t *testing.T) {
 	gn := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	validateEmotivEEG(t, gn)
 	w := map[string]int{
-		"*":    3,
-		"+":    6,
-		"-":    4,
-		"/":    1,
-		"Avg2": 2,
-		"Logi": 1,
-		"c2":   2,
-		"c3":   1,
-		"c7":   2,
-		"d0":   1,
-		"d4":   2,
-		"d5":   1,
-		"d7":   1,
-		"d8":   2,
-		"d9":   4,
+		"c2": 3, "d0": 2, "Logi": 1, "d4": 2, "d9": 4, "d7": 1, "+": 9, "d1": 1, "d5": 1,
+		"c7": 2, "Avg2": 3, "d2": 1, "*": 3, "d3": 2, "d8": 4, "c3": 1, "/": 2, "-": 6, "Inv": 1,
 	}
-	if !reflect.DeepEqual(gn.SymbolCount, w) {
-		t.Errorf("Genome %q SymbolCount=%v, want %v", gn, gn.SymbolCount, w)
+	if !reflect.DeepEqual(gn.SymbolMap, w) {
+		t.Errorf("Genome %q SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
 	}
 }
 
@@ -900,21 +824,11 @@ func TestFuelConsumption(t *testing.T) {
 	gn := newFuelConsumption()
 	validateFuelConsumption(t, gn)
 	w := map[string]int{
-		"*":    2,
-		"+":    7,
-		"-":    3,
-		"Ln":   1,
-		"Min2": 1,
-		"Tanh": 2,
-		"c1":   1,
-		"c4":   4,
-		"c7":   1,
-		"d0":   3,
-		"d2":   1,
-		"d6":   3,
+		"*": 3, "d0": 7, "-": 4, "d5": 1, "Ln": 1, "Tanh": 2, "c1": 1, "+": 9, "c7": 1,
+		"Min2": 1, "/": 2, "c4": 5, "d2": 2, "Atan": 1, "d6": 3,
 	}
-	if !reflect.DeepEqual(gn.SymbolCount, w) {
-		t.Errorf("Genome %q SymbolCount=%v, want %v", gn, gn.SymbolCount, w)
+	if !reflect.DeepEqual(gn.SymbolMap, w) {
+		t.Errorf("Genome %q SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
 	}
 }
 

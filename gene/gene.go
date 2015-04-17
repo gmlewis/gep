@@ -27,13 +27,8 @@ type Gene struct {
 	Symbols []string
 	// Constants is the slice of floats available for use by this gene.
 	Constants []float64
-	// SymbolCount maps the symbol name to the count of the number
-	// of times the symbol is actually used in the generated function.
-	// Note that this count is typically different from the number
-	// of times the symbol appears in the Karva expression.  This can be
-	// a handy metric to assist in the fitness evaluation of a Gene.
-	// This map is calculated when the function is (bf or mf) is created.
-	SymbolCount map[string]int
+
+	SymbolMap   map[string]int          // do not use directly.  Use SymbolCount() instead.
 	bf          func([]bool) bool       // boolean generated function
 	mf          func([]float64) float64 // math generated function
 	headSize    int
@@ -149,7 +144,7 @@ func (g *Gene) getBoolArgOrder(nodes functions.FuncMap) [][]int {
 func (g *Gene) EvalBool(in []bool, nodes functions.FuncMap) bool {
 	if g.bf == nil {
 		argOrder := g.getBoolArgOrder(nodes)
-		g.bf, g.SymbolCount = g.buildBoolTree(0, argOrder, nodes)
+		g.bf, g.SymbolMap = g.buildBoolTree(0, argOrder, nodes)
 	}
 	return g.bf(in)
 }
@@ -255,12 +250,29 @@ func (g *Gene) getMathArgOrder() [][]int {
 	return argOrder
 }
 
+// SymbolCount returns the count of the number of times the symbol
+// is actually used in the Gene.
+// Note that this count is typically different from the number
+// of times the symbol appears in the Karva expression.  This can be
+// a handy metric to assist in the fitness evaluation of a Gene.
+// Note also that this currently only works for Math expressions.
+// Hopefully this restriction will be lifted in the future.
+// A workaround for using it with other types is to evaluate the
+// Gene, and then g.symbolCount will already be populated.
+func (g *Gene) SymbolCount(sym string) int {
+	if g.SymbolMap == nil {
+		argOrder := g.getMathArgOrder()
+		g.mf, g.SymbolMap = g.buildMathTree(0, argOrder)
+	}
+	return g.SymbolMap[sym]
+}
+
 // EvalMath evaluates the gene as a floating-point expression and returns the result.
 // in represents the float64 inputs available to the gene.
 func (g *Gene) EvalMath(in []float64) float64 {
 	if g.mf == nil {
 		argOrder := g.getMathArgOrder()
-		g.mf, g.SymbolCount = g.buildMathTree(0, argOrder)
+		g.mf, g.SymbolMap = g.buildMathTree(0, argOrder)
 	}
 	return g.mf(in)
 }
