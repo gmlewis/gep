@@ -37,8 +37,8 @@ func TestNand(t *testing.T) {
 		"d0":  2,
 		"d1":  4,
 	}
-	if !reflect.DeepEqual(nand.SymbolCount, w) {
-		t.Errorf("Gene %q SymbolCount=%v, want %v", nand, nand.SymbolCount, w)
+	if !reflect.DeepEqual(nand.SymbolMap, w) {
+		t.Errorf("Gene %q SymbolMap=%v, want %v", nand, nand.SymbolMap, w)
 	}
 	nand = New("Or.And.Not.d0.Not.And.Or.d0.d0.d1.d1.d0.d1.d1.d1")
 	validateNand(t, nand)
@@ -49,8 +49,8 @@ func TestNand(t *testing.T) {
 		"d0":  3,
 		"d1":  2,
 	}
-	if !reflect.DeepEqual(nand.SymbolCount, w) {
-		t.Errorf("Gene %q SymbolCount=%v, want %v", nand, nand.SymbolCount, w)
+	if !reflect.DeepEqual(nand.SymbolMap, w) {
+		t.Errorf("Gene %q SymbolMap=%v, want %v", nand, nand.SymbolMap, w)
 	}
 }
 
@@ -124,8 +124,8 @@ func TestMath(t *testing.T) {
 		for _, n := range test.tests {
 			validateMath(t, g, n.in, n.out)
 		}
-		if !reflect.DeepEqual(g.SymbolCount, test.count) {
-			t.Errorf("Gene %q SymbolCount=%v, want %v", g, g.SymbolCount, test.count)
+		if !reflect.DeepEqual(g.SymbolMap, test.count) {
+			t.Errorf("Gene %q SymbolMap=%v, want %v", g, g.SymbolMap, test.count)
 		}
 	}
 }

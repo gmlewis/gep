@@ -19,13 +19,8 @@ type Genome struct {
 	Genes    []*gene.Gene
 	LinkFunc string
 	Score    float64
-	// SymbolCount maps the symbol name to the count of the number
-	// of times the symbol is actually used in the generated function.
-	// Note that this count is typically different from the number
-	// of times the symbol appears in the Karva expression.  This can be
-	// a handy metric to assist in the fitness evaluation of a Genome.
-	// This also includes the number of times the LinkFunc is called.
-	SymbolCount map[string]int
+
+	SymbolMap map[string]int // do not use directly.  Use SymbolCount() instead.
 }
 
 // New creates a new genome from the given genes and linking function.
@@ -39,6 +34,28 @@ func merge(dst *map[string]int, src map[string]int) {
 	}
 }
 
+// SymbolCount returns the count of the number of times the symbol
+// is actually used in the Genome.
+// Note that this count is typically different from the number
+// of times the symbol appears in the Karva expression.  This can be
+// a handy metric to assist in the fitness evaluation of a Genome.
+// Note also that this currently only works for Math expressions.
+// Hopefully this restriction will be lifted in the future.
+// A workaround for using it with other types is to evaluate the
+// Genome, and then g.symbolCount will already be populated.
+func (g *Genome) SymbolCount(sym string) int {
+	if g.SymbolMap == nil {
+		g.SymbolMap = make(map[string]int)
+		g.SymbolMap[g.LinkFunc] = len(g.Genes) - 1
+		for i := 0; i < len(g.Genes); i++ {
+			g.Genes[i].SymbolCount(sym) // force evaluation
+			m := g.Genes[i].SymbolMap
+			merge(&(g.SymbolMap), m)
+		}
+	}
+	return g.SymbolMap[sym]
+}
+
 // EvalBool evaluates the genome as a boolean expression and returns the result.
 // in represents the boolean inputs available to the genome.
 // fm is the map of available boolean functions to the genome.
@@ -49,19 +66,22 @@ func (g *Genome) EvalBool(in []bool, fm functions.FuncMap) bool {
 		return false
 	}
 	var count map[string]int
-	if g.SymbolCount == nil {
+	if g.SymbolMap == nil {
 		count = make(map[string]int)
 		count[g.LinkFunc] = len(g.Genes) - 1
 	}
 	result := g.Genes[0].EvalBool(in, fm)
+	if count != nil {
+		merge(&count, g.Genes[0].SymbolMap)
+	}
 	for i := 1; i < len(g.Genes); i++ {
 		result = lf.BoolFunction(result, g.Genes[i].EvalBool(in, fm), false, false)
 		if count != nil {
-			merge(&count, g.Genes[i].SymbolCount)
+			merge(&count, g.Genes[i].SymbolMap)
 		}
 	}
 	if count != nil {
-		g.SymbolCount = count
+		g.SymbolMap = count
 	}
 	return result
 }
@@ -75,19 +95,22 @@ func (g *Genome) EvalMath(in []float64) float64 {
 		return 0.0
 	}
 	var count map[string]int
-	if g.SymbolCount == nil {
+	if g.SymbolMap == nil {
 		count = make(map[string]int)
 		count[g.LinkFunc] = len(g.Genes) - 1
 	}
 	result := g.Genes[0].EvalMath(in)
+	if count != nil {
+		merge(&count, g.Genes[0].SymbolMap)
+	}
 	for i := 1; i < len(g.Genes); i++ {
 		result = lf.Float64Function(result, g.Genes[i].EvalMath(in), 0.0, 0.0)
 		if count != nil {
-			merge(&count, g.Genes[i].SymbolCount)
+			merge(&count, g.Genes[i].SymbolMap)
 		}
 	}
 	if count != nil {
-		g.SymbolCount = count
+		g.SymbolMap = count
 	}
 	return result
 }
