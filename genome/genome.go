@@ -158,6 +158,9 @@ type ScoringFunc func(g *Genome) float64
 
 // Evaluate scores a genome and sends the result to a channel.
 func (g *Genome) Evaluate(sf ScoringFunc, c chan<- *Genome) {
+	if sf == nil {
+		log.Fatalf("genome.Evaluate: ScoringFunc must not be nil")
+	}
 	g.Score = sf(g)
 	c <- g
 }

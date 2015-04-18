@@ -25,3 +25,27 @@ func TestMaxArity(t *testing.T) {
 		t.Errorf("maxArity(%v, mn.Math) = %v, want %v", funcs, g, w)
 	}
 }
+
+func BenchmarkReplication(b *testing.B) {
+	funcs := []gene.FuncWeight{
+		{"+", 1},
+		{"-", 1},
+		{"*", 1},
+	}
+	e := New(funcs, mn.Math, 30, 8, 4, 1, 0, "+", nil)
+	for i := 0; i < b.N; i++ {
+		e.replication()
+	}
+}
+
+func BenchmarkMutation(b *testing.B) {
+	funcs := []gene.FuncWeight{
+		{"+", 1},
+		{"-", 1},
+		{"*", 1},
+	}
+	e := New(funcs, mn.Math, 30, 8, 4, 1, 0, "+", nil)
+	for i := 0; i < b.N; i++ {
+		e.mutation()
+	}
+}
