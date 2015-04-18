@@ -902,3 +902,49 @@ func TestMutate(t *testing.T) {
 		t.Errorf("TestMutate failed: gn == mux\n")
 	}
 }
+
+func BenchmarkMutate(b *testing.B) {
+	headSize := 7
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 5
+	numConstants := 5
+	funcs := []gene.FuncWeight{
+		{"+", 1},
+		{"-", 5},
+		{"*", 5},
+	}
+	g1 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g2 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g3 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g4 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g := New([]*gene.Gene{g1, g2, g3, g4}, "+")
+	for i := 0; i < b.N; i++ {
+		g.Mutate(1)
+	}
+}
+
+var result *Genome
+
+func BenchmarkDup(b *testing.B) {
+	headSize := 7
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 5
+	numConstants := 5
+	funcs := []gene.FuncWeight{
+		{"+", 1},
+		{"-", 5},
+		{"*", 5},
+	}
+	g1 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g2 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g3 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g4 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g := New([]*gene.Gene{g1, g2, g3, g4}, "+")
+	var v *Genome
+	for i := 0; i < b.N; i++ {
+		v = g.Dup()
+	}
+	result = v
+}

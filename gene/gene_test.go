@@ -179,3 +179,41 @@ func TestMutate(t *testing.T) {
 		t.Errorf("TestMutate failed: g1 == mux\n")
 	}
 }
+
+func BenchmarkMutate(b *testing.B) {
+	headSize := 7
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 5
+	numConstants := 5
+	funcs := []FuncWeight{
+		{"+", 1},
+		{"-", 5},
+		{"*", 5},
+	}
+	g := RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	for i := 0; i < b.N; i++ {
+		g.Mutate()
+	}
+}
+
+var result *Gene
+
+func BenchmarkDup(b *testing.B) {
+	headSize := 7
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 5
+	numConstants := 5
+	funcs := []FuncWeight{
+		{"+", 1},
+		{"-", 5},
+		{"*", 5},
+	}
+	g := RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	var v *Gene
+	for i := 0; i < b.N; i++ {
+		v = g.Dup()
+	}
+	result = v
+}
