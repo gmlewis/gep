@@ -14,7 +14,12 @@ The definitive book about GEP is available here:
 
 - http://www.springer.com/3-540-32796-7
 
+The lightning talk I gave about GEP at GopherCon 2014 is available here:
+
+- http://go-talks.appspot.com/github.com/gmlewis/gep/gophercon2014/gep-in-go/gep-in-go.slide#1
+
 ## Status
+[![GoDoc](https://godoc.org/github.com/gmlewis/gep?status.svg)](https://godoc.org/github.com/gmlewis/gep)
 [![Build Status](https://travis-ci.org/gmlewis/gep.png)](https://travis-ci.org/gmlewis/gep)
 
 ----------------------------------------------------------------------
