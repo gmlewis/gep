@@ -18,6 +18,8 @@ The lightning talk I gave about GEP at GopherCon 2014 is available here:
 
 - http://go-talks.appspot.com/github.com/gmlewis/gep/gophercon2014/gep-in-go/gep-in-go.slide#1
 
+This is not an official Google product.
+
 ## Status
 [![GoDoc](https://godoc.org/github.com/gmlewis/gep?status.svg)](https://godoc.org/github.com/gmlewis/gep)
 [![Build Status](https://travis-ci.org/gmlewis/gep.png)](https://travis-ci.org/gmlewis/gep)
