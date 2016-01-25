@@ -1,3 +1,7 @@
+// Copyright 2014 Google Inc. All rights reserved.
+// Use of this source code is governed by the Apache 2.0
+// license that can be found in the LICENSE file.
+
 // Package functions provides a map of available functions for the GEP algorithm.
 package functions
 

@@ -1,3 +1,7 @@
+// Copyright 2014 Google Inc. All rights reserved.
+// Use of this source code is governed by the Apache 2.0
+// license that can be found in the LICENSE file.
+
 // odd-7-parity is a simple experiment to run the GEP algorithm using the Boolean logic package.
 // Given a set of input functions (Not, And, and Or), this solves how to create an
 // odd 7 parity function from those basic building blocks.
