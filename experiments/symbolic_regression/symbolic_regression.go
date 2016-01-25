@@ -1,3 +1,7 @@
+// Copyright 2014 Google Inc. All rights reserved.
+// Use of this source code is governed by the Apache 2.0
+// license that can be found in the LICENSE file.
+
 // Symbolic_regression is a simple experiment to run the GEP algorithm using the floating-point math package.
 // Given a set of input functions (+, -, *, and /), this solves the equation "a^4 + a^3 + a^2 + a"
 // from those basic building blocks. This experiment usually converges to a solution within

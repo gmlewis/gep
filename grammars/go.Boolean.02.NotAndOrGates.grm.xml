@@ -1,6 +1,9 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE grammar SYSTEM "grammar.dtd">
 <grammar name="Go" version="5" ext="go" type="Not-And-Or Only">
+   <!--Copyright 2014 Google Inc. All rights reserved.-->
+   <!--Use of this source code is governed by the Apache 2.0-->
+   <!--license that can be found in the LICENSE file.-->
    <!--*******************************************Contributed by Glenn Lewis*******************************************-->
    <!--List of all the Boolean functions supported by GeneXproTools 5.0. All functions must be completely defined.-->
    <!--To generate Carriage Return Line Feeds (CrLf) use the token {CRLF} (curly braces included).-->

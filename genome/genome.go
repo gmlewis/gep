@@ -1,3 +1,7 @@
+// Copyright 2014 Google Inc. All rights reserved.
+// Use of this source code is governed by the Apache 2.0
+// license that can be found in the LICENSE file.
+
 // Package genome provides the basis for a single GEP genome.
 // A genome consists of one or more genes.
 package genome
