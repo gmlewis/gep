@@ -69,23 +69,9 @@ func (g *Genome) EvalBool(in []bool, fm functions.FuncMap) bool {
 		log.Printf("Unable to find linking function: %v", g.LinkFunc)
 		return false
 	}
-	var count map[string]int
-	if g.SymbolMap == nil {
-		count = make(map[string]int)
-		count[g.LinkFunc] = len(g.Genes) - 1
-	}
 	result := g.Genes[0].EvalBool(in, fm)
-	if count != nil {
-		merge(&count, g.Genes[0].SymbolMap)
-	}
 	for i := 1; i < len(g.Genes); i++ {
 		result = lf.BoolFunction(result, g.Genes[i].EvalBool(in, fm), false, false)
-		if count != nil {
-			merge(&count, g.Genes[i].SymbolMap)
-		}
-	}
-	if count != nil {
-		g.SymbolMap = count
 	}
 	return result
 }
@@ -98,23 +84,9 @@ func (g *Genome) EvalMath(in []float64) float64 {
 		log.Printf("Unable to find linking function: %v", g.LinkFunc)
 		return 0.0
 	}
-	var count map[string]int
-	if g.SymbolMap == nil {
-		count = make(map[string]int)
-		count[g.LinkFunc] = len(g.Genes) - 1
-	}
 	result := g.Genes[0].EvalMath(in)
-	if count != nil {
-		merge(&count, g.Genes[0].SymbolMap)
-	}
 	for i := 1; i < len(g.Genes); i++ {
 		result = lf.Float64Function(result, g.Genes[i].EvalMath(in), 0.0, 0.0)
-		if count != nil {
-			merge(&count, g.Genes[i].SymbolMap)
-		}
-	}
-	if count != nil {
-		g.SymbolMap = count
 	}
 	return result
 }

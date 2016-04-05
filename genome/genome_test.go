@@ -106,6 +106,7 @@ func TestSixMultiplexer(t *testing.T) {
 	},
 		"And")
 	validateSixMultiplexer(t, mux)
+	mux.SymbolCount("Or") // Force creation of SymbolMap.
 	w := map[string]int{
 		"Or": 7, "d1": 7, "d4": 6, "d3": 5, "d5": 2, "And": 9, "d0": 7, "d2": 4, "Nor": 7, "Not": 3, "Nand": 7,
 	}
@@ -145,6 +146,7 @@ func TestOdd3Parity(t *testing.T) {
 	},
 		"And")
 	validateOdd3Parity(t, mux)
+	mux.SymbolCount("Or") // Force creation of SymbolMap.
 	w := map[string]int{
 		"d1": 6, "Or": 7, "Not": 4, "And": 10, "d2": 6, "d0": 6,
 	}
@@ -305,6 +307,7 @@ func TestOdd7Parity(t *testing.T) {
 	},
 		"Xor")
 	validateOdd7Parity(t, mux)
+	mux.SymbolCount("Or") // Force creation of SymbolMap.
 	w := map[string]int{
 		"Nor": 5, "Or": 5, "d2": 5, "d4": 4, "d0": 3, "d6": 3, "And": 5, "Xor": 14, "d5": 7, "Nand": 4, "d1": 8, "d3": 4, "Not": 1,
 	}
@@ -420,6 +423,7 @@ func TestMaunaLoaCO2(t *testing.T) {
 	}
 	gn := New([]*gene.Gene{g1, g2, g3, g4, g5}, "Avg2")
 	validateMaunaLoaCO2(t, gn)
+	gn.SymbolCount("NOT") // Force creation of SymbolMap.
 	w := map[string]int{
 		"-": 10, "d9": 1, "d0": 3, "c3": 1, "c0": 3, "c4": 3, "Min2": 6, "3Rt": 2,
 		"d5": 4, "+": 5, "d4": 1, "X4": 1, "c1": 2, "/": 2, "*": 4, "Max2": 6,
@@ -589,6 +593,7 @@ func TestIrisPlants(t *testing.T) {
 	}
 	gn := New([]*gene.Gene{g1, g2, g3}, "+")
 	validateIrisPlants(t, gn)
+	gn.SymbolCount("AND1") // Force creation of SymbolMap.
 	w := map[string]int{
 		"GOE2C": 1, "Avg2": 1, "c1": 1, "d0": 2, "+": 2, "d2": 4, "d3": 2, "AND1": 1, "c6": 1,
 		"AND2": 2, "3Rt": 1, "GOE2A": 1, "Sqrt": 1, "GOE2E": 1,
@@ -679,6 +684,7 @@ func TestEmotivEEG(t *testing.T) {
 	}
 	gn := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	validateEmotivEEG(t, gn)
+	gn.SymbolCount("Logi") // Force creation of SymbolMap.
 	w := map[string]int{
 		"c2": 3, "d0": 2, "Logi": 1, "d4": 2, "d9": 4, "d7": 1, "+": 9, "d1": 1, "d5": 1,
 		"c7": 2, "Avg2": 3, "d2": 1, "*": 3, "d3": 2, "d8": 4, "c3": 1, "/": 2, "-": 6, "Inv": 1,
@@ -827,6 +833,7 @@ func newFuelConsumption() *Genome {
 func TestFuelConsumption(t *testing.T) {
 	gn := newFuelConsumption()
 	validateFuelConsumption(t, gn)
+	gn.SymbolCount("/") // Force creation of SymbolMap.
 	w := map[string]int{
 		"*": 3, "d0": 7, "-": 4, "d5": 1, "Ln": 1, "Tanh": 2, "c1": 1, "+": 9, "c7": 1,
 		"Min2": 1, "/": 2, "c4": 5, "d2": 2, "Atan": 1, "d6": 3,
