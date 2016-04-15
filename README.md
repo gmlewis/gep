@@ -12,7 +12,7 @@ Here is a concise summary of GEP:
 
 The definitive book about GEP is available here:
 
-- http://www.springer.com/3-540-32796-7
+- http://www.amazon.com/Gene-Expression-Programming-Mathematical-Computational/dp/3642069320
 
 The lightning talk I gave about GEP at GopherCon 2014 is available here:
 
