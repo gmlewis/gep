@@ -66,9 +66,12 @@ func (d *dump) generateCode() ([]byte, error) {
 	helpers := make(grammars.HelperMap)
 	s, ok := d.gr.Functions.FuncMap[d.genome.LinkFunc]
 	if !ok {
-		return nil, fmt.Errorf("unable to find grammar linking function: %v\n", s.Symbol())
+		return nil, fmt.Errorf("unable to find grammar linking function: %v", s.Symbol())
 	}
 	glf, ok := s.(*grammars.Function)
+	if !ok {
+		return nil, fmt.Errorf("error casting link function: %v", s.Symbol())
+	}
 	exps := []string{""}
 	for i, e := range d.genome.Genes {
 		// d.write(fmt.Sprintf("// GML: d.genome.Genes: e=%#v\n", e))

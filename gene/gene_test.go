@@ -71,7 +71,7 @@ var mathTests = []struct {
 	{
 		gene: "+.d0.d1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0",
 		tests: []mathTest{
-			mathTest{in: []float64{1.0, 2.0}, out: 3.0},
+			{in: []float64{1.0, 2.0}, out: 3.0},
 		},
 		count: map[string]int{
 			"+":  1,
@@ -82,17 +82,17 @@ var mathTests = []struct {
 	{
 		gene: "-.+.+.-.-.*.d0.d0.d0.d0.d0.d0.d0",
 		tests: []mathTest{
-			mathTest{in: []float64{0}, out: 0},
-			mathTest{in: []float64{2.81}, out: -10.7061},
-			mathTest{in: []float64{6}, out: -42},
-			mathTest{in: []float64{7.043}, out: -56.646849},
-			mathTest{in: []float64{8}, out: -72},
-			mathTest{in: []float64{10}, out: -110},
-			mathTest{in: []float64{11.38}, out: -140.8844},
-			mathTest{in: []float64{12}, out: -156},
-			mathTest{in: []float64{14}, out: -210},
-			mathTest{in: []float64{15}, out: -240},
-			mathTest{in: []float64{20}, out: -420},
+			{in: []float64{0}, out: 0},
+			{in: []float64{2.81}, out: -10.7061},
+			{in: []float64{6}, out: -42},
+			{in: []float64{7.043}, out: -56.646849},
+			{in: []float64{8}, out: -72},
+			{in: []float64{10}, out: -110},
+			{in: []float64{11.38}, out: -140.8844},
+			{in: []float64{12}, out: -156},
+			{in: []float64{14}, out: -210},
+			{in: []float64{15}, out: -240},
+			{in: []float64{20}, out: -420},
 		},
 		count: map[string]int{
 			"+":  2,
@@ -104,7 +104,7 @@ var mathTests = []struct {
 	{
 		gene: "-.*.*.*.d0./.d0.d0.d0.d0.d0.d0.d0",
 		tests: []mathTest{
-			mathTest{in: []float64{20.0}, out: 7980.0},
+			{in: []float64{20.0}, out: 7980.0},
 		},
 		count: map[string]int{
 			"-":  1,

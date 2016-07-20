@@ -13,8 +13,8 @@ import (
 // FloatFunc ...
 type FloatFunc func(predicted, target []float64) (float64, error)
 
-// LengthErr is returned when the predicted and target slices are empty or not the same length.
-var LengthErr = errors.New("length error")
+// ErrLength is returned when the predicted and target slices are empty or not the same length.
+var ErrLength = errors.New("length error")
 
 // NumHitsAbs returns a fitness function that favors models that perform well for all
 // fitness cases within a certain absolute error (that is, the precision that is chosen
@@ -26,13 +26,13 @@ func NumHitsAbs(precision, scaleFactor float64) (FloatFunc, error) {
 	}
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		result := 0.0
 		for i, t := range target {
 			e := math.Abs(predicted[i] - t)
 			if e <= precision {
-				result += 1
+				result++
 			}
 		}
 		return result * scaleFactor, nil
@@ -49,19 +49,19 @@ func NumHitsRel(precision, scaleFactor float64) (FloatFunc, error) {
 	}
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		result := 0.0
 		for i, t := range target {
 			if t == 0 {
 				if predicted[i] == 0 {
-					result += 1
+					result++
 				}
 				continue
 			}
 			e := math.Abs((predicted[i] - t) / t)
 			if e <= precision {
-				result += 1
+				result++
 			}
 		}
 		return result * scaleFactor, nil
@@ -77,7 +77,7 @@ func NumHitsRel(precision, scaleFactor float64) (FloatFunc, error) {
 func SelectionRangeAbs(selectionRange, scaleFactor float64) (FloatFunc, error) {
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		result := 0.0
 		for i, t := range target {
@@ -97,7 +97,7 @@ func SelectionRangeAbs(selectionRange, scaleFactor float64) (FloatFunc, error) {
 func SelectionRangeRel(selectionRange, scaleFactor float64) (FloatFunc, error) {
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		result := 0.0
 		for i, t := range target {
@@ -119,7 +119,7 @@ func SelectionRangeRel(selectionRange, scaleFactor float64) (FloatFunc, error) {
 func MeanSquaredErrorAbs(scaleFactor float64) (FloatFunc, error) {
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		result := 0.0
 		for i, t := range target {
@@ -136,7 +136,7 @@ func MeanSquaredErrorAbs(scaleFactor float64) (FloatFunc, error) {
 func MeanSquaredErrorAbsRoot(scaleFactor float64) (FloatFunc, error) {
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		result := 0.0
 		for i, t := range target {
@@ -153,7 +153,7 @@ func MeanSquaredErrorAbsRoot(scaleFactor float64) (FloatFunc, error) {
 func MeanSquaredErrorRelRoot(scaleFactor float64) (FloatFunc, error) {
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		result := 0.0
 		for i, t := range target {
@@ -174,7 +174,7 @@ func MeanSquaredErrorRelRoot(scaleFactor float64) (FloatFunc, error) {
 func MeanSquaredErrorRel(scaleFactor float64) (FloatFunc, error) {
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		result := 0.0
 		for i, t := range target {
@@ -196,7 +196,7 @@ func MeanSquaredErrorRel(scaleFactor float64) (FloatFunc, error) {
 func RSquare(scaleFactor float64) (FloatFunc, error) {
 	return func(predicted, target []float64) (float64, error) {
 		if len(predicted) == 0 || len(target) == 0 || len(predicted) != len(target) {
-			return 0, LengthErr
+			return 0, ErrLength
 		}
 		var sumP, sumT, sumPP, sumTP, sumTT float64
 		for i, t := range target {

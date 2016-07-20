@@ -15,7 +15,7 @@ import (
 
 func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Grammar, helpers grammars.HelperMap) (string, error) {
 	if symbolIndex > len(g.Symbols) {
-		return "", fmt.Errorf("bad symbolIndex %v for symbols: %v\n", symbolIndex, g.Symbols)
+		return "", fmt.Errorf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
 	}
 	sym := g.Symbols[symbolIndex]
 	if s, ok := grammar.Functions.FuncMap[sym]; ok {
@@ -44,7 +44,7 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 	if sym[0:1] == "d" {
 		index, err := strconv.Atoi(sym[1:])
 		if err != nil {
-			return "", fmt.Errorf("unable to parse variable index: sym=%v\n", sym)
+			return "", fmt.Errorf("unable to parse variable index: sym=%v", sym)
 		}
 		if n := g.numTerminals - len(g.Constants); index > n {
 			log.Fatalf("terminal symbol name %q exceeds number of terminals (%v)", sym, n)
@@ -54,14 +54,14 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 	if sym[0:1] == "c" {
 		index, err := strconv.Atoi(sym[1:])
 		if err != nil {
-			return "", fmt.Errorf("unable to parse constant index: sym=%v\n", sym)
+			return "", fmt.Errorf("unable to parse constant index: sym=%v", sym)
 		}
 		if index > len(g.Constants) {
 			log.Fatalf("constant symbol name %q exceeds length of constant slice (%v)", sym, len(g.Constants))
 		}
 		return fmt.Sprintf("%f", g.Constants[index]), nil
 	}
-	return "", fmt.Errorf("unable to render function: sym=%v for gene %#v\n", sym, g)
+	return "", fmt.Errorf("unable to render function: sym=%v for gene %#v", sym, g)
 }
 
 // Expression builds up the expression tree and returns the resulting string.
