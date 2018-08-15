@@ -1,3 +1,4 @@
+// -*- compile-command: "go test"; -*-
 // Copyright 2014 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
@@ -248,16 +249,20 @@ func (g *Gene) getMathArgOrder() [][]int {
 	argCount := 0
 	for i := 0; i < len(g.Symbols); i++ {
 		sym := g.Symbols[i]
-		if s, ok := mn.Math[sym]; ok {
-			if s.Terminals() > 0 {
-				args := make([]int, s.Terminals())
-				for j := 0; j < s.Terminals(); j++ {
-					argCount++
-					args[j] = argCount
-				}
-				argOrder[i] = args
-			}
+		s, ok := mn.Math[sym]
+		if !ok {
+			continue
 		}
+		n := s.Terminals()
+		if n <= 0 {
+			continue
+		}
+		args := make([]int, n)
+		for j := 0; j < n; j++ {
+			argCount++
+			args[j] = argCount
+		}
+		argOrder[i] = args
 	}
 	return argOrder
 }
