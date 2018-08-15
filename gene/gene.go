@@ -124,21 +124,33 @@ func (g Gene) String() string {
 	return strings.Join(g.Symbols, ".")
 }
 
+// argOrder generates a slice of argument indices (1-based) for every function
+// within the list of symbols. It takes into account the arity of each function.
+//
+// argOrder is used to build up the actual evaluatable expression tree.
+//
+// For example:
+//   'Or.And.Not.Nor' => [[1, 2], [3, 4], [5, 6], [7, 8]]
+//   'Or.d0.c0.Nor' => [[1, 2], nil, nil, [3, 4]]
 func (g *Gene) getBoolArgOrder(nodes functions.FuncMap) [][]int {
 	argOrder := make([][]int, len(g.Symbols))
 	argCount := 0
 	for i := 0; i < len(g.Symbols); i++ {
 		sym := g.Symbols[i]
-		if s, ok := nodes[sym]; ok {
-			if s.Terminals() > 0 {
-				args := make([]int, s.Terminals())
-				for j := 0; j < s.Terminals(); j++ {
-					argCount++
-					args[j] = argCount
-				}
-				argOrder[i] = args
-			}
+		s, ok := nodes[sym]
+		if !ok {
+			continue
 		}
+		n := s.Terminals()
+		if n <= 0 {
+			continue
+		}
+		args := make([]int, n)
+		for j := 0; j < n; j++ {
+			argCount++
+			args[j] = argCount
+		}
+		argOrder[i] = args
 	}
 	return argOrder
 }
