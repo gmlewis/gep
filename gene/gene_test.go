@@ -1,3 +1,4 @@
+// -*- compile-command: "go test"; -*-
 // Copyright 2014 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
@@ -64,9 +65,10 @@ type mathTest struct {
 }
 
 var mathTests = []struct {
-	gene  string
-	tests []mathTest
-	count map[string]int
+	gene     string
+	tests    []mathTest
+	count    map[string]int
+	argOrder [][]int
 }{
 	{
 		gene: "+.d0.d1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0",
@@ -78,6 +80,7 @@ var mathTests = []struct {
 			"d0": 1,
 			"d1": 1,
 		},
+		argOrder: [][]int{{1, 2}, nil, nil, {3, 4}, {5, 6}, {7, 8}, {9, 10}, nil, nil, nil, nil, nil, nil, nil, nil},
 	},
 	{
 		gene: "-.+.+.-.-.*.d0.d0.d0.d0.d0.d0.d0",
@@ -100,6 +103,7 @@ var mathTests = []struct {
 			"*":  1,
 			"d0": 7,
 		},
+		argOrder: [][]int{{1, 2}, {3, 4}, {5, 6}, {7, 8}, {9, 10}, {11, 12}, nil, nil, nil, nil, nil, nil, nil},
 	},
 	{
 		gene: "-.*.*.*.d0./.d0.d0.d0.d0.d0.d0.d0",
@@ -112,6 +116,7 @@ var mathTests = []struct {
 			"/":  1,
 			"d0": 6,
 		},
+		argOrder: [][]int{{1, 2}, {3, 4}, {5, 6}, {7, 8}, nil, {9, 10}, nil, nil, nil, nil, nil, nil, nil},
 	},
 }
 
@@ -125,6 +130,10 @@ func validateMath(t *testing.T, g *Gene, in []float64, out float64) {
 func TestMath(t *testing.T) {
 	for _, test := range mathTests {
 		g := New(test.gene)
+		argOrder := g.getMathArgOrder()
+		if !reflect.DeepEqual(argOrder, test.argOrder) {
+			t.Errorf("Gene %q argOrder=%#v, want %#v", g, argOrder, test.argOrder)
+		}
 		for _, n := range test.tests {
 			validateMath(t, g, n.in, n.out)
 		}

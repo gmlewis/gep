@@ -235,6 +235,14 @@ func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int, nodes functions.
 	return func(in []bool) bool { return false }, count
 }
 
+// argOrder generates a slice of argument indices (1-based) for every function
+// within the list of symbols. It takes into account the arity of each function.
+//
+// argOrder is used to build up the actual evaluatable expression tree.
+//
+// For example:
+//   '+.*.-./' => [[1, 2], [3, 4], [5, 6], [7, 8]]
+//   '+.d0.c0./' => [[1, 2], nil, nil, [3, 4]]
 func (g *Gene) getMathArgOrder() [][]int {
 	argOrder := make([][]int, len(g.Symbols))
 	argCount := 0
