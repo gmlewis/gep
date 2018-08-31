@@ -40,7 +40,7 @@ func main() {
 	log.Printf("Observation space: %+v", observationSpace)
 
 	if err := c.StartMonitor(id, "/tmp/"+env, true, false, false); err != nil {
-		log.Fatalf(`StartMonitor(%q, "/tmp/%v"): %v`, id, env)
+		log.Fatalf(`StartMonitor(%q, "/tmp/%v"): %v`, id, env, err)
 	}
 
 	obs, err := c.Reset(id)
@@ -53,7 +53,7 @@ func main() {
 		// TODO: Replace SampleAction with GEP algorithm.
 		act, err := c.SampleAction(id)
 		if err != nil {
-			log.Fatalf("SampleAction(%q): %v", err)
+			log.Fatalf("SampleAction(%q): %v", id, err)
 		}
 
 		var reward float64

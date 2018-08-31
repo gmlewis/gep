@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gmlewis/gep/grammars"
+	"github.com/gmlewis/gep/v2/grammars"
 )
 
 func main() {

@@ -8,8 +8,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/gmlewis/gep/gene"
-	"github.com/gmlewis/gep/grammars"
+	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v2/grammars"
 )
 
 func TestWriteNand(t *testing.T) {

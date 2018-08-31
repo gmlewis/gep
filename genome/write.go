@@ -13,8 +13,8 @@ import (
 
 	"go/format"
 
-	"github.com/gmlewis/gep/functions"
-	"github.com/gmlewis/gep/grammars"
+	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v2/grammars"
 )
 
 type dump struct {

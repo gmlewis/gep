@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"testing"
 
-	bn "github.com/gmlewis/gep/functions/bool_nodes"
-	"github.com/gmlewis/gep/gene"
+	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v2/gene"
 )
 
 const delta = 1.0

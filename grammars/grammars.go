@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gmlewis/gep/functions"
+	"github.com/gmlewis/gep/v2/functions"
 )
 
 const grammarPath = "github.com/gmlewis/gep/grammars"

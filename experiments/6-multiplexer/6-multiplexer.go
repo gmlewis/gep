@@ -14,11 +14,11 @@ import (
 	"os"
 	"time"
 
-	bn "github.com/gmlewis/gep/functions/bool_nodes"
-	"github.com/gmlewis/gep/gene"
-	"github.com/gmlewis/gep/genome"
-	"github.com/gmlewis/gep/grammars"
-	"github.com/gmlewis/gep/model"
+	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v2/genome"
+	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v2/model"
 )
 
 var multiTests = []struct {

@@ -11,9 +11,9 @@ import (
 	"math/rand"
 	"runtime"
 
-	"github.com/gmlewis/gep/functions"
-	"github.com/gmlewis/gep/gene"
-	"github.com/gmlewis/gep/genome"
+	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v2/genome"
 )
 
 // Generation represents one complete generation of the model.

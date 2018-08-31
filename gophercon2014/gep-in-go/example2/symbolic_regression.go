@@ -10,10 +10,10 @@ import (
 	"math/rand"
 	"time"
 
-	mn "github.com/gmlewis/gep/functions/math_nodes"
-	"github.com/gmlewis/gep/gene"
-	"github.com/gmlewis/gep/genome"
-	"github.com/gmlewis/gep/model"
+	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v2/genome"
+	"github.com/gmlewis/gep/v2/model"
 )
 
 var srTests = []struct {

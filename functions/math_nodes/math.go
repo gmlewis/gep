@@ -9,7 +9,7 @@ import (
 	"log"
 	"math"
 
-	"github.com/gmlewis/gep/functions"
+	"github.com/gmlewis/gep/v2/functions"
 )
 
 // MathNode is a floating-point function used for the formation of GEP expressions.

@@ -5,7 +5,7 @@
 package boolNodes
 
 import (
-	"github.com/gmlewis/gep/functions"
+	"github.com/gmlewis/gep/v2/functions"
 )
 
 // BoolNandOnly defines the boolean functions available for this model.

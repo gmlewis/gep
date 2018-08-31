@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"testing"
 
-	bn "github.com/gmlewis/gep/functions/bool_nodes"
+	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
 
 var nandTests = []struct {

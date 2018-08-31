@@ -7,8 +7,8 @@ package model
 import (
 	"testing"
 
-	mn "github.com/gmlewis/gep/functions/math_nodes"
-	"github.com/gmlewis/gep/gene"
+	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v2/gene"
 )
 
 func TestMaxArity(t *testing.T) {

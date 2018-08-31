@@ -11,9 +11,9 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/gmlewis/gep/functions"
-	mn "github.com/gmlewis/gep/functions/math_nodes"
-	"github.com/gmlewis/gep/gene"
+	"github.com/gmlewis/gep/v2/functions"
+	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v2/gene"
 )
 
 // Genome contains the genes that make up the genome.

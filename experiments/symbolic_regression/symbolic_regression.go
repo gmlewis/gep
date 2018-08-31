@@ -16,11 +16,11 @@ import (
 	"os"
 	"time"
 
-	mn "github.com/gmlewis/gep/functions/math_nodes"
-	"github.com/gmlewis/gep/gene"
-	"github.com/gmlewis/gep/genome"
-	"github.com/gmlewis/gep/grammars"
-	"github.com/gmlewis/gep/model"
+	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v2/genome"
+	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v2/model"
 )
 
 // srTests is a random sample of inputs and outputs for the function "a^4 + a^3 + a^2 + a"

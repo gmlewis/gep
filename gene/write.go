@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gmlewis/gep/grammars"
+	"github.com/gmlewis/gep/v2/grammars"
 )
 
 func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Grammar, helpers grammars.HelperMap) (string, error) {
