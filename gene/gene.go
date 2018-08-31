@@ -82,7 +82,7 @@ func New(x string) *Gene {
 // properties of the gene, and functions provide the available functions and
 // their respective weights to be used in the creation of the gene.
 func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []FuncWeight) *Gene {
-	totalWeight := numTerminals
+	totalWeight := numTerminals + numConstants
 	for _, f := range functions {
 		totalWeight += f.Weight
 	}
