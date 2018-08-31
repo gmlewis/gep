@@ -31,18 +31,11 @@ This is not an official Google product.
 To build and run this code, it may help to understand this presentation,
 specifically about Go workspaces: http://talks.golang.org/2012/tutorial.slide#9
 
-For example, to set up your GOPATH (once only):
-
-```
-$ export GOPATH=$HOME/go
-$ mkdir -p $GOPATH/src
-```
-
 To run the NAND gate GEP experiment:
 
 ```
 $ go get github.com/gmlewis/gep/v2/experiments/nand
-$ $GOPATH/bin/nand
+$ nand
 Stopping after generation #0
 
 // gepModel is auto-generated Go source code for the
@@ -65,7 +58,7 @@ To run the Symbolic Regression experiment:
 
 ```
 $ go get github.com/gmlewis/gep/v2/experiments/symbolic_regression
-$ $GOPATH/bin/symbolic_regression
+$ symbolic_regression
 Stopping after generation #86
 
 // gepModel is auto-generated Go source code for the
@@ -111,7 +104,7 @@ For example:
 
 ```
 $ go get github.com/gmlewis/gep/v2/experiments/load_grammars
-$ $GOPATH/bin/load_grammars
+$ load_grammars
 ```
 
 ----------------------------------------------------------------------
