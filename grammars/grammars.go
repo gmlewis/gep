@@ -17,7 +17,7 @@ import (
 	"github.com/gmlewis/gep/v2/functions"
 )
 
-const grammarPath = "github.com/gmlewis/gep/grammars"
+const grammarPath = "github.com/gmlewis/gep/v2/grammars"
 
 // Functions is a collection of Functions available in the language grammar.
 type Functions struct {

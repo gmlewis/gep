@@ -41,7 +41,7 @@ $ mkdir -p $GOPATH/src
 To run the NAND gate GEP experiment:
 
 ```
-$ go get github.com/gmlewis/gep/experiments/nand
+$ go get github.com/gmlewis/gep/v2/experiments/nand
 $ $GOPATH/bin/nand
 Stopping after generation #0
 
@@ -64,7 +64,7 @@ func gepModel(d []bool) bool {
 To run the Symbolic Regression experiment:
 
 ```
-$ go get github.com/gmlewis/gep/experiments/symbolic_regression
+$ go get github.com/gmlewis/gep/v2/experiments/symbolic_regression
 $ $GOPATH/bin/symbolic_regression
 Stopping after generation #86
 
@@ -96,7 +96,7 @@ func gepModel(d []float64) float64 {
 To run unit tests, type:
 
 ```
-$ go test github.com/gmlewis/gep/...
+$ go test github.com/gmlewis/gep/v2/...
 ```
 
 ----------------------------------------------------------------------
@@ -110,7 +110,7 @@ versus output.  This helped to weed out errors.
 For example:
 
 ```
-$ go get github.com/gmlewis/gep/experiments/load_grammars
+$ go get github.com/gmlewis/gep/v2/experiments/load_grammars
 $ $GOPATH/bin/load_grammars
 ```
 
