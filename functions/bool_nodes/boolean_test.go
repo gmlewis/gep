@@ -20,8 +20,8 @@ var nandTests = []struct {
 
 func TestNand(t *testing.T) {
 	for _, test := range nandTests {
-		if g, w := BoolAllGates["Nand"].BoolFunction(test.in[0], test.in[1], false, false), test.out; g != w {
-			t.Errorf("BoolAllGates[Nand](%v,%v,false,false) = %v, want %v", test.in[0], test.in[1], g, w)
+		if g, w := BoolAllGates["Nand"].BoolFunction(test.in), test.out; g != w {
+			t.Errorf("BoolAllGates[Nand]([%v,%v]) = %v, want %v", test.in[0], test.in[1], g, w)
 		}
 	}
 }
@@ -29,10 +29,11 @@ func TestNand(t *testing.T) {
 var result bool
 
 func runBenchmark(b *testing.B, sym string) {
+	x := []bool{false, true, true, false}
 	var v bool
 	f := BoolAllGates[sym]
 	for i := 0; i < b.N; i++ {
-		v = f.BoolFunction(false, true, true, false)
+		v = f.BoolFunction(x)
 	}
 	result = v
 }

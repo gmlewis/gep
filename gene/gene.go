@@ -161,7 +161,8 @@ func (g *Gene) getBoolArgOrder(nodes functions.FuncMap) [][]int {
 func (g *Gene) EvalBool(in []bool, nodes functions.FuncMap) bool {
 	if g.bf == nil {
 		argOrder := g.getBoolArgOrder(nodes)
-		g.bf, g.SymbolMap = g.buildBoolTree(0, argOrder, nodes)
+		g.SymbolMap = make(map[string]int)
+		g.bf = g.buildBoolTree(0, argOrder, nodes)
 	}
 	return g.bf(in)
 }
@@ -172,61 +173,76 @@ func merge(dst *map[string]int, src map[string]int) {
 	}
 }
 
-func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int, nodes functions.FuncMap) (func([]bool) bool, map[string]int) {
-	count := make(map[string]int)
+func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int, nodes functions.FuncMap) func([]bool) bool {
+	// count := make(map[string]int)
 	// log.Infof("buildBoolTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex >= len(g.Symbols) {
 		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
-		return func(a []bool) bool { return false }, count
+		return func(a []bool) bool { return false } // , count
 	}
 	sym := g.Symbols[symbolIndex]
-	count[sym]++
+	g.SymbolMap[sym]++
 	if s, ok := nodes[sym]; ok {
-		switch s.Terminals() {
-		case 0:
-			return func(in []bool) bool {
-				return s.BoolFunction(false, false, false, false)
-			}, count
-		case 1:
-			args := argOrder[symbolIndex]
-			f, c := g.buildBoolTree(args[0], argOrder, nodes)
-			merge(&count, c)
-			return func(in []bool) bool {
-				return s.BoolFunction(f(in), false, false, false)
-			}, count
-		case 2:
-			args := argOrder[symbolIndex]
-			left, lc := g.buildBoolTree(args[0], argOrder, nodes)
-			merge(&count, lc)
-			right, rc := g.buildBoolTree(args[1], argOrder, nodes)
-			merge(&count, rc)
-			return func(in []bool) bool {
-				return s.BoolFunction(left(in), right(in), false, false)
-			}, count
-		case 3:
-			args := argOrder[symbolIndex]
-			f1, c1 := g.buildBoolTree(args[0], argOrder, nodes)
-			merge(&count, c1)
-			f2, c2 := g.buildBoolTree(args[1], argOrder, nodes)
-			merge(&count, c2)
-			f3, c3 := g.buildBoolTree(args[2], argOrder, nodes)
-			merge(&count, c3)
-			return func(in []bool) bool {
-				return s.BoolFunction(f1(in), f2(in), f3(in), false)
-			}, count
-		case 4:
-			args := argOrder[symbolIndex]
-			f1, c1 := g.buildBoolTree(args[0], argOrder, nodes)
-			merge(&count, c1)
-			f2, c2 := g.buildBoolTree(args[1], argOrder, nodes)
-			merge(&count, c2)
-			f3, c3 := g.buildBoolTree(args[2], argOrder, nodes)
-			merge(&count, c3)
-			f4, c4 := g.buildBoolTree(args[3], argOrder, nodes)
-			merge(&count, c4)
-			return func(in []bool) bool {
-				return s.BoolFunction(f1(in), f2(in), f3(in), f4(in))
-			}, count
+		/*
+			switch s.Terminals() {
+			case 0:
+				return func(in []bool) bool {
+					return s.BoolFunction(false, false, false, false)
+				}, count
+			case 1:
+				args := argOrder[symbolIndex]
+				f, c := g.buildBoolTree(args[0], argOrder, nodes)
+				merge(&count, c)
+				return func(in []bool) bool {
+					return s.BoolFunction(f(in), false, false, false)
+				}, count
+			case 2:
+				args := argOrder[symbolIndex]
+				left, lc := g.buildBoolTree(args[0], argOrder, nodes)
+				merge(&count, lc)
+				right, rc := g.buildBoolTree(args[1], argOrder, nodes)
+				merge(&count, rc)
+				return func(in []bool) bool {
+					return s.BoolFunction(left(in), right(in), false, false)
+				}, count
+			case 3:
+				args := argOrder[symbolIndex]
+				f1, c1 := g.buildBoolTree(args[0], argOrder, nodes)
+				merge(&count, c1)
+				f2, c2 := g.buildBoolTree(args[1], argOrder, nodes)
+				merge(&count, c2)
+				f3, c3 := g.buildBoolTree(args[2], argOrder, nodes)
+				merge(&count, c3)
+				return func(in []bool) bool {
+					return s.BoolFunction(f1(in), f2(in), f3(in), false)
+				}, count
+			case 4:
+				args := argOrder[symbolIndex]
+				f1, c1 := g.buildBoolTree(args[0], argOrder, nodes)
+				merge(&count, c1)
+				f2, c2 := g.buildBoolTree(args[1], argOrder, nodes)
+				merge(&count, c2)
+				f3, c3 := g.buildBoolTree(args[2], argOrder, nodes)
+				merge(&count, c3)
+				f4, c4 := g.buildBoolTree(args[3], argOrder, nodes)
+				merge(&count, c4)
+				return func(in []bool) bool {
+					return s.BoolFunction(f1(in), f2(in), f3(in), f4(in))
+				}, count
+			}
+		*/
+		args := argOrder[symbolIndex]
+		var funcs []func([]bool) bool
+		for _, arg := range args {
+			f := g.buildBoolTree(arg, argOrder, nodes)
+			funcs = append(funcs, f)
+		}
+		return func(in []bool) bool {
+			var values []bool
+			for _, f := range funcs {
+				values = append(values, f(in))
+			}
+			return s.BoolFunction(values)
 		}
 	} else { // No named symbol found - look for d0, d1, ...
 		if sym[0:1] == "d" {
@@ -239,13 +255,13 @@ func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int, nodes functions.
 						return false
 					}
 					return in[index]
-				}, count
+				} // , count
 			}
 		}
 		// Note that constants c0, c1, ... don't make sense for bool expressions
 	}
 	log.Printf("unable to return function: unknown gene symbol %q", sym)
-	return func(in []bool) bool { return false }, count
+	return func(in []bool) bool { return false } // , count
 }
 
 // argOrder generates a slice of argument indices (1-based) for every function
@@ -291,7 +307,8 @@ func (g *Gene) getMathArgOrder() [][]int {
 func (g *Gene) SymbolCount(sym string) int {
 	if g.SymbolMap == nil {
 		argOrder := g.getMathArgOrder()
-		g.mf, g.SymbolMap = g.buildMathTree(0, argOrder)
+		g.SymbolMap = make(map[string]int)
+		g.mf = g.buildMathTree(0, argOrder)
 	}
 	return g.SymbolMap[sym]
 }
@@ -301,66 +318,82 @@ func (g *Gene) SymbolCount(sym string) int {
 func (g *Gene) EvalMath(in []float64) float64 {
 	if g.mf == nil {
 		argOrder := g.getMathArgOrder()
-		g.mf, g.SymbolMap = g.buildMathTree(0, argOrder)
+		g.SymbolMap = make(map[string]int)
+		g.mf = g.buildMathTree(0, argOrder)
 	}
 	return g.mf(in)
 }
 
-func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) (func([]float64) float64, map[string]int) {
-	count := make(map[string]int)
+func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) float64 {
+	// count := make(map[string]int)
 	// log.Infof("buildMathTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex > len(g.Symbols) {
 		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
-		return func(a []float64) float64 { return 0.0 }, count
+		return func(a []float64) float64 { return 0.0 } // , count
 	}
 	sym := g.Symbols[symbolIndex]
-	count[sym]++
+	g.SymbolMap[sym]++
 	if s, ok := mn.Math[sym]; ok {
-		switch s.Terminals() {
-		case 0:
-			return func(in []float64) float64 {
-				return s.Float64Function(0.0, 0.0, 0.0, 0.0)
-			}, count
-		case 1:
-			args := argOrder[symbolIndex]
-			f, c := g.buildMathTree(args[0], argOrder)
-			merge(&count, c)
-			return func(in []float64) float64 {
-				return s.Float64Function(f(in), 0.0, 0.0, 0.0)
-			}, count
-		case 2:
-			args := argOrder[symbolIndex]
-			left, lc := g.buildMathTree(args[0], argOrder)
-			merge(&count, lc)
-			right, rc := g.buildMathTree(args[1], argOrder)
-			merge(&count, rc)
-			return func(in []float64) float64 {
-				return s.Float64Function(left(in), right(in), 0.0, 0.0)
-			}, count
-		case 3:
-			args := argOrder[symbolIndex]
-			f1, c1 := g.buildMathTree(args[0], argOrder)
-			merge(&count, c1)
-			f2, c2 := g.buildMathTree(args[1], argOrder)
-			merge(&count, c2)
-			f3, c3 := g.buildMathTree(args[2], argOrder)
-			merge(&count, c3)
-			return func(in []float64) float64 {
-				return s.Float64Function(f1(in), f2(in), f3(in), 0.0)
-			}, count
-		case 4:
-			args := argOrder[symbolIndex]
-			f1, c1 := g.buildMathTree(args[0], argOrder)
-			merge(&count, c1)
-			f2, c2 := g.buildMathTree(args[1], argOrder)
-			merge(&count, c2)
-			f3, c3 := g.buildMathTree(args[2], argOrder)
-			merge(&count, c3)
-			f4, c4 := g.buildMathTree(args[3], argOrder)
-			merge(&count, c4)
-			return func(in []float64) float64 {
-				return s.Float64Function(f1(in), f2(in), f3(in), f4(in))
-			}, count
+		/*
+			switch s.Terminals() {
+			case 0:
+				return func(in []float64) float64 {
+					return s.Float64Function(0.0, 0.0, 0.0, 0.0)
+				}, count
+			case 1:
+				args := argOrder[symbolIndex]
+				f, c := g.buildMathTree(args[0], argOrder)
+				merge(&count, c)
+				return func(in []float64) float64 {
+					return s.Float64Function(f(in), 0.0, 0.0, 0.0)
+				}, count
+			case 2:
+				args := argOrder[symbolIndex]
+				left, lc := g.buildMathTree(args[0], argOrder)
+				merge(&count, lc)
+				right, rc := g.buildMathTree(args[1], argOrder)
+				merge(&count, rc)
+				return func(in []float64) float64 {
+					return s.Float64Function(left(in), right(in), 0.0, 0.0)
+				}, count
+			case 3:
+				args := argOrder[symbolIndex]
+				f1, c1 := g.buildMathTree(args[0], argOrder)
+				merge(&count, c1)
+				f2, c2 := g.buildMathTree(args[1], argOrder)
+				merge(&count, c2)
+				f3, c3 := g.buildMathTree(args[2], argOrder)
+				merge(&count, c3)
+				return func(in []float64) float64 {
+					return s.Float64Function(f1(in), f2(in), f3(in), 0.0)
+				}, count
+			case 4:
+				args := argOrder[symbolIndex]
+				f1, c1 := g.buildMathTree(args[0], argOrder)
+				merge(&count, c1)
+				f2, c2 := g.buildMathTree(args[1], argOrder)
+				merge(&count, c2)
+				f3, c3 := g.buildMathTree(args[2], argOrder)
+				merge(&count, c3)
+				f4, c4 := g.buildMathTree(args[3], argOrder)
+				merge(&count, c4)
+				return func(in []float64) float64 {
+					return s.Float64Function(f1(in), f2(in), f3(in), f4(in))
+				}, count
+			}
+		*/
+		args := argOrder[symbolIndex]
+		var funcs []func([]float64) float64
+		for _, arg := range args {
+			f := g.buildMathTree(arg, argOrder)
+			funcs = append(funcs, f)
+		}
+		return func(in []float64) float64 {
+			var values []float64
+			for _, f := range funcs {
+				values = append(values, f(in))
+			}
+			return s.Float64Function(values)
 		}
 	} else { // No named symbol found - look for d0, d1, ...
 		if sym[0:1] == "d" {
@@ -373,7 +406,7 @@ func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) (func([]float64)
 						return 0.0
 					}
 					return in[index]
-				}, count
+				} // , count
 			}
 		} else if sym[0:1] == "c" {
 			if index, err := strconv.Atoi(sym[1:]); err != nil {
@@ -385,12 +418,12 @@ func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) (func([]float64)
 						return 0.0
 					}
 					return g.Constants[index]
-				}, count
+				} // , count
 			}
 		}
 	}
 	log.Printf("unable to return function: unknown gene symbol %q", sym)
-	return func(in []float64) float64 { return 0.0 }, count
+	return func(in []float64) float64 { return 0.0 } // , count
 }
 
 // Mutate mutates a gene by performing a single random symbol exchange within the gene.

@@ -53,12 +53,12 @@ func (f *Function) Terminals() int {
 }
 
 // BoolFunction allows FuncMap to implement interace functions.FuncMap.
-func (f *Function) BoolFunction(a, b, c, d bool) bool {
+func (f *Function) BoolFunction([]bool) bool {
 	return false
 }
 
 // Float64Function allows FuncMap to implement interace functions.FuncMap.
-func (f *Function) Float64Function(a, b, c, d float64) float64 {
+func (f *Function) Float64Function([]float64) float64 {
 	return 0.0
 }
 

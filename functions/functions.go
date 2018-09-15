@@ -15,7 +15,7 @@ type FuncNode interface {
 	// Terminals is the number of input terminals for the function.
 	Terminals() int
 	// BoolFunction represents a general boolean function.
-	BoolFunction(a, b, c, d bool) bool
+	BoolFunction([]bool) bool
 	// Float64Function represents a general floating-point function.
-	Float64Function(a, b, c, d float64) float64
+	Float64Function([]float64) float64
 }

@@ -14,7 +14,7 @@ type BoolNode struct {
 	index     int
 	symbol    string
 	terminals int
-	function  func(x0, x1, x2, x3 bool) bool
+	function  func(x []bool) bool
 }
 
 // Symbol returns the Karva symbol for this boolean function.
@@ -28,12 +28,12 @@ func (n BoolNode) Terminals() int {
 }
 
 // BoolFunction calls the boolean function and returns the result.
-func (n BoolNode) BoolFunction(a, b, c, d bool) bool {
-	return n.function(a, b, c, d)
+func (n BoolNode) BoolFunction(x []bool) bool {
+	return n.function(x)
 }
 
 // Float64Function is unused in this package and returns an error.
-func (n BoolNode) Float64Function(a, b, c, d float64) float64 {
+func (n BoolNode) Float64Function([]float64) float64 {
 	log.Println("error calling Float64Function on BoolNode model.")
 	return 0.0
 }

@@ -71,7 +71,8 @@ func (g *Genome) EvalBool(in []bool, fm functions.FuncMap) bool {
 	}
 	result := g.Genes[0].EvalBool(in, fm)
 	for i := 1; i < len(g.Genes); i++ {
-		result = lf.BoolFunction(result, g.Genes[i].EvalBool(in, fm), false, false)
+		x := []bool{result, g.Genes[i].EvalBool(in, fm)}
+		result = lf.BoolFunction(x)
 	}
 	return result
 }
@@ -86,7 +87,8 @@ func (g *Genome) EvalMath(in []float64) float64 {
 	}
 	result := g.Genes[0].EvalMath(in)
 	for i := 1; i < len(g.Genes); i++ {
-		result = lf.Float64Function(result, g.Genes[i].EvalMath(in), 0.0, 0.0)
+		x := []float64{result, g.Genes[i].EvalMath(in)}
+		result = lf.Float64Function(x)
 	}
 	return result
 }
