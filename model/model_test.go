@@ -7,7 +7,7 @@ package model
 import (
 	"testing"
 
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 )
 
@@ -18,15 +18,15 @@ func TestMaxArity(t *testing.T) {
 		{"*", 3},
 		{"/", 4},
 	}
-	if g, w := maxArity(funcs, mn.Math), 2; g != w {
-		t.Errorf("maxArity(%v, mn.Math) = %v, want %v", funcs, g, w)
+	if g, w := maxArity(funcs, functions.Float64), 2; g != w {
+		t.Errorf("maxArity(%v, functions.Float64) = %v, want %v", funcs, g, w)
 	}
 	funcs = append(funcs, gene.FuncWeight{
 		Symbol: "LT3A",
 		Weight: 1,
 	})
-	if g, w := maxArity(funcs, mn.Math), 3; g != w {
-		t.Errorf("maxArity(%v, mn.Math) = %v, want %v", funcs, g, w)
+	if g, w := maxArity(funcs, functions.Float64), 3; g != w {
+		t.Errorf("maxArity(%v, functions.Float64) = %v, want %v", funcs, g, w)
 	}
 }
 
@@ -36,7 +36,7 @@ func BenchmarkReplication(b *testing.B) {
 		{"-", 1},
 		{"*", 1},
 	}
-	e := New(funcs, mn.Math, 30, 8, 4, 1, 0, "+", nil)
+	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
 	for i := 0; i < b.N; i++ {
 		e.replication()
 	}
@@ -48,7 +48,7 @@ func BenchmarkMutation(b *testing.B) {
 		{"-", 1},
 		{"*", 1},
 	}
-	e := New(funcs, mn.Math, 30, 8, 4, 1, 0, "+", nil)
+	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
 	for i := 0; i < b.N; i++ {
 		e.mutation()
 	}

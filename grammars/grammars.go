@@ -57,6 +57,11 @@ func (f *Function) BoolFunction([]bool) bool {
 	return false
 }
 
+// IntFunction allows FuncMap to implement interace functions.FuncMap.
+func (f *Function) IntFunction([]int) int {
+	return 0
+}
+
 // Float64Function allows FuncMap to implement interace functions.FuncMap.
 func (f *Function) Float64Function([]float64) float64 {
 	return 0.0

@@ -14,7 +14,7 @@ import (
 	"os"
 	"time"
 
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/genome"
 	"github.com/gmlewis/gep/v2/grammars"
@@ -162,7 +162,7 @@ func init() {
 func validateParity(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range parityTests {
-		r := g.EvalBool(n.in, bn.BoolAllGates)
+		r := g.EvalBool(n.in)
 		if r == n.out {
 			correct++
 		}
@@ -177,7 +177,7 @@ func main() {
 		{"Or", 20},
 	}
 	numIn := len(parityTests[0].in)
-	e := model.New(funcs, bn.BoolAllGates, 30, 8, 4, numIn, 0, "Xor", validateParity)
+	e := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "Xor", validateParity)
 	s := e.Evolve(10000)
 
 	// Write out the Go source code for the solution.

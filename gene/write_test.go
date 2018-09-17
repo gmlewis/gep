@@ -7,12 +7,13 @@ package gene
 import (
 	"testing"
 
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/grammars"
 )
 
 func TestExpression(t *testing.T) {
 	want := "(((!((d[0] && d[1]))) && (d[0] || d[1])) || (!((d[1] && d[1]))))"
-	g := New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0")
+	g := New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0", functions.Bool)
 	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
 		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
@@ -33,11 +34,11 @@ func TestExpression(t *testing.T) {
 
 func TestConstants(t *testing.T) {
 	want := "(d[0]+0.500000)"
-	g := New("+.d0.c1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0")
+	g := New("+.d0.c1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0", functions.Float64)
 	g.Constants = []float64{0.1, 0.5}
 	grammar, err := grammars.LoadGoMathGrammar()
 	if err != nil {
-		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
+		t.Fatalf("unable to LoadGoMathGrammar(): %v", err)
 	}
 
 	helpers := make(grammars.HelperMap)

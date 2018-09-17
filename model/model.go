@@ -12,6 +12,9 @@ import (
 	"runtime"
 
 	"github.com/gmlewis/gep/v2/functions"
+	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	in "github.com/gmlewis/gep/v2/functions/int_nodes"
+	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/genome"
 )
@@ -25,7 +28,7 @@ type Generation struct {
 
 // New creates a new random generation of the model.
 // fs is a slice of function weights.
-// fm is the map of available functions to use for creating the generation of the model.
+// funcType is the underlying function type (no generics).
 // numGenomes is the number of genomes to use to populate this generation of the model.
 // headSize is the number of head symbols to use in a genome.
 // numGenesPerGenome is the number of genes to use per genome.
@@ -33,18 +36,18 @@ type Generation struct {
 // numConstants is the number of constants (inputs) to use within each gene.
 // linkFunc is the linking function used to combine the genes within a genome.
 // sf is the scoring (or fitness) function.
-func New(fs []gene.FuncWeight, fm functions.FuncMap, numGenomes, headSize, numGenesPerGenome, numTerminals, numConstants int, linkFunc string, sf genome.ScoringFunc) *Generation {
+func New(fs []gene.FuncWeight, funcType functions.FuncType, numGenomes, headSize, numGenesPerGenome, numTerminals, numConstants int, linkFunc string, sf genome.ScoringFunc) *Generation {
 	r := &Generation{
 		Genomes:     make([]*genome.Genome, numGenomes, numGenomes),
 		Funcs:       fs,
 		ScoringFunc: sf,
 	}
-	n := maxArity(fs, fm)
+	n := maxArity(fs, funcType)
 	tailSize := headSize*(n-1) + 1
 	for i := range r.Genomes {
 		genes := make([]*gene.Gene, numGenesPerGenome, numGenesPerGenome)
 		for j := range genes {
-			genes[j] = gene.RandomNew(headSize, tailSize, numTerminals, numConstants, fs)
+			genes[j] = gene.RandomNew(headSize, tailSize, numTerminals, numConstants, fs, funcType)
 		}
 		r.Genomes[i] = genome.New(genes, linkFunc)
 	}
@@ -135,10 +138,22 @@ func (g *Generation) getBest() *genome.Genome {
 }
 
 // maxArity determines the maximum number of input terminals for the given set of symbols.
-func maxArity(fs []gene.FuncWeight, fm functions.FuncMap) int {
+func maxArity(fs []gene.FuncWeight, funcType functions.FuncType) int {
+	var lookup functions.FuncMap
+	switch funcType {
+	case functions.Bool:
+		lookup = bn.BoolAllGates
+	case functions.Int:
+		lookup = in.Int
+	case functions.Float64:
+		lookup = mn.Math
+	default:
+		log.Fatalf("unknown funcType: %v", funcType)
+	}
+
 	r := 0
 	for _, f := range fs {
-		if fn, ok := fm[f.Symbol]; ok {
+		if fn, ok := lookup[f.Symbol]; ok {
 			if fn.Terminals() > r {
 				r = fn.Terminals()
 			}

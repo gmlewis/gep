@@ -9,7 +9,7 @@ import (
 	"math/rand"
 	"time"
 
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/genome"
 	"github.com/gmlewis/gep/v2/model"
@@ -32,7 +32,7 @@ func init() {
 func validateNand(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range nandTests {
-		r := g.EvalBool(n.in, bn.BoolAllGates)
+		r := g.EvalBool(n.in)
 		if r == n.out {
 			correct++
 		}
@@ -46,7 +46,7 @@ func main() {
 		{"And", 5},
 		{"Or", 5},
 	}
-	e := model.New(funcs, bn.BoolAllGates, 30, 7, 1, 2, 0, "Or", validateNand)
+	e := model.New(funcs, functions.Bool, 30, 7, 1, 2, 0, "Or", validateNand)
 	s := e.Evolve(1000)
 	fmt.Printf("nand solution: %v, score=%v\n", s, validateNand(s))
 }

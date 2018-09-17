@@ -36,6 +36,12 @@ func (n MathNode) BoolFunction([]bool) bool {
 	return false
 }
 
+// IntFunction is unused in this package and returns an error.
+func (n MathNode) IntFunction([]int) int {
+	log.Println("error calling IntFunction on MathNode model.")
+	return 0
+}
+
 // Float64Function calls the floating-point function and returns the result.
 func (n MathNode) Float64Function(x []float64) float64 {
 	return n.function(x)
@@ -43,6 +49,7 @@ func (n MathNode) Float64Function(x []float64) float64 {
 
 // Math lists all the available floating-point functions for this package.
 var Math = functions.FuncMap{
+	// TODO(gmlewis): Change functions to operate on the entire length of the slice.
 	"+":     MathNode{0, "+", 2, func(x []float64) float64 { return (x[0] + x[1]) }},
 	"-":     MathNode{1, "-", 2, func(x []float64) float64 { return (x[0] - x[1]) }},
 	"*":     MathNode{2, "*", 2, func(x []float64) float64 { return (x[0] * x[1]) }},

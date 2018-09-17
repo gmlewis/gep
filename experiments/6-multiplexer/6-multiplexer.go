@@ -14,7 +14,7 @@ import (
 	"os"
 	"time"
 
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/genome"
 	"github.com/gmlewis/gep/v2/grammars"
@@ -98,7 +98,7 @@ func init() {
 func validateMulti(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range multiTests {
-		r := g.EvalBool(n.in, bn.BoolAllGates)
+		r := g.EvalBool(n.in)
 		if r == n.out {
 			correct++
 		}
@@ -115,7 +115,7 @@ func main() {
 		{"Nor", 20},
 	}
 	numIn := len(multiTests[0].in)
-	e := model.New(funcs, bn.BoolAllGates, 30, 8, 4, numIn, 0, "And", validateMulti)
+	e := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "And", validateMulti)
 	s := e.Evolve(20000)
 
 	// Write out the Go source code for the solution.

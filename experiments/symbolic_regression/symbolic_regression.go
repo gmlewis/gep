@@ -16,7 +16,7 @@ import (
 	"os"
 	"time"
 
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/genome"
 	"github.com/gmlewis/gep/v2/grammars"
@@ -70,7 +70,7 @@ func main() {
 		{"*", 1},
 	}
 	numIn := len(srTests[0].in)
-	e := model.New(funcs, mn.Math, 30, 8, 4, numIn, 0, "+", validateFunc)
+	e := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc)
 	s := e.Evolve(10000)
 
 	// Write out the Go source code for the solution.

@@ -14,8 +14,22 @@ type FuncNode interface {
 	Symbol() string
 	// Terminals is the number of input terminals for the function.
 	Terminals() int
+
 	// BoolFunction represents a general boolean function.
 	BoolFunction([]bool) bool
+	// IntFunction represents a general integer function.
+	IntFunction([]int) int
 	// Float64Function represents a general floating-point function.
 	Float64Function([]float64) float64
 }
+
+// FuncType represents the underlying function type of the model, genome, and gene.
+// This is needed in place of generics.
+type FuncType int
+
+const (
+	unknown FuncType = iota
+	Bool
+	Int
+	Float64
+)

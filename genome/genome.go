@@ -11,8 +11,6 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/gmlewis/gep/v2/functions"
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
 	"github.com/gmlewis/gep/v2/gene"
 )
 
@@ -43,10 +41,6 @@ func merge(dst *map[string]int, src map[string]int) {
 // Note that this count is typically different from the number
 // of times the symbol appears in the Karva expression.  This can be
 // a handy metric to assist in the fitness evaluation of a Genome.
-// Note also that this currently only works for Math expressions.
-// Hopefully this restriction will be lifted in the future.
-// A workaround for using it with other types is to evaluate the
-// Genome, and then g.symbolCount will already be populated.
 func (g *Genome) SymbolCount(sym string) int {
 	if g.SymbolMap == nil {
 		g.SymbolMap = make(map[string]int)
@@ -58,39 +52,6 @@ func (g *Genome) SymbolCount(sym string) int {
 		}
 	}
 	return g.SymbolMap[sym]
-}
-
-// EvalBool evaluates the genome as a boolean expression and returns the result.
-// in represents the boolean inputs available to the genome.
-// fm is the map of available boolean functions to the genome.
-func (g *Genome) EvalBool(in []bool, fm functions.FuncMap) bool {
-	lf, ok := fm[g.LinkFunc]
-	if !ok {
-		log.Printf("Unable to find linking function: %v", g.LinkFunc)
-		return false
-	}
-	result := g.Genes[0].EvalBool(in, fm)
-	for i := 1; i < len(g.Genes); i++ {
-		x := []bool{result, g.Genes[i].EvalBool(in, fm)}
-		result = lf.BoolFunction(x)
-	}
-	return result
-}
-
-// EvalMath evaluates the genome as a floating-point expression and returns the result.
-// in represents the float64 inputs available to the genome.
-func (g *Genome) EvalMath(in []float64) float64 {
-	lf, ok := mn.Math[g.LinkFunc]
-	if !ok {
-		log.Printf("Unable to find linking function: %v", g.LinkFunc)
-		return 0.0
-	}
-	result := g.Genes[0].EvalMath(in)
-	for i := 1; i < len(g.Genes); i++ {
-		x := []float64{result, g.Genes[i].EvalMath(in)}
-		result = lf.Float64Function(x)
-	}
-	return result
 }
 
 // String returns the Karva representation of the genome.

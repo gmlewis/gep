@@ -7,7 +7,7 @@ package main
 import (
 	"testing"
 
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/model"
 )
@@ -20,7 +20,7 @@ func BenchmarkValidateFunc(b *testing.B) {
 		{"-", 1},
 		{"*", 1},
 	}
-	e := model.New(funcs, mn.Math, 30, 8, 4, 1, 0, "+", nil)
+	e := model.New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
 	var v float64
 	for i := 0; i < b.N; i++ {
 		v = validateFunc(e.Genomes[0])

@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"testing"
 
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 )
 
@@ -90,7 +90,7 @@ var sixMultiplexerTests = []struct {
 
 func validateSixMultiplexer(t *testing.T, g *Genome) {
 	for i, n := range sixMultiplexerTests {
-		r := g.EvalBool(n.in, bn.BoolAllGates)
+		r := g.EvalBool(n.in)
 		if r != n.out {
 			t.Errorf("%v: sixMultiplexer.EvalBool(%#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
 		}
@@ -99,10 +99,10 @@ func validateSixMultiplexer(t *testing.T, g *Genome) {
 
 func TestSixMultiplexer(t *testing.T) {
 	mux := New([]*gene.Gene{
-		gene.New("Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2"),
-		gene.New("Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3"),
-		gene.New("Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0"),
-		gene.New("Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1"),
+		gene.New("Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2", functions.Bool),
+		gene.New("Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3", functions.Bool),
+		gene.New("Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0", functions.Bool),
+		gene.New("Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1", functions.Bool),
 	},
 		"And")
 	validateSixMultiplexer(t, mux)
@@ -131,7 +131,7 @@ var odd3ParityTests = []struct {
 
 func validateOdd3Parity(t *testing.T, g *Genome) {
 	for i, n := range odd3ParityTests {
-		r := g.EvalBool(n.in, bn.BoolAllGates)
+		r := g.EvalBool(n.in)
 		if r != n.out {
 			t.Errorf("%v: odd3Parity.EvalBool(%#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
 		}
@@ -140,9 +140,9 @@ func validateOdd3Parity(t *testing.T, g *Genome) {
 
 func TestOdd3Parity(t *testing.T) {
 	mux := New([]*gene.Gene{
-		gene.New("Or.Or.d1.And.Or.d0.And.d2.d0.d2.d1.d1.d1.d0.d1"),
-		gene.New("Not.And.And.Not.Or.And.And.d0.d1.d2.d2.d1.d0.d2.d2"),
-		gene.New("Or.Or.Or.And.And.Not.Not.d1.d2.d0.d2.d1.d0.d0.d2"),
+		gene.New("Or.Or.d1.And.Or.d0.And.d2.d0.d2.d1.d1.d1.d0.d1", functions.Bool),
+		gene.New("Not.And.And.Not.Or.And.And.d0.d1.d2.d2.d1.d0.d2.d2", functions.Bool),
+		gene.New("Or.Or.Or.And.And.Not.Not.d1.d2.d0.d2.d1.d0.d0.d2", functions.Bool),
 	},
 		"And")
 	validateOdd3Parity(t, mux)
@@ -291,7 +291,7 @@ var odd7ParityTests = []struct {
 
 func validateOdd7Parity(t *testing.T, g *Genome) {
 	for i, n := range odd7ParityTests {
-		r := g.EvalBool(n.in, bn.BoolAllGates)
+		r := g.EvalBool(n.in)
 		if r != n.out {
 			t.Errorf("%v: odd7Parity.EvalBool(%#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
 		}
@@ -300,10 +300,10 @@ func validateOdd7Parity(t *testing.T, g *Genome) {
 
 func TestOdd7Parity(t *testing.T) {
 	mux := New([]*gene.Gene{
-		gene.New("Nor.Nand.d4.Or.Or.Xor.Or.Xor.d1.d4.d1.d0.d5.d2.d2.d1.d1"),
-		gene.New("And.Or.Nor.Nand.Xor.Xor.Xor.Nor.d5.d0.d4.d3.d3.d6.d5.d5.d1"),
-		gene.New("Xor.Xor.Xor.Xor.Nand.Or.Nand.Nor.d0.d2.d2.d4.d1.d1.d3.d1.d3"),
-		gene.New("And.And.And.Xor.Nor.And.Xor.Not.d2.d5.d5.d5.d1.d6.d6.d1.d1"),
+		gene.New("Nor.Nand.d4.Or.Or.Xor.Or.Xor.d1.d4.d1.d0.d5.d2.d2.d1.d1", functions.Bool),
+		gene.New("And.Or.Nor.Nand.Xor.Xor.Xor.Nor.d5.d0.d4.d3.d3.d6.d5.d5.d1", functions.Bool),
+		gene.New("Xor.Xor.Xor.Xor.Nand.Or.Nand.Nor.d0.d2.d2.d4.d1.d1.d3.d1.d3", functions.Bool),
+		gene.New("And.And.And.Xor.Nor.And.Xor.Not.d2.d5.d5.d5.d1.d6.d6.d1.d1", functions.Bool),
 	},
 		"Xor")
 	validateOdd7Parity(t, mux)
@@ -356,11 +356,11 @@ func validateMaunaLoaCO2(t *testing.T, g *Genome) {
 }
 
 func TestMaunaLoaCO2(t *testing.T) {
-	g1 := gene.New("Avg2.Avg2.Avg2.Avg2.Max2.+.-.3Rt.*.+.d10.d10.d5.d5.d9.c6.c4.d3.d10.d10.c1")
-	g2 := gene.New("5Rt.-.d10.-.Floor.5Rt.Max2.Min2.Max2.Max2.d4.c3.d1.c8.d0.d8.d1.d1.d1.c0.c9")
-	g3 := gene.New("-.Ln.*.Avg2.Min2.Min2.+.X4.d6.Min2.d0.c9.d5.d5.c1.c7.d1.d10.d3.c4.d10")
-	g4 := gene.New("3Rt.+.NOT.Min2.c0.+./.*.*.-.c5.c4.c1.c8.d3.d8.d10.d8.c8.c0.d0")
-	g5 := gene.New("Max2.-./.Min2.-.-.-.d10.-.Max2.d0.d10.d10.c4.c0.d6.c6.c0.c9.d10.d10")
+	g1 := gene.New("Avg2.Avg2.Avg2.Avg2.Max2.+.-.3Rt.*.+.d10.d10.d5.d5.d9.c6.c4.d3.d10.d10.c1", functions.Float64)
+	g2 := gene.New("5Rt.-.d10.-.Floor.5Rt.Max2.Min2.Max2.Max2.d4.c3.d1.c8.d0.d8.d1.d1.d1.c0.c9", functions.Float64)
+	g3 := gene.New("-.Ln.*.Avg2.Min2.Min2.+.X4.d6.Min2.d0.c9.d5.d5.c1.c7.d1.d10.d3.c4.d10", functions.Float64)
+	g4 := gene.New("3Rt.+.NOT.Min2.c0.+./.*.*.-.c5.c4.c1.c8.d3.d8.d10.d8.c8.c0.d0", functions.Float64)
+	g5 := gene.New("Max2.-./.Min2.-.-.-.d10.-.Max2.d0.d10.d10.c4.c0.d6.c6.c0.c9.d10.d10", functions.Float64)
 	g1.Constants = []float64{
 		2.05725272377697,
 		-8.22715872676778,
@@ -552,9 +552,9 @@ func validateIrisPlants(t *testing.T, g *Genome) {
 }
 
 func TestIrisPlants(t *testing.T) {
-	g1 := gene.New("Sqrt.GOE2E.d2.d2.d2.c6.+.d3.d2.c3.c4.c9.d2.c7.d0.d3.d3")
-	g2 := gene.New("d2.*.3Rt.Ln.*.Ln.OR2.GOE2A.c7.d2.c3.d3.d2.d3.d2.c1.c9")
-	g3 := gene.New("AND2.Avg2.GOE2C.d3.AND1.GOE2A.3Rt.AND2.d0.c1.d3.d2.d0.c6.c3.c7.d0")
+	g1 := gene.New("Sqrt.GOE2E.d2.d2.d2.c6.+.d3.d2.c3.c4.c9.d2.c7.d0.d3.d3", functions.Float64)
+	g2 := gene.New("d2.*.3Rt.Ln.*.Ln.OR2.GOE2A.c7.d2.c3.d3.d2.d3.d2.c1.c9", functions.Float64)
+	g3 := gene.New("AND2.Avg2.GOE2C.d3.AND1.GOE2A.3Rt.AND2.d0.c1.d3.d2.d0.c6.c3.c7.d0", functions.Float64)
 	g1.Constants = []float64{
 		-7.36991485335856,
 		3.02133243812372E-02,
@@ -630,10 +630,10 @@ func validateEmotivEEG(t *testing.T, g *Genome) {
 }
 
 func TestEmotivEEG(t *testing.T) {
-	g1 := gene.New("Inv./.c2.+.Avg2.+.-.+.d8.-.d0.d2.d3.d3.d8.d1.c2.c2.d3.c2.d9")
-	g2 := gene.New("Avg2.c2.Logi.+.*.*.*.-.d4.d8.d9.c3.d9.d7.d9.c3.d7.d2.c2.d8.d10")
-	g3 := gene.New("-.Avg2.d4.c7.+.-.-.+.d0./.d9.c7.d5.d9.c2.c4.c6.d11.c1.d12.d10")
-	g4 := gene.New("d8.d5.Inv.-.*.-.-.-.d5.-.c2.d0.c4.d8.d2.c1.d0.d6.d7.d12.d9")
+	g1 := gene.New("Inv./.c2.+.Avg2.+.-.+.d8.-.d0.d2.d3.d3.d8.d1.c2.c2.d3.c2.d9", functions.Float64)
+	g2 := gene.New("Avg2.c2.Logi.+.*.*.*.-.d4.d8.d9.c3.d9.d7.d9.c3.d7.d2.c2.d8.d10", functions.Float64)
+	g3 := gene.New("-.Avg2.d4.c7.+.-.-.+.d0./.d9.c7.d5.d9.c2.c4.c6.d11.c1.d12.d10", functions.Float64)
+	g4 := gene.New("d8.d5.Inv.-.*.-.-.-.d5.-.c2.d0.c4.d8.d2.c1.d0.d6.d7.d12.d9", functions.Float64)
 	g1.Constants = []float64{
 		-3.66252632221442,
 		4.32132938627278,
@@ -775,10 +775,10 @@ func validateFuelConsumption(t *testing.T, g *Genome) {
 }
 
 func newFuelConsumption() *Genome {
-	g1 := gene.New("+.d2.-.+./.Atan./.*.c4.d0.d5.d0.d0.d0.d5.d2.d0")
-	g2 := gene.New("c7.+.+.+.Avg2.d4.d6.-.d4.c7.d1.d2.c2.d6.c8.d6.d2")
-	g3 := gene.New("Min2.-.+.d6.*.*.Ln.Tanh.c4.c4.d0.c4.d6.d4.d4.c2.c4")
-	g4 := gene.New("-.-.d2.+.+.Tanh.+.c1.c4.d0.d0.d6.d6.c9.d5.c9.c7")
+	g1 := gene.New("+.d2.-.+./.Atan./.*.c4.d0.d5.d0.d0.d0.d5.d2.d0", functions.Float64)
+	g2 := gene.New("c7.+.+.+.Avg2.d4.d6.-.d4.c7.d1.d2.c2.d6.c8.d6.d2", functions.Float64)
+	g3 := gene.New("Min2.-.+.d6.*.*.Ln.Tanh.c4.c4.d0.c4.d6.d4.d4.c2.c4", functions.Float64)
+	g4 := gene.New("-.-.d2.+.+.Tanh.+.c1.c4.d0.d0.d6.d6.c9.d5.c9.c7", functions.Float64)
 	g1.Constants = []float64{
 		-6.89063692129276,
 		-5.68895535142064,
@@ -866,10 +866,10 @@ func checkEqual(g1 *Genome, g2 *Genome) error {
 
 func TestDup(t *testing.T) {
 	mux := New([]*gene.Gene{
-		gene.New("Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2"),
-		gene.New("Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3"),
-		gene.New("Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0"),
-		gene.New("Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1"),
+		gene.New("Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2", functions.Bool),
+		gene.New("Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3", functions.Bool),
+		gene.New("Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0", functions.Bool),
+		gene.New("Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1", functions.Bool),
 	},
 		"And")
 	validateSixMultiplexer(t, mux) // Force evaluation
@@ -901,10 +901,10 @@ func TestMutate(t *testing.T) {
 		{"Or", 5},
 	}
 	mux := New([]*gene.Gene{
-		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs),
-		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs),
-		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs),
-		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs),
+		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs, functions.Bool),
+		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs, functions.Bool),
+		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs, functions.Bool),
+		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs, functions.Bool),
 	},
 		"And")
 	gn := mux.Dup()
@@ -925,10 +925,10 @@ func BenchmarkMutate(b *testing.B) {
 		{"-", 5},
 		{"*", 5},
 	}
-	g1 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
-	g2 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
-	g3 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
-	g4 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g1 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
+	g2 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
+	g3 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
+	g4 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
 	g := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	for i := 0; i < b.N; i++ {
 		g.Mutate(1)
@@ -948,10 +948,10 @@ func BenchmarkDup(b *testing.B) {
 		{"-", 5},
 		{"*", 5},
 	}
-	g1 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
-	g2 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
-	g3 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
-	g4 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs)
+	g1 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
+	g2 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
+	g3 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
+	g4 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
 	g := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	var v *Genome
 	for i := 0; i < b.N; i++ {

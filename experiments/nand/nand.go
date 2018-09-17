@@ -15,7 +15,7 @@ import (
 	"os"
 	"time"
 
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/genome"
 	"github.com/gmlewis/gep/v2/grammars"
@@ -39,7 +39,7 @@ func init() {
 func validateNand(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range nandTests {
-		r := g.EvalBool(n.in, bn.BoolAllGates)
+		r := g.EvalBool(n.in)
 		if r == n.out {
 			correct++
 		}
@@ -54,7 +54,7 @@ func main() {
 		{"Or", 5},
 	}
 	numIn := len(nandTests[0].in)
-	e := model.New(funcs, bn.BoolAllGates, 30, 7, 1, numIn, 0, "Or", validateNand)
+	e := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand)
 	s := e.Evolve(1000)
 
 	// Write out the Go source code for the solution.

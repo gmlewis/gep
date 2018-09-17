@@ -1,4 +1,3 @@
-// -*- compile-command: "go test"; -*-
 // Copyright 2014 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
@@ -12,6 +11,11 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+
+	"github.com/gmlewis/gep/v2/functions"
+	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	in "github.com/gmlewis/gep/v2/functions/int_nodes"
+	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
 )
 
 // FuncWeight contains the symbol name and its weight to be used during
@@ -30,9 +34,14 @@ type Gene struct {
 	// Constants is the slice of floats available for use by this gene.
 	Constants []float64
 
-	SymbolMap   map[string]int          // do not use directly.  Use SymbolCount() instead.
-	bf          func([]bool) bool       // boolean generated function
-	mf          func([]float64) float64 // math generated function
+	// funcType keep track of the underlying function types (no generics).
+	funcType functions.FuncType
+	// Instead of generics, we list all the possibilities:
+	bf   func([]bool) bool       // boolean generated function
+	intF func([]int) int         // integer generated function
+	mf   func([]float64) float64 // math generated function
+
+	SymbolMap   map[string]int // do not use directly.  Use SymbolCount() instead.
 	headSize    int
 	choiceSlice []string
 	// numTerminals is the number of inputs to the genetic program.
@@ -45,7 +54,7 @@ type Gene struct {
 }
 
 // New creates a new gene based on the Karva string representation.
-func New(x string) *Gene {
+func New(x string, funcType functions.FuncType) *Gene {
 	parts := strings.Split(x, ".")
 	numConstants, numTerminals := 0, 0
 	for _, sym := range parts {
@@ -70,6 +79,7 @@ func New(x string) *Gene {
 	return &Gene{
 		Symbols:      parts,
 		Constants:    make([]float64, numConstants),
+		funcType:     funcType,
 		numTerminals: numTerminals + numConstants,
 	}
 }
@@ -78,7 +88,7 @@ func New(x string) *Gene {
 // algorithm. The headSize, tailSize, numTerminals, and numConstants determine the respective
 // properties of the gene, and functions provide the available functions and
 // their respective weights to be used in the creation of the gene.
-func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []FuncWeight) *Gene {
+func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []FuncWeight, funcType functions.FuncType) *Gene {
 	totalWeight := numTerminals + numConstants
 	for _, f := range functions {
 		totalWeight += f.Weight
@@ -101,6 +111,7 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 	r := &Gene{
 		Symbols:      make([]string, 0, headSize+tailSize),
 		Constants:    constants,
+		funcType:     funcType,
 		headSize:     headSize,
 		choiceSlice:  choiceSlice,
 		numTerminals: numTerminals + numConstants,
@@ -119,6 +130,27 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 // String returns the Karva representation of the gene.
 func (g Gene) String() string {
 	return strings.Join(g.Symbols, ".")
+}
+
+// SymbolCount returns the count of the number of times the symbol
+// is actually used in the Gene.
+// Note that this count is typically different from the number
+// of times the symbol appears in the Karva expression.  This can be
+// a handy metric to assist in the fitness evaluation of a Gene.
+func (g *Gene) SymbolCount(sym string) int {
+	if g.SymbolMap == nil {
+		switch g.funcType {
+		case functions.Bool:
+			g.generateBoolFunc()
+		case functions.Int:
+			g.generateIntFunc()
+		case functions.Float64:
+			g.generateMathFunc()
+		default:
+			log.Fatalf("unknown funcType: %v", g.funcType)
+		}
+	}
+	return g.SymbolMap[sym]
 }
 
 // Mutate mutates a gene by performing a single random symbol exchange within the gene.
@@ -162,7 +194,9 @@ func (g *Gene) Dup() *Gene {
 	r := &Gene{
 		Symbols:      make([]string, len(g.Symbols)),
 		Constants:    make([]float64, len(g.Constants)),
+		funcType:     g.funcType,
 		bf:           g.bf,
+		intF:         g.intF,
 		mf:           g.mf,
 		headSize:     g.headSize,
 		choiceSlice:  make([]string, len(g.choiceSlice)),
@@ -216,4 +250,47 @@ func CheckEqual(g1 *Gene, g2 *Gene) error {
 		return fmt.Errorf("g1.numTerminals=%v != g2.numTerminals=%v", g1.numTerminals, g2.numTerminals)
 	}
 	return nil
+}
+
+// getArgOrder generates a slice of argument indices (1-based) for every function
+// within the list of symbols. It takes into account the arity of each function.
+//
+// argOrder is used to build up the actual evaluatable expression tree.
+//
+// For example:
+//   '+.*.-./' => [[1, 2], [3, 4], [5, 6], [7, 8]]
+//   '+.d0.c0./' => [[1, 2], nil, nil, [3, 4]]
+func (g *Gene) getArgOrder() [][]int {
+	var lookup functions.FuncMap
+	switch g.funcType {
+	case functions.Bool:
+		lookup = bn.BoolAllGates
+	case functions.Int:
+		lookup = in.Int
+	case functions.Float64:
+		lookup = mn.Math
+	default:
+		log.Fatalf("unknown funcType: %v", g.funcType)
+	}
+
+	argOrder := make([][]int, len(g.Symbols))
+	argCount := 0
+	for i := 0; i < len(g.Symbols); i++ {
+		sym := g.Symbols[i]
+		s, ok := lookup[sym]
+		if !ok {
+			continue
+		}
+		n := s.Terminals()
+		if n <= 0 {
+			continue
+		}
+		args := make([]int, n)
+		for j := 0; j < n; j++ {
+			argCount++
+			args[j] = argCount
+		}
+		argOrder[i] = args
+	}
+	return argOrder
 }

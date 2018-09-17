@@ -32,6 +32,12 @@ func (n BoolNode) BoolFunction(x []bool) bool {
 	return n.function(x)
 }
 
+// IntFunction is unused in this package and returns an error.
+func (n BoolNode) IntFunction([]int) int {
+	log.Println("error calling IntFunction on BoolNode model.")
+	return 0
+}
+
 // Float64Function is unused in this package and returns an error.
 func (n BoolNode) Float64Function([]float64) float64 {
 	log.Println("error calling Float64Function on BoolNode model.")
