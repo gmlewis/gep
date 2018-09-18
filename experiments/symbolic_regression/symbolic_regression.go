@@ -65,9 +65,9 @@ func validateFunc(g *genome.Genome) float64 {
 
 func main() {
 	funcs := []gene.FuncWeight{
-		{"+", 1},
-		{"-", 1},
-		{"*", 1},
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
 	}
 	numIn := len(srTests[0].in)
 	e := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc)

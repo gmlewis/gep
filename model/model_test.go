@@ -13,10 +13,10 @@ import (
 
 func TestMaxArity(t *testing.T) {
 	funcs := []gene.FuncWeight{
-		{"+", 1},
-		{"-", 2},
-		{"*", 3},
-		{"/", 4},
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 2},
+		{Symbol: "*", Weight: 3},
+		{Symbol: "/", Weight: 4},
 	}
 	if g, w := maxArity(funcs, functions.Float64), 2; g != w {
 		t.Errorf("maxArity(%v, functions.Float64) = %v, want %v", funcs, g, w)
@@ -32,9 +32,9 @@ func TestMaxArity(t *testing.T) {
 
 func BenchmarkReplication(b *testing.B) {
 	funcs := []gene.FuncWeight{
-		{"+", 1},
-		{"-", 1},
-		{"*", 1},
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
 	}
 	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
 	for i := 0; i < b.N; i++ {
@@ -44,9 +44,9 @@ func BenchmarkReplication(b *testing.B) {
 
 func BenchmarkMutation(b *testing.B) {
 	funcs := []gene.FuncWeight{
-		{"+", 1},
-		{"-", 1},
-		{"*", 1},
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
 	}
 	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
 	for i := 0; i < b.N; i++ {

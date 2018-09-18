@@ -896,9 +896,9 @@ func TestMutate(t *testing.T) {
 	tailSize := headSize*(maxArity-1) + 1
 	numTerminals := 5
 	funcs := []gene.FuncWeight{
-		{"Not", 1},
-		{"And", 5},
-		{"Or", 5},
+		{Symbol: "Not", Weight: 1},
+		{Symbol: "And", Weight: 5},
+		{Symbol: "Or", Weight: 5},
 	}
 	mux := New([]*gene.Gene{
 		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs, functions.Bool),
@@ -921,9 +921,9 @@ func BenchmarkMutate(b *testing.B) {
 	numTerminals := 5
 	numConstants := 5
 	funcs := []gene.FuncWeight{
-		{"+", 1},
-		{"-", 5},
-		{"*", 5},
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 5},
+		{Symbol: "*", Weight: 5},
 	}
 	g1 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
 	g2 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
@@ -944,9 +944,9 @@ func BenchmarkDup(b *testing.B) {
 	numTerminals := 5
 	numConstants := 5
 	funcs := []gene.FuncWeight{
-		{"+", 1},
-		{"-", 5},
-		{"*", 5},
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 5},
+		{Symbol: "*", Weight: 5},
 	}
 	g1 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
 	g2 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)

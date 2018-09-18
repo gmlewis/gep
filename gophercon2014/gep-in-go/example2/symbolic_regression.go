@@ -52,10 +52,10 @@ func validateFunc(g *genome.Genome) float64 {
 
 func main() {
 	funcs := []gene.FuncWeight{
-		{"+", 1},
-		{"-", 1},
-		{"*", 1},
-		{"/", 1},
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
+		{Symbol: "/", Weight: 1},
 	}
 	e := model.New(funcs, functions.Float64, 30, 6, 1, 1, 0, "+", validateFunc)
 	s := e.Evolve(10000)

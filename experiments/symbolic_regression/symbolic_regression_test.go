@@ -16,9 +16,9 @@ var result float64
 
 func BenchmarkValidateFunc(b *testing.B) {
 	funcs := []gene.FuncWeight{
-		{"+", 1},
-		{"-", 1},
-		{"*", 1},
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
 	}
 	e := model.New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
 	var v float64

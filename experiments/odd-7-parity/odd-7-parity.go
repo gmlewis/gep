@@ -172,9 +172,9 @@ func validateParity(g *genome.Genome) float64 {
 
 func main() {
 	funcs := []gene.FuncWeight{
-		{"Not", 10},
-		{"And", 20},
-		{"Or", 20},
+		{Symbol: "Not", Weight: 10},
+		{Symbol: "And", Weight: 20},
+		{Symbol: "Or", Weight: 20},
 	}
 	numIn := len(parityTests[0].in)
 	e := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "Xor", validateParity)

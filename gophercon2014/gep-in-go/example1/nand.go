@@ -42,9 +42,9 @@ func validateNand(g *genome.Genome) float64 {
 
 func main() {
 	funcs := []gene.FuncWeight{
-		{"Not", 1},
-		{"And", 5},
-		{"Or", 5},
+		{Symbol: "Not", Weight: 1},
+		{Symbol: "And", Weight: 5},
+		{Symbol: "Or", Weight: 5},
 	}
 	e := model.New(funcs, functions.Bool, 30, 7, 1, 2, 0, "Or", validateNand)
 	s := e.Evolve(1000)
