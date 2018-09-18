@@ -31,6 +31,9 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 			}
 		}
 		args := argOrder[symbolIndex]
+		if len(args) < f.Terminals() {
+			log.Fatalf("symbol %q args length mismatch: len(args)=%v, want %v; check FuncType", sym, len(args), f.Terminals())
+		}
 		for i := 0; i < f.Terminals(); i++ {
 			e, err := g.buildExp(args[i], argOrder, grammar, helpers)
 			if err != nil {
