@@ -67,6 +67,11 @@ func (f *Function) Float64Function([]float64) float64 {
 	return 0.0
 }
 
+// VectorIntFunction allows FuncMap to implement interace functions.FuncMap.
+func (f *Function) VectorIntFunction([]functions.VectorInt) functions.VectorInt {
+	return functions.VectorInt{}
+}
+
 // Replacement determines how a function can be replaced.
 type Replacement struct {
 	Type      string `xml:"type,attr"`

@@ -5,6 +5,9 @@
 // Package functions provides a map of available functions for the GEP algorithm.
 package functions
 
+// VectorInt is a vector of integers.
+type VectorInt []int
+
 // FuncMap is a map from the symbol name of a function to its defining FuncNode.
 type FuncMap map[string]FuncNode
 
@@ -21,6 +24,8 @@ type FuncNode interface {
 	IntFunction([]int) int
 	// Float64Function represents a general floating-point function.
 	Float64Function([]float64) float64
+	// VectorIntFunction represents a general vector of integers function.
+	VectorIntFunction([]VectorInt) VectorInt
 }
 
 // FuncType represents the underlying function type of the model, genome, and gene.
@@ -32,4 +37,5 @@ const (
 	Bool
 	Int
 	Float64
+	VectorInts
 )

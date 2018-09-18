@@ -47,6 +47,11 @@ func (n MathNode) Float64Function(x []float64) float64 {
 	return n.function(x)
 }
 
+// VectorIntFunction allows FuncMap to implement interace functions.FuncMap.
+func (n MathNode) VectorIntFunction([]functions.VectorInt) functions.VectorInt {
+	return functions.VectorInt{}
+}
+
 // Math lists all the available floating-point functions for this package.
 var Math = functions.FuncMap{
 	// TODO(gmlewis): Change functions to operate on the entire length of the slice.

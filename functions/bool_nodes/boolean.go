@@ -7,6 +7,8 @@ package boolNodes
 
 import (
 	"log"
+
+	"github.com/gmlewis/gep/v2/functions"
 )
 
 // BoolNode is a boolean function used for the formation of GEP expressions.
@@ -42,4 +44,9 @@ func (n BoolNode) IntFunction([]int) int {
 func (n BoolNode) Float64Function([]float64) float64 {
 	log.Println("error calling Float64Function on BoolNode model.")
 	return 0.0
+}
+
+// VectorIntFunction allows FuncMap to implement interace functions.FuncMap.
+func (n BoolNode) VectorIntFunction([]functions.VectorInt) functions.VectorInt {
+	return functions.VectorInt{}
 }
