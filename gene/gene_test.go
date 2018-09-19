@@ -72,7 +72,7 @@ var intTests = []struct {
 	{
 		gene: "+.d0.d1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0",
 		tests: []intTest{
-			{in: []int{1.0, 2.0}, want: 3.0},
+			{in: []int{1, 2}, want: 3},
 		},
 		count: map[string]int{
 			"+":  1,
@@ -82,7 +82,7 @@ var intTests = []struct {
 		argOrder: [][]int{{1, 2}, nil, nil, {3, 4}, {5, 6}, {7, 8}, {9, 10}, nil, nil, nil, nil, nil, nil, nil, nil},
 	},
 	{
-		gene: "-.+.+.-.-.*.d0.d0.d0.d0.d0.d0.d0",
+		gene: "-.+.+.-.-.*.d0.d0.d0.d0.d0.d0.d0", // -(x^2 + x)
 		tests: []intTest{
 			{in: []int{0}, want: 0},
 			{in: []int{2}, want: -6},
@@ -105,9 +105,9 @@ var intTests = []struct {
 		argOrder: [][]int{{1, 2}, {3, 4}, {5, 6}, {7, 8}, {9, 10}, {11, 12}, nil, nil, nil, nil, nil, nil, nil},
 	},
 	{
-		gene: "-.*.*.*.d0./.d0.d0.d0.d0.d0.d0.d0",
+		gene: "-.*.*.*.d0./.d0.d0.d0.d0.d0.d0.d0", // x^3 - x
 		tests: []intTest{
-			{in: []int{20.0}, want: 7980.0},
+			{in: []int{20}, want: 7980},
 		},
 		count: map[string]int{
 			"-":  1,
@@ -219,6 +219,80 @@ func TestMath(t *testing.T) {
 		}
 		for _, n := range test.tests {
 			validateMath(t, g, n.in, n.want)
+		}
+		if !reflect.DeepEqual(g.SymbolMap, test.count) {
+			t.Errorf("Gene %q SymbolMap=%v, want %v", g, g.SymbolMap, test.count)
+		}
+	}
+}
+
+type vectorIntTest struct {
+	in   []VectorInt
+	want VectorInt
+}
+
+var vectorIntTests = []struct {
+	gene     string
+	tests    []vectorIntTest
+	count    map[string]int
+	argOrder [][]int
+}{
+	{
+		gene: "+.d0.d1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0",
+		tests: []vectorIntTest{
+			{in: []VectorInt{{1, 2, 3, 4}, {5, 6, 7, 8}}, want: VectorInt{6, 8, 10, 12}},
+		},
+		count: map[string]int{
+			"+":  1,
+			"d0": 1,
+			"d1": 1,
+		},
+		argOrder: [][]int{{1, 2}, nil, nil, {3, 4}, {5, 6}, {7, 8}, {9, 10}, nil, nil, nil, nil, nil, nil, nil, nil},
+	},
+	{
+		gene: "-.+.+.-.-.*.d0.d0.d0.d0.d0.d0.d0",
+		tests: []vectorIntTest{
+			{in: []VectorInt{{0, 2, 6, 7, 8, 10, 11, 12, 14, 15, 20}}, want: VectorInt{0, -6, -42, -56, -72, -110, -132, -156, -210, -240, -420}},
+		},
+		count: map[string]int{
+			"+":  2,
+			"-":  3,
+			"*":  1,
+			"d0": 7,
+		},
+		argOrder: [][]int{{1, 2}, {3, 4}, {5, 6}, {7, 8}, {9, 10}, {11, 12}, nil, nil, nil, nil, nil, nil, nil},
+	},
+	{
+		gene: "-.*.*.*.d0./.d0.d0.d0.d0.d0.d0.d0",
+		tests: []vectorIntTest{
+			{in: []VectorInt{{0, 20}}, want: VectorInt{0, 7980}},
+		},
+		count: map[string]int{
+			"-":  1,
+			"*":  3,
+			"/":  1,
+			"d0": 6,
+		},
+		argOrder: [][]int{{1, 2}, {3, 4}, {5, 6}, {7, 8}, nil, {9, 10}, nil, nil, nil, nil, nil, nil, nil},
+	},
+}
+
+func validateVectorInt(t *testing.T, g *Gene, in []VectorInt, want VectorInt) {
+	got := g.EvalVectorInt(in)
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("%v: math.Eval(%#v) => %v, want %v", g, in, got, want)
+	}
+}
+
+func TestVectorInt(t *testing.T) {
+	for _, test := range vectorIntTests {
+		g := New(test.gene, functions.Float64)
+		argOrder := g.getArgOrder()
+		if !reflect.DeepEqual(argOrder, test.argOrder) {
+			t.Errorf("Gene %q argOrder=%#v, want %#v", g, argOrder, test.argOrder)
+		}
+		for _, n := range test.tests {
+			validateVectorInt(t, g, n.in, n.want)
 		}
 		if !reflect.DeepEqual(g.SymbolMap, test.count) {
 			t.Errorf("Gene %q SymbolMap=%v, want %v", g, g.SymbolMap, test.count)

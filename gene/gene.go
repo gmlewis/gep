@@ -16,6 +16,7 @@ import (
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
 	in "github.com/gmlewis/gep/v2/functions/int_nodes"
 	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	vin "github.com/gmlewis/gep/v2/functions/vector_int_nodes"
 )
 
 // FuncWeight contains the symbol name and its weight to be used during
@@ -37,9 +38,10 @@ type Gene struct {
 	// funcType keep track of the underlying function types (no generics).
 	funcType functions.FuncType
 	// Instead of generics, we list all the possibilities:
-	bf   func([]bool) bool       // boolean generated function
-	intF func([]int) int         // integer generated function
-	mf   func([]float64) float64 // math generated function
+	bf   func([]bool) bool                               // boolean generated function
+	intF func([]int) int                                 // integer generated function
+	mf   func([]float64) float64                         // math generated function
+	vif  func([]functions.VectorInt) functions.VectorInt // vector of integers generated function
 
 	SymbolMap   map[string]int // do not use directly.  Use SymbolCount() instead.
 	headSize    int
@@ -146,6 +148,8 @@ func (g *Gene) SymbolCount(sym string) int {
 			g.generateIntFunc()
 		case functions.Float64:
 			g.generateMathFunc()
+		case functions.VectorInts:
+			g.generateVectorIntFunc()
 		default:
 			log.Fatalf("unknown funcType: %v", g.funcType)
 		}
@@ -182,7 +186,9 @@ func (g *Gene) Mutate() {
 	}
 	// Invalidate the cached function
 	g.bf = nil
+	g.intF = nil
 	g.mf = nil
+	g.vif = nil
 }
 
 // Dup duplicates the gene into the provided destination gene.
@@ -269,6 +275,8 @@ func (g *Gene) getArgOrder() [][]int {
 		lookup = in.Int
 	case functions.Float64:
 		lookup = mn.Math
+	case functions.VectorInts:
+		lookup = vin.VectorIntFuncs
 	default:
 		log.Fatalf("unknown funcType: %v", g.funcType)
 	}

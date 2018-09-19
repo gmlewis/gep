@@ -11,12 +11,14 @@ import (
 	"github.com/gmlewis/gep/v2/functions"
 )
 
+type VectorInt = functions.VectorInt
+
 // VectorIntNode is a vector of integers function used for the formation of GEP expressions.
 type VectorIntNode struct {
 	index     int
 	symbol    string
 	terminals int
-	function  func(x []functions.VectorInt) functions.VectorInt
+	function  func(x []VectorInt) VectorInt
 }
 
 // Symbol returns the Karva symbol for this vector of integers function.
@@ -47,15 +49,15 @@ func (n VectorIntNode) Float64Function([]float64) float64 {
 }
 
 // VectorIntFunction allows FuncMap to implement interace functions.FuncMap.
-func (n VectorIntNode) VectorIntFunction(x []functions.VectorInt) functions.VectorInt {
+func (n VectorIntNode) VectorIntFunction(x []VectorInt) VectorInt {
 	return n.function(x)
 }
 
 // sliceOp is a function used on each index of a VectorInt.
 type sliceOp func(in []int) int
 
-// processVector is a helper function that processes each index of an array of VectorInts.
-func processVector(x []functions.VectorInt, op sliceOp) (result functions.VectorInt) {
+// ProcessVector is a helper function that processes each index of an array of VectorInts.
+func ProcessVector(x []VectorInt, op sliceOp) (result VectorInt) {
 	if len(x) == 0 {
 		return result
 	}
@@ -73,16 +75,16 @@ func processVector(x []functions.VectorInt, op sliceOp) (result functions.Vector
 // Int lists all the available vector of integers functions for this package.
 var VectorIntFuncs = functions.FuncMap{
 	// TODO(gmlewis): Change functions to operate on variable-length slices.
-	"+": VectorIntNode{0, "+", 2, func(x []functions.VectorInt) functions.VectorInt {
+	"+": VectorIntNode{0, "+", 2, func(x []VectorInt) VectorInt {
 		op := func(in []int) (result int) {
 			for i := 0; i < 2; /* len(in) */ i++ {
 				result += in[i]
 			}
 			return result
 		}
-		return processVector(x, op)
+		return ProcessVector(x, op)
 	}},
-	"-": VectorIntNode{1, "-", 2, func(x []functions.VectorInt) functions.VectorInt {
+	"-": VectorIntNode{1, "-", 2, func(x []VectorInt) VectorInt {
 		op := func(in []int) (result int) {
 			result = in[0]
 			for i := 1; i < 2; /* len(in) */ i++ {
@@ -90,9 +92,9 @@ var VectorIntFuncs = functions.FuncMap{
 			}
 			return result
 		}
-		return processVector(x, op)
+		return ProcessVector(x, op)
 	}},
-	"*": VectorIntNode{2, "*", 2, func(x []functions.VectorInt) functions.VectorInt {
+	"*": VectorIntNode{2, "*", 2, func(x []VectorInt) VectorInt {
 		op := func(in []int) (result int) {
 			result = in[0]
 			for i := 1; i < 2; /* len(in) */ i++ {
@@ -100,16 +102,20 @@ var VectorIntFuncs = functions.FuncMap{
 			}
 			return result
 		}
-		return processVector(x, op)
+		return ProcessVector(x, op)
 	}},
-	"/": VectorIntNode{3, "/", 2, func(x []functions.VectorInt) functions.VectorInt {
+	"/": VectorIntNode{3, "/", 2, func(x []VectorInt) VectorInt {
 		op := func(in []int) (result int) {
 			result = in[0]
 			for i := 1; i < 2; /* len(in) */ i++ {
-				result /= in[i]
+				if in[0] == 0 {
+					result = 0
+				} else {
+					result /= in[i]
+				}
 			}
 			return result
 		}
-		return processVector(x, op)
+		return ProcessVector(x, op)
 	}},
 }
