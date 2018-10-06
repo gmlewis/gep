@@ -8,7 +8,7 @@ import (
 	"log"
 	"strconv"
 
- "github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v2/functions"
 	vin "github.com/gmlewis/gep/v2/functions/vector_int_nodes"
 )
 
