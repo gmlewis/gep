@@ -6,65 +6,54 @@ package main
 
 import (
 	"log"
+	"time"
 
-	gym "github.com/openai/gym-http-api/binding-go"
+	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
 
 const (
-	baseURL = "http://localhost:5000"
-	env     = "Copy-v0"
+	host        = "localhost:5001"
+	environment = "Copy-v0"
 )
 
 func main() {
-	c, err := gym.NewClient(baseURL)
+	env, err := gym.Make(host, environment)
 	if err != nil {
-		log.Fatalf("gym.NewClient(%q): %v", baseURL, err)
+		log.Fatalf("gym.Make(%q, %q): %v", host, environment, err)
 	}
+	defer env.Close()
 
-	id, err := c.Create(env)
+	obsSpace, err := env.ObservationSpace()
 	if err != nil {
-		log.Fatalf("Unable to create environment %q: %v", env, err)
+		log.Fatalf("ObservationSpace(): %v", err)
 	}
-	defer c.Close(id)
-	log.Printf("id=%q", id)
+	log.Printf("Observation space: %+v", obsSpace)
 
-	actionSpace, err := c.ActionSpace(id)
+	obs, err := env.Reset()
 	if err != nil {
-		log.Fatalf("ActionSpace(%q): %v", id, err)
-	}
-	log.Printf("Action space: %+v", actionSpace)
-	observationSpace, err := c.ObservationSpace(id)
-	if err != nil {
-		log.Fatalf("ObservationSpace(%q): %v", id, err)
-	}
-	log.Printf("Observation space: %+v", observationSpace)
-
-	if err := c.StartMonitor(id, "/tmp/"+env, true, false, false); err != nil {
-		log.Fatalf(`StartMonitor(%q, "/tmp/%v"): %v`, id, env, err)
-	}
-
-	obs, err := c.Reset(id)
-	if err != nil {
-		log.Fatalf("Reset(%q): %v", id, err)
+		log.Fatalf("Reset(): %v", err)
 	}
 	log.Printf("1st observation: %v", obs)
+
+	startTime := time.Now()
+	var steps int
 	var done bool
 	for !done {
 		// TODO: Replace SampleAction with GEP algorithm.
-		act, err := c.SampleAction(id)
-		if err != nil {
-			log.Fatalf("SampleAction(%q): %v", id, err)
+		var action []int
+		if err := env.SampleAction(&action); err != nil {
+			log.Fatalf("SampleAction(): %v", err)
 		}
 
 		var reward float64
-		obs, reward, done, _, err = c.Step(id, act, false)
+		obs, reward, done, _, err = env.Step(action)
 		if err != nil {
-			log.Fatalf("Step(%q, %v, false): %v", id, act, err)
+			log.Fatalf("Step(%v): %v", action, err)
 		}
-		log.Printf("reward=%v, observatioan=%v", reward, obs)
+		steps++
+		log.Printf("Step #%v: action=%v, obs=%v, reward=%v, done=%v", steps, action, obs, reward, done)
 	}
 
-	if err := c.CloseMonitor(id); err != nil {
-		log.Fatalf("CloseMonitor(%q): %v", id, err)
-	}
+	seconds := time.Since(startTime).Seconds()
+	log.Printf("Processed %v steps in %v seconds (%v sps)", steps, seconds, float64(steps)/seconds)
 }
