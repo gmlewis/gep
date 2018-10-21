@@ -5,6 +5,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"time"
 
@@ -12,48 +13,65 @@ import (
 )
 
 const (
-	host        = "localhost:5001"
-	environment = "Copy-v0"
+	host            = "localhost:5001"
+	environment     = "Copy-v0"
+	defaultMinSteps = 1e4
+	defaultMaxSteps = 1e6
+)
+
+var (
+	minSteps = flag.Int("min", defaultMinSteps, "Minimum number of steps to run")
+	maxSteps = flag.Int("max", defaultMaxSteps, "Maximum number of steps to run")
 )
 
 func main() {
+	flag.Parse()
+
 	env, err := gym.Make(host, environment)
-	if err != nil {
-		log.Fatalf("gym.Make(%q, %q): %v", host, environment, err)
-	}
+	check("gym.Make(%q, %q): %v", host, environment, err)
 	defer env.Close()
 
 	obsSpace, err := env.ObservationSpace()
-	if err != nil {
-		log.Fatalf("ObservationSpace(): %v", err)
-	}
+	check("ObservationSpace(): %v", err)
 	log.Printf("Observation space: %+v", obsSpace)
 
-	obs, err := env.Reset()
-	if err != nil {
-		log.Fatalf("Reset(): %v", err)
-	}
-	log.Printf("1st observation: %v", obs)
+	lastObs, err := env.Reset()
+	check("Reset(): %v", err)
 
 	startTime := time.Now()
-	var steps int
-	var done bool
-	for !done {
-		// TODO: Replace SampleAction with GEP algorithm.
-		var action []int
-		if err := env.SampleAction(&action); err != nil {
-			log.Fatalf("SampleAction(): %v", err)
+	var (
+		steps  int
+		done   bool
+		reward float64
+	)
+	for (!done || reward < 1.0 || steps < *minSteps) && steps < *maxSteps {
+		if done {
+			lastObs, err = env.Reset()
+			check("Reset(): %v", err)
 		}
 
-		var reward float64
+		// TODO: Replace SampleAction with GEP algorithm.
+		var action []int
+		err := env.SampleAction(&action)
+		check("SampleAction(): %v", err)
+
+		var obs gym.Obs
 		obs, reward, done, _, err = env.Step(action)
-		if err != nil {
-			log.Fatalf("Step(%v): %v", action, err)
-		}
+		check("Step(%v): %v", action, err)
 		steps++
-		log.Printf("Step #%v: action=%v, obs=%v, reward=%v, done=%v", steps, action, obs, reward, done)
+		log.Printf("Step #%v: obs=%v, action=%v, reward=%v, done=%v", steps, lastObs, action, reward, done)
+		lastObs = obs
+
+		// TODO: Send reward to GEP.
 	}
 
 	seconds := time.Since(startTime).Seconds()
-	log.Printf("Processed %v steps in %v seconds (%v sps)", steps, seconds, float64(steps)/seconds)
+	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", steps, seconds, float64(steps)/seconds)
+}
+
+func check(fmt string, args ...interface{}) {
+	err := args[len(args)-1]
+	if err != nil {
+		log.Fatalf(fmt, args...)
+	}
 }
