@@ -1,4 +1,7 @@
 // -*- compile-command: "go run main.go"; -*-
+// Copyright 2018 Google Inc. All rights reserved.
+// Use of this source code is governed by the Apache 2.0
+// license that can be found in the LICENSE file.
 
 // Copy-v0 runs a GEP algorithm on the OpenAI Gym "Copy-v0" Algorithm problem.
 // https://gym.openai.com/envs/Copy-v0/
@@ -9,6 +12,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/gmlewis/gep/model"
 	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
 
@@ -42,6 +46,9 @@ func main() {
 	check("ObservationSpace: %v", err)
 	log.Printf("Observation space: %+v", obsSpace)
 
+	gep, err := model.ForOpenAI(actionSpace, obsSpace)
+	check("ForOpenAI: %v", err)
+
 	lastObs, err := env.Reset()
 	check("Reset: %v", err)
 
@@ -57,10 +64,9 @@ func main() {
 			check("Reset: %v", err)
 		}
 
-		// TODO: Replace SampleAction with GEP algorithm.
 		var action []int
-		err := env.SampleAction(&action)
-		check("SampleAction: %v", err)
+		err := gep.Evaluate(lastObs, &action)
+		check("Evaluate(%v): %v", lastObs, err)
 
 		var obs gym.Obs
 		obs, reward, done, _, err = env.Step(action)
@@ -69,7 +75,8 @@ func main() {
 		log.Printf("Step #%v: obs=%v, action=%v, reward=%v, done=%v", steps, lastObs, action, reward, done)
 		lastObs = obs
 
-		// TODO: Send reward to GEP.
+		err = gep.Evolve(reward)
+		check("Evolve(%v): %v", reward, err)
 	}
 
 	seconds := time.Since(startTime).Seconds()
