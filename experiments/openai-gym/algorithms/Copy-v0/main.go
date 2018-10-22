@@ -31,12 +31,19 @@ func main() {
 	check("gym.Make(%q, %q): %v", host, environment, err)
 	defer env.Close()
 
+	actionSpace, err := env.ActionSpace()
+	check("ActionSpace: %v", err)
+	log.Printf("Action space: %+v", actionSpace)
+	for i, subSpace := range actionSpace.Subspaces {
+		log.Printf("SubSpace[%v]: %+v", i, subSpace)
+	}
+
 	obsSpace, err := env.ObservationSpace()
-	check("ObservationSpace(): %v", err)
+	check("ObservationSpace: %v", err)
 	log.Printf("Observation space: %+v", obsSpace)
 
 	lastObs, err := env.Reset()
-	check("Reset(): %v", err)
+	check("Reset: %v", err)
 
 	startTime := time.Now()
 	var (
@@ -47,13 +54,13 @@ func main() {
 	for (!done || reward < 1.0 || steps < *minSteps) && steps < *maxSteps {
 		if done {
 			lastObs, err = env.Reset()
-			check("Reset(): %v", err)
+			check("Reset: %v", err)
 		}
 
 		// TODO: Replace SampleAction with GEP algorithm.
 		var action []int
 		err := env.SampleAction(&action)
-		check("SampleAction(): %v", err)
+		check("SampleAction: %v", err)
 
 		var obs gym.Obs
 		obs, reward, done, _, err = env.Step(action)
