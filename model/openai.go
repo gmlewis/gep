@@ -7,9 +7,16 @@ package model
 import (
 	"log"
 
+	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/genome"
 	gym "github.com/gmlewis/gym-socket-api/binding-go"
+)
+
+const (
+	headSize     = 10
+	tailSize     = 10
+	numConstants = 6
 )
 
 // Model represents a GEP model.
@@ -42,9 +49,15 @@ func ForOpenAI(actionSpace, obsSpace *gym.Space) (Model, error) {
 	var genes []*gene.Gene
 	switch obsSpace.Type {
 	case "Discrete":
-		// for i := 0; i < numGenes; i++ {
-		// 	genes = append(genes, gene.RandomNew())
-		// }
+		funcs := []gene.FuncWeight{
+			{Symbol: "+", Weight: 1},
+			{Symbol: "-", Weight: 5},
+			{Symbol: "*", Weight: 5},
+		}
+		for i := 0; i < numGenes; i++ {
+			genes = append(genes, gene.RandomNew(headSize, tailSize, 1, numConstants, funcs, functions.Int))
+		}
+		m.genome = genome.New(genes, "tuple")
 	case "Tuple":
 	case "MultiBinary":
 	case "MultiDiscrete":
