@@ -2,6 +2,8 @@
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
+//go:generate go run gen-benchmarks.go
+
 // Package boolNodes defines the Boolean function collections available for the GEP algorithm.
 package boolNodes
 
