@@ -2,6 +2,8 @@
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
+//go:generate go run gen-benchmarks.go
+
 // Package intNodes defines the integer function collection available for the GEP algorithm.
 package intNodes
 
@@ -11,7 +13,7 @@ import (
 	"github.com/gmlewis/gep/v2/functions"
 )
 
-// IntNode is a integer function used for the formation of GEP expressions.
+// IntNode is an integer function used for the formation of GEP expressions.
 type IntNode struct {
 	index     int
 	symbol    string
@@ -48,6 +50,7 @@ func (n IntNode) Float64Function([]float64) float64 {
 
 // VectorIntFunction allows FuncMap to implement interace functions.FuncMap.
 func (n IntNode) VectorIntFunction([]functions.VectorInt) functions.VectorInt {
+	log.Println("error calling VectorIntFunction on IntNode model.")
 	return functions.VectorInt{}
 }
 

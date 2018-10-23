@@ -5,6 +5,9 @@
 package model
 
 import (
+	"log"
+
+	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/genome"
 	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
@@ -19,30 +22,35 @@ type Model interface {
 type openai struct {
 	actionSpace *gym.Space
 	obsSpace    *gym.Space
-	genomes     []*genome.Genome
+	genome      *genome.Genome
 }
 
 // ForOpenAI returns a Model based upon the action and observation spaces.
 func ForOpenAI(actionSpace, obsSpace *gym.Space) (Model, error) {
 	m := &openai{actionSpace: actionSpace, obsSpace: obsSpace}
 
+	numGenes := 1
 	switch actionSpace.Type {
 	case "Discrete":
 	case "Tuple":
-
+		numGenes = actionSpace.N
 	case "MultiBinary":
 	case "MultiDiscrete":
 	case "Box":
 	}
 
+	var genes []*gene.Gene
 	switch obsSpace.Type {
 	case "Discrete":
-
+		// for i := 0; i < numGenes; i++ {
+		// 	genes = append(genes, gene.RandomNew())
+		// }
 	case "Tuple":
 	case "MultiBinary":
 	case "MultiDiscrete":
 	case "Box":
 	}
+	log.Printf("numGenes=%v, genes=%v", numGenes, genes)
 
 	return m, nil
 }
