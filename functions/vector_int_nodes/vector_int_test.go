@@ -48,8 +48,3 @@ func runBenchmark(b *testing.B, sym string) {
 	}
 	result = v
 }
-
-func BenchmarkPlus(b *testing.B)     { runBenchmark(b, "+") }
-func BenchmarkMinus(b *testing.B)    { runBenchmark(b, "-") }
-func BenchmarkMultiply(b *testing.B) { runBenchmark(b, "*") }
-func BenchmarkDivide(b *testing.B)   { runBenchmark(b, "/") }

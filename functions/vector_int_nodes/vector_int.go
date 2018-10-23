@@ -2,6 +2,8 @@
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
+//go:generate go run gen-benchmarks.go
+
 // Package vectorIntNodes defines the vector of integers function collection available for the GEP algorithm.
 package vectorIntNodes
 
