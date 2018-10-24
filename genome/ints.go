@@ -6,11 +6,12 @@ package genome
 
 import (
 	"log"
+	"sync"
 
 	intN "github.com/gmlewis/gep/v2/functions/int_nodes"
 )
 
-// EvalInt evaluates the genome as a floating-point expression and returns the result.
+// EvalInt evaluates the genome as an integer expression and returns the result.
 // in represents the int inputs available to the genome.
 func (g *Genome) EvalInt(in []int) int {
 	lf, ok := intN.Int[g.LinkFunc]
@@ -24,4 +25,18 @@ func (g *Genome) EvalInt(in []int) int {
 		result = lf.IntFunction(x)
 	}
 	return result
+}
+
+// EvalIntTuple evaluates the genome by evaluating each gene and assigning
+// its output to each element of the tuple.
+func (g *Genome) EvalIntTuple(in, out []int) {
+	var wg sync.WaitGroup
+	for i := 0; i < len(g.Genes); i++ {
+		wg.Add(1)
+		go func(i int) {
+			out[i] = g.Genes[i].EvalInt(in)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
 }

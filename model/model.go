@@ -125,7 +125,7 @@ func (g *Generation) getBest() *genome.Genome {
 	bestGenome := g.Genomes[0]
 	c := make(chan *genome.Genome)
 	for i := 0; i < len(g.Genomes); i++ { // Evaluate genomes concurrently
-		go g.Genomes[i].Evaluate(g.ScoringFunc, c)
+		go g.Genomes[i].EvaluateWithScore(g.ScoringFunc, c)
 	}
 	for i := 0; i < len(g.Genomes); i++ { // Collect and return the highest scoring Genome
 		gn := <-c

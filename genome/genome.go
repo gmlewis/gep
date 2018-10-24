@@ -7,11 +7,13 @@
 package genome
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"strings"
 
 	"github.com/gmlewis/gep/v2/gene"
+	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
 
 // Genome contains the genes that make up the genome.
@@ -95,11 +97,31 @@ func (g *Genome) Dup() *Genome {
 // a valid solution and a return value of 1000 (or higher) means a perfect solution.
 type ScoringFunc func(g *Genome) float64
 
-// Evaluate scores a genome and sends the result to a channel.
-func (g *Genome) Evaluate(sf ScoringFunc, c chan<- *Genome) {
+// EvaluateWithScore scores a genome and sends the result to a channel.
+func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
 	if sf == nil {
-		log.Fatalf("genome.Evaluate: ScoringFunc must not be nil")
+		log.Fatalf("genome.EvaluateWithScore: ScoringFunc must not be nil")
 	}
 	g.Score = sf(g)
 	c <- g
+}
+
+// Evaluate runs the model with the observation and populates the provided action
+// based on the link function.
+func (g *Genome) Evaluate(obs gym.Obs, action interface{}) error {
+	result := make([]int, len(g.Genes))
+	var in int
+	if err := obs.Unmarshal(&in); err != nil {
+		return fmt.Errorf("Unmarshal: %v", err)
+	}
+	g.EvalIntTuple([]int{in}, result)
+	switch v := action.(type) {
+	case *[]int:
+		for _, val := range result {
+			*v = append(*v, val)
+		}
+	default:
+		return fmt.Errorf("Action type %v not yet supported", v)
+	}
+	return nil
 }
