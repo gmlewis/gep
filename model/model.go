@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"runtime"
 
 	"github.com/gmlewis/gep/v2/functions"
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
@@ -56,7 +55,6 @@ func New(fs []gene.FuncWeight, funcType functions.FuncType, numGenomes, headSize
 
 // Evolve runs the GEP algorithm for the given number of iterations, or until a score of 1000 (or more) is reached.
 func (g *Generation) Evolve(iterations int) *genome.Genome {
-	runtime.GOMAXPROCS(runtime.NumCPU()) // Use all CPUs
 	// Algorithm flow diagram, figure 3.1, book page 56
 	for i := 0; i < iterations; i++ {
 		// fmt.Printf("Iteration #%v...\n", i)
