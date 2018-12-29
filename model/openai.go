@@ -128,7 +128,8 @@ func (o *OpenAI) Evolve(reward float64) error {
 		gen := &Generation{Genomes: o.Genomes}
 		gen.replication()
 		gen.mutation()
-		o.Genomes = append([]*genome.Genome{ng}, gen.Genomes...)
+		// o.Genomes = append([]*genome.Genome{ng}, gen.Genomes...)
+		o.Genomes = append(gen.Genomes[0:maxGenomes-1], ng)
 
 		// for i, g := range o.Genomes {
 		// 	log.Printf("genome[%v]=%v", i, g)
