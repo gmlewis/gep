@@ -131,7 +131,19 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 
 // String returns the Karva representation of the gene.
 func (g Gene) String() string {
-	return strings.Join(g.Symbols, ".")
+	var syms []string
+	for _, s := range g.Symbols {
+		if strings.HasPrefix(s, "c") {
+			i, err := strconv.Atoi(s[1:])
+			if err != nil {
+				log.Fatalf("bad constant name: %v", s)
+			}
+			syms = append(syms, fmt.Sprintf("%v(%.2f)", s, g.Constants[i]))
+		} else {
+			syms = append(syms, s)
+		}
+	}
+	return strings.Join(syms, ".")
 }
 
 // SymbolCount returns the count of the number of times the symbol

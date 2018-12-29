@@ -62,7 +62,7 @@ func (g Genome) String() string {
 	for _, v := range g.Genes {
 		result = append(result, v.String())
 	}
-	return strings.Join(result, "|"+g.LinkFunc+"|")
+	return fmt.Sprintf("%v, score=%v", strings.Join(result, "|"+g.LinkFunc+"|"), g.Score)
 }
 
 // Mutate mutates a genome by performing numMutations random symbol exchanges within the genome.

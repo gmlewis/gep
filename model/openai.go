@@ -16,9 +16,8 @@ import (
 )
 
 const (
-	headSize = 10
-	// tailSize     = 10
-	numConstants = 6
+	headSize     = 10
+	numConstants = 1
 	maxGenomes   = 10
 )
 
@@ -82,6 +81,7 @@ func (o *OpenAI) Evaluate(obs gym.Obs, action interface{}) error {
 	if err := o.Genomes[0].Evaluate(obs, action); err != nil {
 		return err
 	}
+	// log.Printf("Evaluate: obs=%v, raw action=%v", obs, action)
 
 	switch o.ActionSpace.Type {
 	// case "Discrete":
@@ -106,6 +106,9 @@ func (o *OpenAI) Evaluate(obs gym.Obs, action interface{}) error {
 	default:
 		return fmt.Errorf("ActionSpace type %v not yet implemented", o.ActionSpace.Type)
 	}
+
+	// log.Printf("Evaluate: obs=%v, final action=%v", obs, action)
+
 	return nil
 }
 
@@ -116,7 +119,7 @@ func (o *OpenAI) Evolve(reward float64) error {
 	// Find the best genome so far.
 	sort.Slice(o.Genomes, func(a, b int) bool { return o.Genomes[a].Score > o.Genomes[b].Score })
 
-	if len(o.Genomes) < maxGenomes || o.Genomes[0].Score < 0 {
+	if len(o.Genomes) < maxGenomes || o.Genomes[0].Score < 500 {
 		oai, err := ForOpenAI(o.ActionSpace, o.ObsSpace)
 		check("ForOpenAI: %v", err)
 		o.Genomes = append([]*genome.Genome{oai.Genomes[0]}, o.Genomes...)
@@ -126,6 +129,19 @@ func (o *OpenAI) Evolve(reward float64) error {
 		gen.replication()
 		gen.mutation()
 		o.Genomes = append([]*genome.Genome{ng}, gen.Genomes...)
+
+		// for i, g := range o.Genomes {
+		// 	log.Printf("genome[%v]=%v", i, g)
+		// 	for in := 0; in < o.ObsSpace.N; in++ {
+		// 		action := []int{}
+		// 		intObs := &intObsT{i: in}
+		// 		if err := g.Evaluate(intObs, &action); err != nil {
+		// 			log.Fatalf("g.Evaluate: %v", err)
+		// 		}
+		// 		log.Printf("genome[%v](%v) = %v", i, in, action)
+		// 	}
+		// }
+		// log.Fatalf("Debug stop.")
 	}
 
 	if len(o.Genomes) > maxGenomes {
@@ -140,4 +156,16 @@ func check(fmt string, args ...interface{}) {
 	if err != nil {
 		log.Fatalf(fmt, args...)
 	}
+}
+
+// For debugging...
+type intObsT struct {
+	i int
+}
+
+func (i *intObsT) Unmarshal(dst interface{}) error {
+	if v, ok := dst.(*int); ok {
+		*v = i.i
+	}
+	return nil
 }

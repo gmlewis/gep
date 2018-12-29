@@ -20,7 +20,7 @@ const (
 	host            = "localhost:5001"
 	environment     = "Copy-v0"
 	defaultMinSteps = 1e6
-	defaultMaxSteps = 1e7
+	defaultMaxSteps = 1e8
 )
 
 var (
@@ -72,7 +72,9 @@ func main() {
 		obs, reward, done, _, err = env.Step(action)
 		check("Step(%v): %v", action, err)
 		steps++
-		// log.Printf("Step #%v: obs=%v, action=%v, reward=%v, done=%v", steps, lastObs, action, reward, done)
+		if steps%(*minSteps/100) == 0 {
+			log.Printf("Step #%v: obs=%v, action=%v, reward=%v, done=%v", steps, lastObs, action, reward, done)
+		}
 		lastObs = obs
 
 		err = gep.Evolve(reward)
