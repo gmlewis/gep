@@ -12,7 +12,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/gmlewis/gep/model"
+	"github.com/gmlewis/gep/v2/model"
 	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
 
