@@ -53,27 +53,28 @@ func main() {
 	check("Reset: %v", err)
 
 	startTime := time.Now()
-	var (
-		steps  int
-		done   bool
-		reward float64
-	)
+	var stepsSinceReset int
+	var steps int
+	var done bool
+	var reward float64
 	for (!done || reward < 1.0 || steps < *minSteps) && steps < *maxSteps {
 		if done {
 			lastObs, err = env.Reset()
 			check("Reset: %v", err)
+			stepsSinceReset = 0
 		}
 
 		var action []int
-		err := gep.Evaluate(lastObs, &action)
+		err := gep.Evaluate(stepsSinceReset, lastObs, &action)
 		check("Evaluate(%v): %v", lastObs, err)
 
 		var obs gym.Obs
 		obs, reward, done, _, err = env.Step(action)
 		check("Step(%v): %v", action, err)
 		steps++
+		stepsSinceReset++
 		if steps%(*minSteps/100) == 0 {
-			log.Printf("Step #%v: obs=%v, action=%v, reward=%v, done=%v", steps, lastObs, action, reward, done)
+			log.Printf("Step #%v: ssr=%v, obs=%v, action=%v, reward=%v, done=%v", steps, stepsSinceReset, lastObs, action, reward, done)
 		}
 		lastObs = obs
 

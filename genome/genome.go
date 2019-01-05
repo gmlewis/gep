@@ -108,13 +108,13 @@ func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
 
 // Evaluate runs the model with the observation and populates the provided action
 // based on the link function.
-func (g *Genome) Evaluate(obs gym.Obs, action interface{}) error {
+func (g *Genome) Evaluate(stepsSinceReset int, obs gym.Obs, action interface{}) error {
 	result := make([]int, len(g.Genes))
 	var in int
 	if err := obs.Unmarshal(&in); err != nil {
 		return fmt.Errorf("Unmarshal: %v", err)
 	}
-	g.EvalIntTuple([]int{in}, result)
+	g.EvalIntTuple([]int{in, stepsSinceReset}, result)
 	switch v := action.(type) {
 	case *[]int:
 		for _, val := range result {

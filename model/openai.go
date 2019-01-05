@@ -62,7 +62,8 @@ func ForOpenAI(actionSpace, obsSpace *gym.Space) (*OpenAI, error) {
 		// 	genes = append(genes, gene.RandomNew(headSize, tailSize, 1, numConstants, funcs, functions.Int))
 		// }
 		// o.Genomes = append(o.Genomes, genome.New(genes, "tuple"))
-		gen := New(funcs, functions.Int, 1, headSize, numGenes, 1, numConstants, "tuple", nil)
+		const numTerminals = 2 // Account for "stepsSinceReset"
+		gen := New(funcs, functions.Int, 1, headSize, numGenes, numTerminals, numConstants, "tuple", nil)
 		o.Genomes = gen.Genomes
 	// case "Tuple":
 	// case "MultiBinary":
@@ -77,8 +78,8 @@ func ForOpenAI(actionSpace, obsSpace *gym.Space) (*OpenAI, error) {
 }
 
 // Evaluate runs the model and returns an action from an observation.
-func (o *OpenAI) Evaluate(obs gym.Obs, action interface{}) error {
-	if err := o.Genomes[0].Evaluate(obs, action); err != nil {
+func (o *OpenAI) Evaluate(stepsSinceReset int, obs gym.Obs, action interface{}) error {
+	if err := o.Genomes[0].Evaluate(stepsSinceReset, obs, action); err != nil {
 		return err
 	}
 	// log.Printf("Evaluate: obs=%v, raw action=%v", obs, action)
