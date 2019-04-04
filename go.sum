@@ -4,5 +4,6 @@ github.com/gmlewis/gym-socket-api v0.0.0-20170918212244-151ca919c857 h1:GVI0KLtD
 github.com/gmlewis/gym-socket-api v0.0.0-20170918212244-151ca919c857/go.mod h1:8rjTjlE8EBaH3h8mo/IP/GtWXgixxkSSEIz0Q/DFxY8=
 github.com/openai/gym-http-api v0.0.0-20170602151020-35c61771df77 h1:DYZfGerrJ9STp9syYheDxXJMpWDI4urgq5vUUj2403U=
 github.com/openai/gym-http-api v0.0.0-20170602151020-35c61771df77/go.mod h1:RX3+TqCLS8hED2ue4qWfIlfbLthdIWBBpaWdfPKpB+E=
+github.com/openai/gym-http-api v0.0.0-20181122003044-15b68c3921fb/go.mod h1:RX3+TqCLS8hED2ue4qWfIlfbLthdIWBBpaWdfPKpB+E=
 github.com/unixpickle/essentials v0.0.0-20180916162721-ae02bc395f1d h1:mRwAxGRBEFcoKSWDoX5CROMJo6xmXBh4rNqOmyhpRi0=
 github.com/unixpickle/essentials v0.0.0-20180916162721-ae02bc395f1d/go.mod h1:lrJ3sPtA3BLwJeUSU3/Fh4E3eK+HMap+5XEwEKc2Tb8=
