@@ -1,9 +1,4 @@
-github.com/gmlewis/gep v1.0.0 h1:qKHrhnuvPX+rrDaJRrDte22EQ22GvPgtTyN6O7M05us=
-github.com/gmlewis/gep v1.0.0/go.mod h1:UcpF3uLKRDkCk3So3NTMJR7XOSnaYikqqW5Kvc+JMIo=
-github.com/gmlewis/gym-socket-api v0.0.0-20170918212244-151ca919c857 h1:GVI0KLtDWQNUIIdwdz6Df1Ah0O0BU0U9ilSlPRIGnBI=
-github.com/gmlewis/gym-socket-api v0.0.0-20170918212244-151ca919c857/go.mod h1:8rjTjlE8EBaH3h8mo/IP/GtWXgixxkSSEIz0Q/DFxY8=
-github.com/openai/gym-http-api v0.0.0-20170602151020-35c61771df77 h1:DYZfGerrJ9STp9syYheDxXJMpWDI4urgq5vUUj2403U=
-github.com/openai/gym-http-api v0.0.0-20170602151020-35c61771df77/go.mod h1:RX3+TqCLS8hED2ue4qWfIlfbLthdIWBBpaWdfPKpB+E=
-github.com/openai/gym-http-api v0.0.0-20181122003044-15b68c3921fb/go.mod h1:RX3+TqCLS8hED2ue4qWfIlfbLthdIWBBpaWdfPKpB+E=
+github.com/gmlewis/gym-socket-api v0.0.0-20190404132630-eda293e82ef6 h1:HhSD04CdsjdlLcOVG3CRqtycnJvHNVphYRBJE/Mu63E=
+github.com/gmlewis/gym-socket-api v0.0.0-20190404132630-eda293e82ef6/go.mod h1:8rjTjlE8EBaH3h8mo/IP/GtWXgixxkSSEIz0Q/DFxY8=
 github.com/unixpickle/essentials v0.0.0-20180916162721-ae02bc395f1d h1:mRwAxGRBEFcoKSWDoX5CROMJo6xmXBh4rNqOmyhpRi0=
 github.com/unixpickle/essentials v0.0.0-20180916162721-ae02bc395f1d/go.mod h1:lrJ3sPtA3BLwJeUSU3/Fh4E3eK+HMap+5XEwEKc2Tb8=
