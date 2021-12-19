@@ -21,8 +21,16 @@ The lightning talk I gave about GEP at GopherCon 2014 is available here:
 This is not an official Google product.
 
 ## Status
-[![GoDoc](https://godoc.org/github.com/gmlewis/gep?status.svg)](https://godoc.org/github.com/gmlewis/gep)
-[![Build Status](https://travis-ci.org/gmlewis/gep.png)](https://travis-ci.org/gmlewis/gep)
+
+[![GoDoc](https://pkg.go.dev/github.com/gmlewis/gep/v2?status.svg)](https://pkg.go.dev/github.com/gmlewis/gep/v2)
+
+I've decided to update this repo using Go 1.18 with generics
+(by building the Go compiler from the latest master branch):
+
+```
+$ go version
+go version devel go1.18-deb988a286 Fri Dec 3 18:09:19 2021 +0000 linux/amd64
+```
 
 ----------------------------------------------------------------------
 
