@@ -22,8 +22,6 @@ This is not an official Google product.
 
 ## Status
 
-[![GoDoc](https://pkg.go.dev/github.com/gmlewis/gep/v2?status.svg)](https://pkg.go.dev/github.com/gmlewis/gep/v2)
-
 I've decided to update this repo using Go 1.18 with generics
 (by building the Go compiler from the latest master branch):
 
