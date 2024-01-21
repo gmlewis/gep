@@ -22,13 +22,8 @@ This is not an official Google product.
 
 ## Status
 
-I've decided to update this repo using Go 1.18 with generics
-(by building the Go compiler from the latest master branch):
-
-```
-$ go version
-go version devel go1.18-deb988a286 Fri Dec 3 18:09:19 2021 +0000 linux/amd64
-```
+I've decided to update this repo using Go with generics (1.18+).
+It is still very experimental.
 
 ----------------------------------------------------------------------
 
@@ -40,8 +35,7 @@ specifically about Go workspaces: http://talks.golang.org/2012/tutorial.slide#9
 To run the NAND gate GEP experiment:
 
 ```
-$ go get github.com/gmlewis/gep/v2/experiments/nand
-$ nand
+$ go run github.com/gmlewis/gep/v2/experiments/nand
 Stopping after generation #0
 
 // gepModel is auto-generated Go source code for the
@@ -63,8 +57,7 @@ func gepModel(d []bool) bool {
 To run the Symbolic Regression experiment:
 
 ```
-$ go get github.com/gmlewis/gep/v2/experiments/symbolic_regression
-$ symbolic_regression
+$ go run github.com/gmlewis/gep/v2/experiments/symbolic_regression
 Stopping after generation #86
 
 // gepModel is auto-generated Go source code for the
@@ -109,8 +102,7 @@ versus output.  This helped to weed out errors.
 For example:
 
 ```
-$ go get github.com/gmlewis/gep/v2/experiments/load_grammars
-$ load_grammars
+$ go run github.com/gmlewis/gep/v2/experiments/load_grammars > grammars.xml
 ```
 
 ----------------------------------------------------------------------
