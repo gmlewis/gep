@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/nats-io/nats.go"
 )
 
@@ -34,6 +35,8 @@ var (
 	showTime = flag.Bool("t", false, "Display timestamps")
 	subj     = flag.String("sub", "gym.env.*", "NATS subject to listen to for env events")
 	urls     = flag.String("s", nats.DefaultURL, "The nats server URLs (separated by commas)")
+
+	jsoncomp = jsoniter.ConfigCompatibleWithStandardLibrary
 )
 
 func main() {
@@ -71,17 +74,32 @@ type agentT struct {
 	msgCount int
 }
 
+type ObsT [3]int
+type Update struct {
+	Obs        ObsT
+	Action     int
+	Reward     float64
+	Terminated bool
+	NextObs    ObsT
+}
+
 func (a *agentT) envHandler(msg *nats.Msg) {
 	a.msgCount++
 	if *debug {
 		printMsg(msg, a.msgCount)
 	}
 	switch msg.Subject {
-	case "gym.env.reset":
-	case "gym.env.obs":
+	case "gym.env.reset": // e.g. [gym.env.reset]: '[[11, 4, 0], {}]'
+	case "gym.env.obs": // e.g. [gym.env.obs]: '[11, 4, 0]'
+		var obs ObsT
+		if err := jsoncomp.Unmarshal(msg.Data, &obs); err != nil {
+			log.Fatal(err)
+		}
 		a.nc.Publish(agentSubject, []byte("1"))
-	case "gym.env.update":
-	case "gym.env.decay_epsilon":
+	case "gym.env.update": // e.g. [gym.env.update]: '[[11, 4, 0], 1, 0.0, false, [21, 4, 0]]'
+		update := parseUpdate(msg.Data)
+		log.Printf("update: %+v", update)
+	case "gym.env.decay_epsilon": // e.g. [gym.env.decay_epsilon]: ''
 	default:
 		log.Fatalf("unknown NATS subject [%v]", msg.Subject)
 	}
@@ -108,5 +126,58 @@ func setupConnOptions(name string) []nats.Option {
 		nats.ClosedHandler(func(nc *nats.Conn) {
 			log.Fatalf("Exiting: %v", nc.LastError())
 		}),
+	}
+}
+
+func parseObs(data any) ObsT {
+	var obs ObsT
+	tmpObs, ok := data.([]any)
+	if !ok {
+		log.Fatalf("parseObs: data: %T", data)
+	}
+	if len(tmpObs) != len(obs) {
+		log.Fatalf("parseObs: tmpObs=%+v, want %v items", tmpObs, len(obs))
+	}
+	for i := 0; i < len(obs); i++ {
+		obs[i] = parseInt(tmpObs[i])
+	}
+	return obs
+}
+
+func parseBool(data any) bool {
+	tmpBool, ok := data.(bool)
+	if !ok {
+		log.Fatalf("parseBool: data: %T", data)
+	}
+	return tmpBool
+}
+
+func parseInt(data any) int {
+	tmpInt, ok := data.(float64)
+	if !ok {
+		log.Fatalf("parseInt: data: %T", data)
+	}
+	return int(tmpInt)
+}
+
+func parseFloat64(data any) float64 {
+	tmpFloat64, ok := data.(float64)
+	if !ok {
+		log.Fatalf("parseFloat64: data: %T", data)
+	}
+	return tmpFloat64
+}
+
+func parseUpdate(data []byte) Update {
+	var update []any
+	if err := jsoncomp.Unmarshal(data, &update); err != nil {
+		log.Fatal(err)
+	}
+	return Update{
+		Obs:        parseObs(update[0]),
+		Action:     parseInt(update[1]),
+		Reward:     parseFloat64(update[2]),
+		Terminated: parseBool(update[3]),
+		NextObs:    parseObs(update[4]),
 	}
 }
