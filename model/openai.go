@@ -161,6 +161,7 @@ func check(fmt string, args ...interface{}) {
 }
 
 // For debugging...
+/*
 type intObsT struct {
 	i int
 }
@@ -171,3 +172,4 @@ func (i *intObsT) Unmarshal(dst interface{}) error {
 	}
 	return nil
 }
+*/

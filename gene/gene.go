@@ -220,15 +220,9 @@ func (g *Gene) Dup() *Gene {
 		choiceSlice:  make([]string, len(g.choiceSlice)),
 		numTerminals: g.numTerminals,
 	}
-	for i := range g.Symbols {
-		r.Symbols[i] = g.Symbols[i]
-	}
-	for i := range g.Constants {
-		r.Constants[i] = g.Constants[i]
-	}
-	for i := range g.choiceSlice {
-		r.choiceSlice[i] = g.choiceSlice[i]
-	}
+	copy(r.Symbols, g.Symbols)
+	copy(r.Constants, g.Constants)
+	copy(r.choiceSlice, g.choiceSlice)
 	return r
 }
 
@@ -276,8 +270,9 @@ func CheckEqual(g1 *Gene, g2 *Gene) error {
 // argOrder is used to build up the actual evaluatable expression tree.
 //
 // For example:
-//   '+.*.-./' => [[1, 2], [3, 4], [5, 6], [7, 8]]
-//   '+.d0.c0./' => [[1, 2], nil, nil, [3, 4]]
+//
+//	'+.*.-./' => [[1, 2], [3, 4], [5, 6], [7, 8]]
+//	'+.d0.c0./' => [[1, 2], nil, nil, [3, 4]]
 func (g *Gene) getArgOrder() [][]int {
 	var lookup functions.FuncMap
 	switch g.funcType {

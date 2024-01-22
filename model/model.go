@@ -37,14 +37,14 @@ type Generation struct {
 // sf is the scoring (or fitness) function.
 func New(fs []gene.FuncWeight, funcType functions.FuncType, numGenomes, headSize, numGenesPerGenome, numTerminals, numConstants int, linkFunc string, sf genome.ScoringFunc) *Generation {
 	r := &Generation{
-		Genomes:     make([]*genome.Genome, numGenomes, numGenomes),
+		Genomes:     make([]*genome.Genome, numGenomes),
 		Funcs:       fs,
 		ScoringFunc: sf,
 	}
 	n := maxArity(fs, funcType)
 	tailSize := headSize*(n-1) + 1
 	for i := range r.Genomes {
-		genes := make([]*gene.Gene, numGenesPerGenome, numGenesPerGenome)
+		genes := make([]*gene.Gene, numGenesPerGenome)
 		for j := range genes {
 			genes[j] = gene.RandomNew(headSize, tailSize, numTerminals, numConstants, fs, funcType)
 		}

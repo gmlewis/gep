@@ -112,16 +112,14 @@ func (g *Genome) Evaluate(stepsSinceReset int, obs gym.Obs, action interface{}) 
 	result := make([]int, len(g.Genes))
 	var in int
 	if err := obs.Unmarshal(&in); err != nil {
-		return fmt.Errorf("Unmarshal: %v", err)
+		return fmt.Errorf("obs.Unmarshal: %w", err)
 	}
 	g.EvalIntTuple([]int{in, stepsSinceReset}, result)
 	switch v := action.(type) {
 	case *[]int:
-		for _, val := range result {
-			*v = append(*v, val)
-		}
+		*v = append(*v, result...)
 	default:
-		return fmt.Errorf("Action type %v not yet supported", v)
+		return fmt.Errorf("action type '%v' not yet supported", v)
 	}
 	return nil
 }

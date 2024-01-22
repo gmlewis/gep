@@ -372,7 +372,7 @@
     
    <!-- The default temporary variable name is applied to all non specified cases. -->
    <tempvars>
-      <tempvar type="default" typename="bool" varname="y">y := false</tempvar>
+      <tempvar type="default" typename="bool" varname="y">var y bool</tempvar>
    </tempvars>
    <endline>{CRLF}</endline>
    <!-- Number of TABs to add to each line in the code block -->

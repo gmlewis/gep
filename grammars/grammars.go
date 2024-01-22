@@ -12,12 +12,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/gmlewis/gep/v2/functions"
 )
-
-const grammarPath = "github.com/gmlewis/gep/grammars"
 
 // Functions is a collection of Functions available in the language grammar.
 type Functions struct {
@@ -290,6 +289,9 @@ func loadGrammar(path string) (*Grammar, error) {
 }
 
 func getPath(filename string) string {
+	_, packageFile, _, _ := runtime.Caller(0)
+	grammarPath := filepath.Dir(packageFile)
+
 	// Support Travis CI automated builds by searching for files
 	dirs := strings.Split(os.Getenv("GOPATH"), ":")
 	for _, dir := range dirs {

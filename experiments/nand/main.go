@@ -1,8 +1,9 @@
+// -*- compile-command: "go run main.go"; -*-
 // Copyright 2014 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
-// NAND is a simple experiment to run the GEP algorithm using the Boolean logic package.
+// nand is a simple experiment to run the GEP algorithm using the Boolean logic package.
 // Given a set of input functions (Not, And, and Or), this solves how to create a NAND gate
 // from those basic building blocks. This experiment usually converges to a solution within
 // the first generation of evolution.
@@ -54,15 +55,16 @@ func main() {
 		{Symbol: "Or", Weight: 5},
 	}
 	numIn := len(nandTests[0].in)
-	e := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand)
-	s := e.Evolve(1000)
+	population := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand)
+	solution := population.Evolve(1000)
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
 		log.Printf("unable to load Boolean grammar: %v", err)
 	}
+
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// nand solution karva expression:\n// %q, score=%v\n", s, validateNand(s))
-	s.Write(os.Stdout, gr)
+	fmt.Printf("// nand solution karva expression:\n// %q\n", solution)
+	solution.Write(os.Stdout, gr)
 }

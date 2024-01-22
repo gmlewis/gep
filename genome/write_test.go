@@ -17,7 +17,7 @@ func TestWriteNand(t *testing.T) {
 	want := `package gepModel
 
 func gepModel(d []bool) bool {
-	y := false
+	var y bool
 
 	y = (((!(d[0] && d[1])) && (d[0] || d[1])) || (!(d[1] && d[1])))
 
@@ -35,7 +35,7 @@ func gepModel(d []bool) bool {
 	b := new(bytes.Buffer)
 	gn.Write(b, grammar)
 	if b.String() != want {
-		t.Errorf("gen.Write() got %v, want %v", b.String(), want)
+		t.Errorf("gen.Write() got:\n%v\nwant:\n%v", b.String(), want)
 	}
 }
 
@@ -47,7 +47,7 @@ import (
 )
 
 func gepModel(d []float64) float64 {
-	y := 0.0
+	var y float64
 
 	y = (d[0] * d[0])
 	y += d[0]
@@ -71,7 +71,7 @@ func gepModel(d []float64) float64 {
 	b := new(bytes.Buffer)
 	gn.Write(b, grammar)
 	if b.String() != want {
-		t.Errorf("gen.Write() got %v, want %v", b.String(), want)
+		t.Errorf("gen.Write() got:\n%v\nwant:\n%v", b.String(), want)
 	}
 }
 
@@ -79,7 +79,7 @@ func TestWrite6Multiplier(t *testing.T) {
 	want := `package gepModel
 
 func gepModel(d []bool) bool {
-	y := false
+	var y bool
 
 	y = (d[3] || ((gepNor(d[1], d[3]) || (d[2] && d[0])) || gepNand((d[1] || d[0]), d[2])))
 	y = y && gepNand((gepNor((d[5] || d[5]), gepNand(d[1], d[0])) || gepNor((d[2] || d[0]), d[3])), d[0])
@@ -111,6 +111,6 @@ func gepNor(x, y bool) bool {
 	b := new(bytes.Buffer)
 	gn.Write(b, grammar)
 	if b.String() != want {
-		t.Errorf("gen.Write() got %v, want %v", b.String(), want)
+		t.Errorf("gen.Write() got:\n%v\nwant:\n%v", b.String(), want)
 	}
 }
