@@ -78,9 +78,9 @@ func (d *dump) generateCode() ([]byte, error) {
 	}
 
 	exps := []string{""}
-	for i, e := range d.genome.Genes {
+	for i, gene := range d.genome.Genes {
 		// d.write(fmt.Sprintf("// GML: d.genome.Genes: e=%#v\n", e))
-		exp, err := e.Expression(d.gr, helpers)
+		exp, err := gene.Expression(d.gr, helpers)
 		if err != nil {
 			return nil, err
 		}

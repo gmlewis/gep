@@ -12,9 +12,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
@@ -31,10 +29,6 @@ var nandTests = []struct {
 	{[]bool{false, true}, true},
 	{[]bool{true, false}, true},
 	{[]bool{true, true}, false},
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
 }
 
 func validateNand(g *genome.Genome) float64 {

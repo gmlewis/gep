@@ -1,3 +1,4 @@
+// -*- compile-command: "go run main.go"; -*-
 // Copyright 2014 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
@@ -10,9 +11,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
@@ -155,10 +154,6 @@ var parityTests = []struct {
 	{[]bool{true, true, true, true, true, true, true}, true},
 }
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
 func validateParity(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range parityTests {
@@ -177,15 +172,16 @@ func main() {
 		{Symbol: "Or", Weight: 20},
 	}
 	numIn := len(parityTests[0].in)
-	e := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "Xor", validateParity)
-	s := e.Evolve(10000)
+	population := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "Xor", validateParity)
+	solution := population.Evolve(10000)
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
 		log.Printf("unable to load Boolean grammar: %v", err)
 	}
+
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// odd-7-parity solution karva expression:\n// %q, score=%v\n", s, validateParity(s))
-	s.Write(os.Stdout, gr)
+	fmt.Printf("// odd-7-parity solution karva expression:\n// %q\n", solution)
+	solution.Write(os.Stdout, gr)
 }

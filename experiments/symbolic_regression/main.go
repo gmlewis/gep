@@ -1,8 +1,9 @@
+// -*- compile-command: "go run main.go"; -*-
 // Copyright 2014 Google Inc. All rights reserved.
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
-// Symbolic_regression is a simple experiment to run the GEP algorithm using the floating-point math package.
+// symbolic_regression is a simple experiment to run the GEP algorithm using the floating-point math package.
 // Given a set of input functions (+, -, *, and /), this solves the equation "a^4 + a^3 + a^2 + a"
 // from those basic building blocks. This experiment usually converges to a solution within
 // the first 10000 generations of evolution, but not always.
@@ -12,9 +13,7 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
@@ -43,10 +42,6 @@ var srTests = []struct {
 	{[]float64{-100}, 99009900},
 }
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
 func validateFunc(g *genome.Genome) float64 {
 	result := 0.0
 	for _, n := range srTests {
@@ -70,15 +65,16 @@ func main() {
 		{Symbol: "*", Weight: 1},
 	}
 	numIn := len(srTests[0].in)
-	e := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc)
-	s := e.Evolve(10000)
+	population := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc)
+	solution := population.Evolve(10000)
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoMathGrammar()
 	if err != nil {
 		log.Printf("unable to load grammar: %v", err)
 	}
+
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %q, score=%v\n", s, validateFunc(s))
-	s.Write(os.Stdout, gr)
+	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %q\n", solution)
+	solution.Write(os.Stdout, gr)
 }

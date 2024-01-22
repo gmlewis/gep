@@ -24,9 +24,11 @@ func TestExpression(t *testing.T) {
 	if err != nil {
 		t.Fatalf("g.Expression error: %v", err)
 	}
+
 	if got != want {
 		t.Errorf("g.Expression got %q, want %q", got, want)
 	}
+
 	if len(helpers) != 0 {
 		t.Errorf("helpers got length %v, want 0", len(helpers))
 	}
@@ -46,9 +48,11 @@ func TestConstants(t *testing.T) {
 	if err != nil {
 		t.Fatalf("g.Expression error: %v", err)
 	}
+
 	if got != want {
 		t.Errorf("g.Expression got %q, want %q", got, want)
 	}
+
 	if len(helpers) != 0 {
 		t.Errorf("helpers got length %v, want 0", len(helpers))
 	}
