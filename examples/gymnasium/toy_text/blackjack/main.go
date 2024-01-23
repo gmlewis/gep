@@ -1,21 +1,32 @@
 // -*- compile-command: "go run main.go"; -*-
 
-// blackjack solves the gymnasium Blackjack game with
-// Reinforcement Learning over NATS.
+// blackjack runs a GEP algorithm on the Gymnasium "Blackjack-v1" algorithm problem.
+// https://gymnasium.farama.org/tutorials/training_agents/blackjack_tutorial/
 package main
 
 import (
 	"flag"
 	"log"
 	"os"
-	"runtime"
 	"time"
 
-	"github.com/nats-io/nats.go"
+	"github.com/gmlewis/gep/v2/model"
+	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
 
 const (
-	agentSubject = "gym.agent.action"
+	host            = "localhost:5001"
+	environment     = "Blackjack-v1"
+	defaultMinSteps = 1000 // 1e6
+	defaultMaxSteps = 2000 // 1e8
+)
+
+var (
+	debug    = flag.Bool("d", false, "Show debug information")
+	showHelp = flag.Bool("h", false, "Show help message")
+	showTime = flag.Bool("t", false, "Display timestamps")
+	minSteps = flag.Int("min", defaultMinSteps, "Minimum number of steps to run")
+	maxSteps = flag.Int("max", defaultMaxSteps, "Maximum number of steps to run")
 )
 
 func usage() {
@@ -28,14 +39,6 @@ func showUsageAndExit(exitCode int) {
 	os.Exit(exitCode)
 }
 
-var (
-	debug    = flag.Bool("d", false, "Show debug information")
-	showHelp = flag.Bool("h", false, "Show help message")
-	showTime = flag.Bool("t", false, "Display timestamps")
-	subj     = flag.String("sub", "gym.env.*", "NATS subject to listen to for env events")
-	urls     = flag.String("s", nats.DefaultURL, "The nats server URLs (separated by commas)")
-)
-
 func main() {
 	log.SetFlags(0) // disable output of timestamp from log.* functions.
 	flag.Usage = usage
@@ -45,68 +48,66 @@ func main() {
 		showUsageAndExit(0)
 	}
 
-	opts := setupConnOptions("NATS GEP Blackjack")
-	nc, err := nats.Connect(*urls, opts...)
+	env, err := gym.Make(host, environment)
+	check("gym.Make(%q, %q): %v", host, environment, err)
+	defer env.Close()
+
+	actionSpace, err := env.ActionSpace()
+	check("ActionSpace: %v", err)
+	log.Printf("Action space: %+v", actionSpace)
+	for i, subSpace := range actionSpace.Subspaces {
+		log.Printf("SubSpace[%v]: %+v", i, subSpace)
+	}
+
+	obsSpace, err := env.ObservationSpace()
+	check("ObservationSpace: %v", err)
+	log.Printf("Observation space: %+v", obsSpace)
+
+	gep, err := model.NewGymnasium(actionSpace, obsSpace)
+	check("NewGymnasium: %v", err)
+
+	lastObs, err := env.Reset()
+	check("Reset: %v", err)
+	log.Printf("env.Reset: lastObj=%T=%s", lastObs, lastObs)
+
+	startTime := time.Now()
+	var stepsSinceReset int
+	var steps int
+	var done bool
+	var reward float64
+	for (!done || reward < 1.0 || steps < *minSteps) && steps < *maxSteps {
+		if done {
+			lastObs, err = env.Reset()
+			check("Reset: %v", err)
+			stepsSinceReset = 0
+		}
+
+		var action int
+		// TODO: integrate Evaluate into loop.
+		// err := gep.Evaluate(stepsSinceReset, lastObs, &action)
+		// check("Evaluate(%v): %v", lastObs, err)
+
+		var obs gym.Obs
+		obs, reward, done, _, err = env.Step(action)
+		check("Step(%v): %v", action, err)
+		steps++
+		stepsSinceReset++
+		if *debug || steps%(*minSteps/100) == 0 {
+			log.Printf("Step #%v: ssr=%v, obs=%v, action=%v, reward=%v, done=%v", steps, stepsSinceReset, lastObs, action, reward, done)
+		}
+		lastObs = obs
+
+		err = gep.Evolve(reward)
+		check("Evolve(%v): %v", reward, err)
+	}
+
+	seconds := time.Since(startTime).Seconds()
+	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", steps, seconds, float64(steps)/seconds)
+}
+
+func check(fmt string, args ...interface{}) {
+	err := args[len(args)-1]
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	agent := &agentT{nc: nc}
-	nc.Subscribe(*subj, agent.envHandler)
-	nc.Flush()
-	if err := nc.LastError(); err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("Listening on [%v]", *subj)
-	if *showTime {
-		log.SetFlags(log.LstdFlags)
-	}
-
-	runtime.Goexit()
-}
-
-type agentT struct {
-	nc       *nats.Conn
-	msgCount int
-}
-
-func (a *agentT) envHandler(msg *nats.Msg) {
-	a.msgCount++
-	if *debug {
-		printMsg(msg, a.msgCount)
-	}
-	switch msg.Subject {
-	case "gym.env.reset":
-	case "gym.env.obs":
-		a.nc.Publish(agentSubject, []byte("1"))
-	case "gym.env.update":
-	case "gym.env.decay_epsilon":
-	default:
-		log.Fatalf("unknown NATS subject [%v]", msg.Subject)
-	}
-}
-
-func printMsg(m *nats.Msg, i int) {
-	log.Printf("[#%v] Received on [%v]: '%v'", i, m.Subject, string(m.Data))
-}
-
-func setupConnOptions(name string) []nats.Option {
-	totalWait := 1 * time.Minute
-	reconnectDelay := time.Second
-
-	return []nats.Option{
-		nats.Name(name),
-		nats.ReconnectWait(reconnectDelay),
-		nats.MaxReconnects(int(totalWait / reconnectDelay)),
-		nats.DisconnectErrHandler(func(nc *nats.Conn, err error) {
-			log.Printf("Disconnected due to:%v, will attempt reconnects for %.0fm", err, totalWait.Minutes())
-		}),
-		nats.ReconnectHandler(func(nc *nats.Conn) {
-			log.Printf("Reconnected [%v]", nc.ConnectedUrl())
-		}),
-		nats.ClosedHandler(func(nc *nats.Conn) {
-			log.Fatalf("Exiting: %v", nc.LastError())
-		}),
+		log.Fatalf("ERROR: "+fmt, args...)
 	}
 }
