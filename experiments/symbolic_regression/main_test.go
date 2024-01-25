@@ -24,7 +24,7 @@ func BenchmarkValidateFunc(b *testing.B) {
 	e := model.New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
 	var v float64
 	for i := 0; i < b.N; i++ {
-		v = validateFunc(e.Genomes[0])
+		v = validateFunc(e.Individuals[0])
 	}
 	result = v
 }

@@ -62,8 +62,11 @@ func main() {
 	obsSpace, err := env.ObservationSpace()
 	check("ObservationSpace: %v", err)
 	log.Printf("Observation space: %+v", obsSpace)
+	for i, sub := range obsSpace.Subspaces {
+		log.Printf("Observation subspace[%v]: %+v", i, *sub)
+	}
 
-	gep, err := model.NewGymnasium(actionSpace, obsSpace)
+	agent, err := model.NewGymnasiumAgent(actionSpace, obsSpace)
 	check("NewGymnasium: %v", err)
 
 	lastObs, err := env.Reset()
@@ -71,38 +74,38 @@ func main() {
 	log.Printf("env.Reset: lastObj=%T=%s", lastObs, lastObs)
 
 	startTime := time.Now()
-	var stepsSinceReset int
-	var steps int
-	var done bool
-	var reward float64
-	for (!done || reward < 1.0 || steps < *minSteps) && steps < *maxSteps {
-		if done {
-			lastObs, err = env.Reset()
-			check("Reset: %v", err)
-			stepsSinceReset = 0
-		}
-
+	var episodeReward float64
+	var episodeSteps int
+	var totalSteps int
+	for (episodeReward < 1.0 || totalSteps < *minSteps) && totalSteps < *maxSteps {
 		var action int
 		// TODO: integrate Evaluate into loop.
-		// err := gep.Evaluate(stepsSinceReset, lastObs, &action)
+		// err := agent.Evaluate(episodeSteps, lastObs, &action)
 		// check("Evaluate(%v): %v", lastObs, err)
+		err := env.SampleAction(&action)
+		check("env.SampleAction: %v", err)
 
-		var obs gym.Obs
-		obs, reward, done, _, err = env.Step(action)
+		obs, reward, terminated, truncated, _, err := env.Step(action)
 		check("Step(%v): %v", action, err)
-		steps++
-		stepsSinceReset++
-		if *debug || steps%(*minSteps/100) == 0 {
-			log.Printf("Step #%v: ssr=%v, obs=%v, action=%v, reward=%v, done=%v", steps, stepsSinceReset, lastObs, action, reward, done)
+		episodeReward += reward
+		totalSteps++
+		episodeSteps++
+		if *debug || totalSteps%(*minSteps/100) == 0 {
+			log.Printf("Step #%v: episodeSteps=%v, obs=%v, action=%v, reward=%v, episodeReward=%v, terminated=%v", totalSteps, episodeSteps, lastObs, action, reward, episodeReward, terminated)
 		}
 		lastObs = obs
 
-		err = gep.Evolve(reward)
-		check("Evolve(%v): %v", reward, err)
+		if terminated || truncated {
+			err := agent.Evolve(episodeReward)
+			check("Evolve(%v): %v", episodeReward, err)
+			lastObs, err = env.Reset()
+			check("Reset: %v", err)
+			episodeSteps = 0
+		}
 	}
 
 	seconds := time.Since(startTime).Seconds()
-	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", steps, seconds, float64(steps)/seconds)
+	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", totalSteps, seconds, float64(totalSteps)/seconds)
 }
 
 func check(fmt string, args ...interface{}) {

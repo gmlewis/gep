@@ -9,6 +9,7 @@ import (
 
 	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v2/genome"
 )
 
 func TestMaxArity(t *testing.T) {
@@ -51,5 +52,28 @@ func BenchmarkMutation(b *testing.B) {
 	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
 	for i := 0; i < b.N; i++ {
 		e.mutation()
+	}
+}
+
+func TestReplication(t *testing.T) {
+	g := &Generation{
+		Individuals: []*genome.Genome{
+			{Score: -1000},
+			{Score: -500},
+			{Score: -100},
+			{Score: -50},
+			{Score: -10},
+			{Score: -5},
+			{Score: -1},
+			{Score: 1},
+			{Score: 5},
+		},
+	}
+
+	before := len(g.Individuals)
+	g.replication()
+	got := len(g.Individuals)
+	if want := before; got != want {
+		t.Errorf("replication = %v individuals, want %v", got, want)
 	}
 }

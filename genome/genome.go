@@ -2,8 +2,13 @@
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
-// Package genome provides the basis for a single GEP genome.
+// Package genome provides the basis for a single GEP genome
+// which represents a single individual in a population.
 // A genome consists of one or more genes.
+// Each gene within an individual is used to generate
+// the outputs (or actions) of that individual.
+// A link function determines how the genes are combined
+// or mapped to the output or actions of the genome.
 package genome
 
 import (
@@ -13,7 +18,6 @@ import (
 	"strings"
 
 	"github.com/gmlewis/gep/v2/gene"
-	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
 
 // Genome contains the genes that make up the genome.
@@ -106,18 +110,20 @@ func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
 	c <- g
 }
 
-// Evaluate runs the model with the observation and populates the provided action
+// Evaluate runs the model with the observations and populates the provided action
 // based on the link function.
-func (g *Genome) Evaluate(stepsSinceReset int, obs gym.Obs, action interface{}) error {
+func (g *Genome) Evaluate(observations []int, action interface{}) error {
 	result := make([]int, len(g.Genes))
-	var in int
-	if err := obs.Unmarshal(&in); err != nil {
-		return fmt.Errorf("obs.Unmarshal: %w", err)
-	}
-	g.EvalIntTuple([]int{in, stepsSinceReset}, result)
+	// var in int
+	// if err := obs.Unmarshal(&in); err != nil {
+	// 	return fmt.Errorf("obs.Unmarshal: %w", err)
+	// }
+
+	g.EvalIntTuple(observations, result)
 	switch v := action.(type) {
 	case *[]int:
-		*v = append(*v, result...)
+		// *v = append(*v, result...)
+		action = &result
 	default:
 		return fmt.Errorf("action type '%v' not yet supported", v)
 	}
