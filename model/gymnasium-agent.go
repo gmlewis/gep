@@ -107,7 +107,6 @@ func (ga *GymnasiumAgent) newIndividual() (*genome.Genome, error) {
 	numGenes := 1
 	switch ga.ActionSpace.Type {
 	case "Discrete":
-		log.Printf("Warning: ActionSpace Discrete not handled yet: N=%v", ga.ActionSpace.N)
 		// N=2 means that the output can have two values: 0, 1
 	case "Tuple":
 		numGenes = len(ga.ActionSpace.Subspaces)
@@ -130,7 +129,10 @@ func (ga *GymnasiumAgent) newIndividual() (*genome.Genome, error) {
 		// 	genes = append(genes, gene.RandomNew(headSize, tailSize, 1, numConstants, funcs, functions.Int))
 		// }
 		// o.Individuals = append(o.Individuals, genome.New(genes, "tuple"))
-		const numTerminals = 2 // Account for added "episodeSteps"
+		numTerminals := 1
+		if ga.appendEpisodeSteps {
+			numTerminals++
+		}
 		gen := New(
 			funcs,
 			functions.Int,
@@ -150,7 +152,10 @@ func (ga *GymnasiumAgent) newIndividual() (*genome.Genome, error) {
 			{Symbol: "-", Weight: 5},
 			{Symbol: "*", Weight: 5},
 		}
-		numTerminals := len(ga.ObsSpace.Subspaces) + 1 // Account for added "episodeSteps"
+		numTerminals := len(ga.ObsSpace.Subspaces)
+		if ga.appendEpisodeSteps {
+			numTerminals++
+		}
 		gen := New(
 			funcs,
 			funcType,
@@ -236,7 +241,7 @@ func (ga *GymnasiumAgent) Evaluate(episodeSteps int, obs gym.Obs, action any) er
 // (ranging from negative (bad) to positive (good)) for the current (#0)
 // individual.
 func (ga *GymnasiumAgent) Evolve(reward float64) error {
-	ga.Individuals[0].Score = reward
+	ga.Individuals[0].Score = reward // should this be += ?
 
 	if len(ga.Individuals) < ga.maxIndividuals {
 		// Create a completely new random individual
@@ -258,7 +263,7 @@ func (ga *GymnasiumAgent) Evolve(reward float64) error {
 	// mutation, and crossover.
 	ng := ga.Individuals[0].Dup()
 	gen := &Generation{Individuals: ga.Individuals}
-	gen.replication()
+	// gen.replication()
 	// Only perform mutation and crossover on the new individual #0
 	// which will be evaluted during the next upcoming episode.
 	gen.singleMutation(0)

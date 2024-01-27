@@ -146,6 +146,12 @@ func (g Gene) String() string {
 	return strings.Join(syms, ".")
 }
 
+// DotGraph returns a graphviz "dot" language representation of the gene.
+func (g Gene) DotGraph() string {
+	var lines []string
+	return strings.Join(lines, "\n")
+}
+
 // SymbolCount returns the count of the number of times the symbol
 // is actually used in the Gene.
 // Note that this count is typically different from the number

@@ -62,11 +62,20 @@ func (g *Genome) SymbolCount(sym string) int {
 
 // String returns the Karva representation of the genome.
 func (g Genome) String() string {
-	result := []string{}
-	for _, v := range g.Genes {
-		result = append(result, v.String())
+	var result []string
+	for _, gene := range g.Genes {
+		result = append(result, gene.String())
 	}
 	return fmt.Sprintf("%v, score=%v", strings.Join(result, "|"+g.LinkFunc+"|"), g.Score)
+}
+
+// DotGraph returns a graphviz "dot" language representation of the genome.
+func (g Genome) DotGraph() string {
+	var lines []string
+	// for i, gene := range g.Genes {
+	// 	karva := gene.DotGraph()
+	// }
+	return strings.Join(lines, "\n")
 }
 
 // Mutate mutates a genome by performing numMutations random symbol exchanges within the genome.

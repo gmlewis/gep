@@ -1,4 +1,5 @@
 .vscode/
+*.log
 
 # symlinks
 /*.sh

@@ -10,23 +10,26 @@ import (
 	"os"
 	"time"
 
+	gym "github.com/gmlewis/gep/gymnasium/envs/toy_text/blackjack"
 	"github.com/gmlewis/gep/v2/model"
-	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
 
 const (
 	host            = "localhost:5001"
 	environment     = "Blackjack-v1"
-	defaultMinSteps = 1000 // 1e6
-	defaultMaxSteps = 2000 // 1e8
+	defaultMinSteps = 100000 // 1e6
+	defaultMaxSteps = 200000 // 1e8
 )
 
 var (
-	debug    = flag.Bool("d", false, "Show debug information")
-	showHelp = flag.Bool("h", false, "Show help message")
-	showTime = flag.Bool("t", false, "Display timestamps")
-	minSteps = flag.Int("min", defaultMinSteps, "Minimum number of steps to run")
-	maxSteps = flag.Int("max", defaultMaxSteps, "Maximum number of steps to run")
+	debug          = flag.Bool("d", false, "Show debug information")
+	headSize       = flag.Int("hs", 100, "Head size of karva expressions")
+	maxIndividuals = flag.Int("mi", 100, "Maximum individuals in population")
+	numConsts      = flag.Int("nc", 2, "Number of constants in karva expressions")
+	showHelp       = flag.Bool("h", false, "Show help message")
+	showTime       = flag.Bool("t", false, "Display timestamps")
+	minSteps       = flag.Int("min", defaultMinSteps, "Minimum number of steps to run")
+	maxSteps       = flag.Int("max", defaultMaxSteps, "Maximum number of steps to run")
 )
 
 func usage() {
@@ -66,7 +69,12 @@ func main() {
 		log.Printf("Observation subspace[%v]: %+v", i, *sub)
 	}
 
-	agent, err := model.NewGymnasiumAgent(actionSpace, obsSpace)
+	opts := []model.GymnasiumAgentOption{
+		model.WithHeadSize(*headSize),
+		model.WithNumConstants(*numConsts),
+		model.WithMaxIndividuals(*maxIndividuals),
+	}
+	agent, err := model.NewGymnasiumAgent(actionSpace, obsSpace, opts...)
 	check("NewGymnasium: %v", err)
 
 	lastObs, err := env.Reset()
@@ -101,11 +109,18 @@ func main() {
 			lastObs, err = env.Reset()
 			check("Reset: %v", err)
 			episodeSteps = 0
+			episodeReward = 0
 		}
 	}
 
 	seconds := time.Since(startTime).Seconds()
 	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", totalSteps, seconds, float64(totalSteps)/seconds)
+
+	log.Printf("\nFinal population:")
+	for i, individual := range agent.Individuals {
+		log.Printf("Individual #%v: %v", i+1, individual)
+	}
+	log.Printf("Done.")
 }
 
 func check(fmt string, args ...any) {
