@@ -10,19 +10,19 @@ import (
 	"os"
 	"time"
 
-	gym "github.com/gmlewis/gep/gymnasium/envs/toy_text/blackjack"
+	gym "github.com/gmlewis/gep/v2/gymnasium"
 	"github.com/gmlewis/gep/v2/model"
 )
 
 const (
-	host            = "localhost:5001"
 	environment     = "Blackjack-v1"
-	defaultMinSteps = 100000 // 1e6
-	defaultMaxSteps = 200000 // 1e8
+	defaultMinSteps = 1e8
+	defaultMaxSteps = 2e8
 )
 
 var (
 	debug          = flag.Bool("d", false, "Show debug information")
+	episodesPerInd = flag.Int("epi", 1000, "Episodes per individual") // TODO
 	headSize       = flag.Int("hs", 100, "Head size of karva expressions")
 	maxIndividuals = flag.Int("mi", 100, "Maximum individuals in population")
 	numConsts      = flag.Int("nc", 2, "Number of constants in karva expressions")
@@ -51,8 +51,8 @@ func main() {
 		showUsageAndExit(0)
 	}
 
-	env, err := gym.Make(host, environment)
-	check("gym.Make(%q, %q): %v", host, environment, err)
+	env, err := gym.Make(environment)
+	check("gym.Make(%q, %q): %v", environment, err)
 	defer env.Close()
 
 	actionSpace, err := env.ActionSpace()
@@ -77,8 +77,7 @@ func main() {
 	agent, err := model.NewGymnasiumAgent(actionSpace, obsSpace, opts...)
 	check("NewGymnasium: %v", err)
 
-	lastObs, err := env.Reset()
-	check("Reset: %v", err)
+	lastObs, _ := env.Reset()
 	log.Printf("env.Reset: lastObj=%T=%s", lastObs, lastObs)
 
 	startTime := time.Now()
@@ -93,7 +92,7 @@ func main() {
 		err := env.SampleAction(&action)
 		check("env.SampleAction: %v", err)
 
-		obs, reward, terminated, truncated, _, err := env.Step(action)
+		obs, reward, terminated, truncated, _ := env.Step(action)
 		check("Step(%v): %v", action, err)
 		episodeReward += reward
 		totalSteps++
@@ -106,8 +105,7 @@ func main() {
 		if terminated || truncated {
 			err := agent.Evolve(episodeReward)
 			check("Evolve(%v): %v", episodeReward, err)
-			lastObs, err = env.Reset()
-			check("Reset: %v", err)
+			lastObs, _ = env.Reset()
 			episodeSteps = 0
 			episodeReward = 0
 		}

@@ -122,16 +122,49 @@ func New(natural, sab bool) *Environment {
 	}
 }
 
+func (e *Environment) ActionSpace() (*gym.Space, error) {
+	return &gym.Space{Type: "Discrete", N: 2}, nil
+}
+
+func (e *Environment) ObservationSpace() (*gym.Space, error) {
+	return &gym.Space{
+		Type: "Tuple",
+		Subspaces: []*gym.Space{
+			{Type: "Discrete", N: 32},
+			{Type: "Discrete", N: 11},
+			{Type: "Discrete", N: 2},
+		},
+	}, nil
+}
+
+func (e *Environment) SampleAction(action any) error {
+	switch v := action.(type) {
+	case *int:
+		*v = rand.Intn(2)
+	default:
+		return fmt.Errorf("unsupported SampleAction type %T", action)
+	}
+	return nil
+}
+
+func (e *Environment) Close() error { return nil }
+
 // Step performs the provided action and returns the next observation,
 // the reward for this action, and whether this episode is terminated.
 // If the action is invalid, truncated will be true. Info is always empty.
-func (e *Environment) Step(action int) (obs gym.Obs, reward float64, terminated bool, truncated bool, info any) {
-	if action < 0 || action > 1 {
-		log.Printf("ERROR: Blackjack: invalid action=%v; must be 0 (stay) or 1 (hit).", action)
+func (e *Environment) Step(action any) (obs gym.Obs, reward float64, terminated bool, truncated bool, info any) {
+	actionInt, ok := action.(int)
+	if !ok {
+		log.Printf("ERROR: Blackjack: invalid action type %T; must be int", action)
 		return obs, reward, terminated, true, nil
 	}
 
-	if action == 1 { // hit: add a card to players hand and return.
+	if actionInt < 0 || actionInt > 1 {
+		log.Printf("ERROR: Blackjack: invalid action=%v; must be 0 (stay) or 1 (hit).", actionInt)
+		return obs, reward, terminated, true, nil
+	}
+
+	if actionInt == 1 { // hit: add a card to players hand and return.
 		e.player = append(e.player, drawCard())
 		if isBust(e.player) {
 			terminated = true
