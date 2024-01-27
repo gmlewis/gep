@@ -4,6 +4,7 @@ go 1.21.6
 
 require (
 	github.com/gmlewis/gym-socket-api v0.2.0
+	github.com/google/go-cmp v0.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/nats-io/nats.go v1.32.0
 )

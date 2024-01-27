@@ -131,18 +131,22 @@ func (g *Generation) replication() {
 	g.Individuals = result
 }
 
+func (g *Generation) singleMutation(index int) {
+	gen := g.Individuals[index]
+	// Determine the total number of mutations to perform within the genome
+	numMutations := 1 + rand.Intn(2)
+	// fmt.Printf("\nMutating genome #%v %v times, before:\n%v\n", genomeNum, numMutations, genome)
+	gen.Mutate(numMutations)
+	// fmt.Printf("after:\n%v\n", gen)
+}
+
 func (g *Generation) mutation() {
 	// Determine the total number of individuals to mutate
 	numIndividuals := 1 + rand.Intn(len(g.Individuals)-1)
 	for i := 0; i < numIndividuals; i++ {
 		// Pick a random genome
 		genomeNum := rand.Intn(len(g.Individuals))
-		gen := g.Individuals[genomeNum]
-		// Determine the total number of mutations to perform within the genome
-		numMutations := 1 + rand.Intn(2)
-		// fmt.Printf("\nMutating genome #%v %v times, before:\n%v\n", genomeNum, numMutations, genome)
-		gen.Mutate(numMutations)
-		// fmt.Printf("after:\n%v\n", genome)
+		g.singleMutation(genomeNum)
 	}
 }
 

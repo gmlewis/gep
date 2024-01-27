@@ -112,20 +112,17 @@ func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
 
 // Evaluate runs the model with the observations and populates the provided action
 // based on the link function.
-func (g *Genome) Evaluate(observations []int, action interface{}) error {
-	result := make([]int, len(g.Genes))
-	// var in int
-	// if err := obs.Unmarshal(&in); err != nil {
-	// 	return fmt.Errorf("obs.Unmarshal: %w", err)
-	// }
+func (g *Genome) Evaluate(observations []int, action any) error {
+	result := g.EvalIntTuple(observations)
+	log.Printf("before clamping: genome.Evaluate=%+v", result)
 
-	g.EvalIntTuple(observations, result)
 	switch v := action.(type) {
 	case *[]int:
-		// *v = append(*v, result...)
-		action = &result
+		*v = result
+	case *int:
+		*v = result[0]
 	default:
-		return fmt.Errorf("action type '%v' not yet supported", v)
+		return fmt.Errorf("genome.Evaluate: action type '%T' not yet supported", v)
 	}
 	return nil
 }

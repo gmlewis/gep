@@ -29,7 +29,7 @@ const (
 var (
 	verbose = flag.Bool("v", false, "Print verbose log messages")
 
-	funcMap = map[string]interface{}{"validateFunc": validateFunc}
+	funcMap = map[string]any{"validateFunc": validateFunc}
 
 	sourceTmpl = template.Must(template.New("source").Funcs(funcMap).Parse(source))
 )
@@ -68,7 +68,7 @@ func validateFunc(in string) string {
 	}
 }
 
-func logf(fmt string, args ...interface{}) {
+func logf(fmt string, args ...any) {
 	if *verbose {
 		log.Printf(fmt, args...)
 	}

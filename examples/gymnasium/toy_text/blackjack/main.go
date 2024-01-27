@@ -108,7 +108,7 @@ func main() {
 	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", totalSteps, seconds, float64(totalSteps)/seconds)
 }
 
-func check(fmt string, args ...interface{}) {
+func check(fmt string, args ...any) {
 	err := args[len(args)-1]
 	if err != nil {
 		log.Fatalf("ERROR: "+fmt, args...)

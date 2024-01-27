@@ -29,14 +29,18 @@ func (g *Genome) EvalInt(in []int) int {
 
 // EvalIntTuple evaluates the genome by evaluating each gene and assigning
 // its output to each element of the tuple.
-func (g *Genome) EvalIntTuple(in, out []int) {
+func (g *Genome) EvalIntTuple(in []int) []int {
+	result := make([]int, len(g.Genes))
+
 	var wg sync.WaitGroup
 	for i := 0; i < len(g.Genes); i++ {
 		wg.Add(1)
 		go func(i int) {
-			out[i] = g.Genes[i].EvalInt(in)
+			result[i] = g.Genes[i].EvalInt(in)
 			wg.Done()
 		}(i)
 	}
 	wg.Wait()
+
+	return result
 }
