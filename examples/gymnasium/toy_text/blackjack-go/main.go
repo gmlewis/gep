@@ -68,6 +68,7 @@ func main() {
 	log.Printf("Running %v concurrent blackjack tables for %v steps with %v episodes per step", *numIndividuals, *numSteps, *episodesPerStep)
 
 	actionSpace, obsSpace, err := gym.GetSpaces(environment)
+	check("gym.GetSpaces: %v", err)
 	log.Printf("%v Action space: %+v", environment, actionSpace)
 	for i, subspace := range actionSpace.Subspaces {
 		log.Printf("Action subspace[%v]: %+v", i, *subspace)

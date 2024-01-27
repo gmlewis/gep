@@ -150,12 +150,12 @@ func (e *Environment) Close() error { return nil }
 func (e *Environment) Step(action any) (obs common.Obs, reward float64, terminated bool, truncated bool, info any) {
 	actionInt, ok := action.(int)
 	if !ok {
-		info = fmt.Errorf("ERROR: Blackjack: invalid action type %T; must be int", action)
+		info = fmt.Errorf("error: Blackjack: invalid action type %T; must be int", action)
 		return obs, reward, terminated, true, info
 	}
 
 	if actionInt < 0 || actionInt > 1 {
-		info = fmt.Errorf("ERROR: Blackjack: invalid action=%v; must be 0 (stay) or 1 (hit).", actionInt)
+		info = fmt.Errorf("error: Blackjack: invalid action=%v; must be 0 (stay) or 1 (hit)", actionInt)
 		return obs, reward, terminated, true, info
 	}
 
