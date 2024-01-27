@@ -35,6 +35,7 @@ type GymnasiumAgents struct {
 
 	// options
 	appendEpisodeSteps bool
+	debug              bool
 	headSize           int
 	numConstants       int
 	numIndividuals     int
@@ -48,6 +49,13 @@ type GymnasiumAgentsOption func(ga *GymnasiumAgents)
 func WithAppendEpisodeSteps() GymnasiumAgentsOption {
 	return func(ga *GymnasiumAgents) {
 		ga.appendEpisodeSteps = true
+	}
+}
+
+// WithDebug prints debug information during run.
+func WithDebug() GymnasiumAgentsOption {
+	return func(ga *GymnasiumAgents) {
+		ga.debug = true
 	}
 }
 
@@ -87,20 +95,16 @@ func NewGymnasiumAgents(actionSpace, obsSpace *common.Space, opts ...GymnasiumAg
 		f(ga)
 	}
 
-	ga.Individuals = make([]*genome.Genome, 0, ga.numIndividuals)
-
-	for i := 0; i < ga.numIndividuals; i++ {
-		individual, err := ga.newIndividual()
-		if err != nil {
-			return nil, err
-		}
-		ga.Individuals = append(ga.Individuals, individual)
+	var err error
+	ga.Individuals, err = ga.newIndividuals()
+	if err != nil {
+		return nil, err
 	}
 
 	return ga, nil
 }
 
-func (ga *GymnasiumAgents) newIndividual() (*genome.Genome, error) {
+func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 	numGenes := 1
 	switch ga.ActionSpace.Type {
 	case "Discrete":
@@ -133,14 +137,14 @@ func (ga *GymnasiumAgents) newIndividual() (*genome.Genome, error) {
 		gen := New(
 			funcs,
 			functions.Int,
-			1, // always start with one individual in the gymnasium for the first episode
+			ga.numIndividuals,
 			ga.headSize,
 			numGenes,
 			numTerminals,
 			ga.numConstants,
 			"tuple",
 			nil)
-		return gen.Individuals[0], nil
+		return gen.Individuals, nil
 
 	case "Tuple":
 		funcType := functions.Int
@@ -156,14 +160,14 @@ func (ga *GymnasiumAgents) newIndividual() (*genome.Genome, error) {
 		gen := New(
 			funcs,
 			funcType,
-			1, // always start with one individual in the gymnasium for the first episode
+			ga.numIndividuals,
 			ga.headSize,
 			numGenes,
 			numTerminals,
 			ga.numConstants,
 			"tuple",
 			nil)
-		return gen.Individuals[0], nil
+		return gen.Individuals, nil
 
 	// case "MultiBinary":
 	// case "MultiDiscrete":
@@ -194,7 +198,11 @@ func (ga *GymnasiumAgents) EvaluateAgent(agentIdx, episodeSteps int, obs common.
 			(*v)[i] = clamp(val, 0, ga.ActionSpace.Subspaces[i].N-1)
 		}
 	case *int:
+		before := *v
 		*v = clamp(*v, 0, ga.ActionSpace.N-1)
+		if ga.debug {
+			log.Printf("EvaluateAgent(agentIdx=%v, obs=%+v)=%v => clamp(0,%v) => %v", agentIdx, observations, before, ga.ActionSpace.N-1, *v)
+		}
 	default:
 		return fmt.Errorf("agent.Evaluate: action type '%T' not yet supported", v)
 	}

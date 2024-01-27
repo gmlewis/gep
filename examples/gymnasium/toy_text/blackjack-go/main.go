@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gmlewis/gep/v2/common"
+	"github.com/gmlewis/gep/v2/grammars"
 	gym "github.com/gmlewis/gep/v2/gymnasium"
 	"github.com/gmlewis/gep/v2/model"
 )
@@ -22,7 +23,7 @@ const (
 )
 
 var (
-	debug           = flag.Bool("d", false, "Show debug information")
+	debug           = flag.Bool("d", false, "Show debug information with 2 individuals in series with 2 steps and 2 episodes per step")
 	episodesPerStep = flag.Int("eps", 1000, "Episodes to run per step")
 	headSize        = flag.Int("hs", 100, "Head size of karva expressions")
 	numConsts       = flag.Int("nc", 2, "Number of constants in karva expressions")
@@ -54,6 +55,16 @@ func main() {
 		showUsageAndExit(0)
 	}
 
+	grammar, err := grammars.LoadGoMathGrammar()
+	check("grammars.LoadGoMathGrammar: %v", err)
+	helpers := grammars.HelperMap{}
+	if *debug {
+		*numIndividuals = 2
+		*numSteps = 2
+		*episodesPerStep = 2
+		log.Printf("RUNNING IN DEBUG MODE")
+	}
+
 	log.Printf("Running %v concurrent blackjack tables for %v steps with %v episodes per step", *numIndividuals, *numSteps, *episodesPerStep)
 
 	actionSpace, obsSpace, err := gym.GetSpaces(environment)
@@ -70,6 +81,9 @@ func main() {
 		model.WithHeadSize(*headSize),
 		model.WithNumConstants(*numConsts),
 		model.WithNumIndividuals(*numIndividuals),
+	}
+	if *debug {
+		opts = append(opts, model.WithDebug())
 	}
 	agents, err := model.NewGymnasiumAgents(actionSpace, obsSpace, opts...)
 	check("NewAgents: %v", err)
@@ -100,16 +114,19 @@ func main() {
 
 	startTime := time.Now()
 
-	for i := 1; i < *numSteps; i++ {
+	for i := 1; i <= *numSteps; i++ {
 		casino.runEpisodes(*episodesPerStep)
 		if *debug || i%(*numSteps/100) == 0 {
 			agents.SortIndividuals()
-			log.Printf("Step #%v: numEpisodes=%v, best: %v", i, *episodesPerStep*i, agents.Individuals[0])
+			expr, err := agents.Individuals[0].Expression(grammar, helpers)
+			check("Expression: %v", err)
+			log.Printf("Step #%v: numEpisodes=%v, best: %v", i, *episodesPerStep*i, expr)
 		}
-		agents.Evolve()
+
+		if i < *numSteps {
+			agents.Evolve()
+		}
 	}
-	// Run one final set of episodes to generate final scores:
-	casino.runEpisodes(*episodesPerStep)
 
 	seconds := time.Since(startTime).Seconds()
 	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", *numSteps, seconds, float64(*numSteps)/seconds)
@@ -119,7 +136,9 @@ func main() {
 
 	log.Printf("\nFinal population:")
 	for i, individual := range agents.Individuals {
-		log.Printf("Individual #%v: %v", i+1, individual)
+		expr, err := individual.Expression(grammar, helpers)
+		check("Expression: %v", err)
+		log.Printf("Individual #%v: %v", i+1, expr)
 	}
 	log.Printf("Done.")
 }
@@ -135,6 +154,14 @@ type tableT struct {
 }
 
 func (c *casinoT) runEpisodes(numEpisodes int) {
+	if *debug { // Run tables serially in debug mode
+		for i, table := range c.tables {
+			log.Printf("runEpisodes for table[%v]", i)
+			table.runEpisodes(numEpisodes)
+		}
+		return
+	}
+
 	// Run all tables concurrently for numEpisodes
 	var wg sync.WaitGroup
 	wg.Add(len(c.tables))
@@ -149,9 +176,9 @@ func (c *casinoT) runEpisodes(numEpisodes int) {
 
 func (t *tableT) runEpisodes(numEpisodes int) {
 	lastObs, _ := t.env.Reset()
-	// if *debug {
-	// 	log.Printf("env.Reset: lastObj=%T=%s", lastObs, lastObs)
-	// }
+	if *debug {
+		log.Printf("env.Reset: lastObs=%v [agent-sum, dealer-card, usable-ace]", lastObs)
+	}
 
 	// Run numEpisodes
 	var totalReward float64
@@ -161,15 +188,19 @@ func (t *tableT) runEpisodes(numEpisodes int) {
 		err := t.evaluateAgent(episodeSteps, lastObs, &action)
 		check("Evaluate(%v): %v", lastObs, err)
 
-		obs, reward, terminated, truncated, _ := t.env.Step(action)
+		obs, reward, terminated, truncated, info := t.env.Step(action)
 		check("Step(%v): %v", action, err)
 
 		totalReward += reward
-		// if *debug || totalSteps%(*minSteps/100) == 0 {
-		// 	log.Printf("Step #%v: episodeSteps=%v, obs=%v, action=%v, reward=%v, episodeReward=%v, terminated=%v", totalSteps, episodeSteps, lastObs, action, reward, episodeReward, terminated)
-		// }
+		if *debug {
+			log.Printf("Episode #%v, step #%v: obs=%v, action=%v, reward=%v, terminated=%v, totalReward=%v", episode+1, episodeSteps+1, lastObs, action, reward, terminated, totalReward)
+		}
 
-		if terminated || truncated {
+		if truncated {
+			log.Fatalf("ERROR: unexpected truncated in Blackjack-v1 environment: info=%v", info)
+		}
+
+		if terminated {
 			lastObs, _ = t.env.Reset()
 			episode++
 			episodeSteps = 0

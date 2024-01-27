@@ -11,7 +11,7 @@ import (
 	"github.com/gmlewis/gep/v2/grammars"
 )
 
-func TestExpression(t *testing.T) {
+func TestExpression_Bool(t *testing.T) {
 	want := "(((!((d[0] && d[1]))) && (d[0] || d[1])) || (!((d[1] && d[1]))))"
 	g := New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0", functions.Bool)
 	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
@@ -34,8 +34,8 @@ func TestExpression(t *testing.T) {
 	}
 }
 
-func TestConstants(t *testing.T) {
-	want := "(d[0]+0.500000)"
+func TestConstants_Float64(t *testing.T) {
+	want := "(d[0]+0.50)"
 	g := New("+.d0.c1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0", functions.Float64)
 	g.Constants = []float64{0.1, 0.5}
 	grammar, err := grammars.LoadGoMathGrammar()

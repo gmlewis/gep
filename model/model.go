@@ -35,7 +35,8 @@ type Generation struct {
 // numConstants is the number of constants (inputs) to use within each gene.
 // linkFunc is the linking function used to combine the genes within a genome.
 // sf is the scoring (or fitness) function.
-func New(fs []gene.FuncWeight,
+func New(
+	fs []gene.FuncWeight,
 	funcType functions.FuncType,
 	numIndividuals,
 	headSize,

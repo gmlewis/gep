@@ -70,7 +70,7 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 		if index > len(g.Constants) {
 			log.Fatalf("programming error: constant symbol name %q exceeds length of constant slice (%v)", sym, len(g.Constants))
 		}
-		return fmt.Sprintf("%f", g.Constants[index]), nil
+		return fmt.Sprintf("%0.2f", g.Constants[index]), nil
 	}
 
 	return "", fmt.Errorf("unable to render function: sym=%v for gene %#v", sym, g)

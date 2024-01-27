@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v2/grammars"
 )
 
 // Genome contains the genes that make up the genome.
@@ -67,6 +68,20 @@ func (g Genome) String() string {
 		result = append(result, gene.String())
 	}
 	return fmt.Sprintf("%v, score=%v", strings.Join(result, "|"+g.LinkFunc+"|"), g.Score)
+}
+
+// Expression returns the expression of the genome.
+func (g Genome) Expression(grammar *grammars.Grammar, helpers grammars.HelperMap) (string, error) {
+	var result []string
+	for _, gene := range g.Genes {
+		s, err := gene.Expression(grammar, helpers)
+		if err != nil {
+			return "", err
+		}
+		result = append(result, s)
+	}
+
+	return fmt.Sprintf("%v, score=%v", strings.Join(result, " "+g.LinkFunc+" "), g.Score), nil
 }
 
 // DotGraph returns a graphviz "dot" language representation of the genome.
