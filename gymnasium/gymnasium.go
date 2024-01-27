@@ -4,17 +4,17 @@ package gymnasium
 import (
 	"fmt"
 
+	"github.com/gmlewis/gep/v2/common"
 	"github.com/gmlewis/gep/v2/gymnasium/envs/toy_text/blackjack"
-	gym "github.com/gmlewis/gym-socket-api/binding-go"
 )
 
 // Environment represents a pure Go training and execution environment.
 type Environment interface {
-	ActionSpace() (*gym.Space, error)
-	ObservationSpace() (*gym.Space, error)
-	Reset() (gym.Obs, any)
+	ActionSpace() (*common.Space, error)
+	ObservationSpace() (*common.Space, error)
+	Reset() (common.Obs, any)
 	SampleAction(action any) error
-	Step(action any) (obs gym.Obs, reward float64, terminated bool, truncated bool, info any)
+	Step(action any) (obs common.Obs, reward float64, terminated bool, truncated bool, info any)
 	Close() error
 }
 
@@ -26,4 +26,25 @@ func Make(environment string) (Environment, error) {
 	default:
 		return nil, fmt.Errorf("unknown environment %q", environment)
 	}
+}
+
+// GetSpaces returns the ActionSpace and ObsSpace for an environment.
+func GetSpaces(environment string) (actionSpace, obsSpace *common.Space, err error) {
+	env, err := Make(environment)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer env.Close()
+
+	actionSpace, err = env.ActionSpace()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	obsSpace, err = env.ObservationSpace()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return actionSpace, obsSpace, nil
 }

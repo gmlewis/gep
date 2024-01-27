@@ -123,7 +123,6 @@ func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
 // based on the link function.
 func (g *Genome) Evaluate(observations []int, action any) error {
 	result := g.EvalIntTuple(observations)
-	log.Printf("before clamping: genome.Evaluate=%+v", result)
 
 	switch v := action.(type) {
 	case *[]int:

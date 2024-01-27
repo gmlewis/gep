@@ -75,9 +75,8 @@
 //
 // # Arguments
 //
-// ```python
-// import gymnasium as gym
-// gym.make('Blackjack-v1', natural=False, sab=False)
+// ```
+// gym.Make('Blackjack-v1')
 // ```
 //
 // <a id="nat"></a>`natural=False`: Whether to give an additional reward for
@@ -100,7 +99,7 @@ import (
 	"math/rand"
 	"slices"
 
-	gym "github.com/gmlewis/gym-socket-api/binding-go"
+	"github.com/gmlewis/gep/v2/common"
 )
 
 // Environment represents a Blackjack environment.
@@ -119,14 +118,14 @@ func New(natural, sab bool) *Environment {
 	}
 }
 
-func (e *Environment) ActionSpace() (*gym.Space, error) {
-	return &gym.Space{Type: "Discrete", N: 2}, nil
+func (e *Environment) ActionSpace() (*common.Space, error) {
+	return &common.Space{Type: "Discrete", N: 2}, nil
 }
 
-func (e *Environment) ObservationSpace() (*gym.Space, error) {
-	return &gym.Space{
+func (e *Environment) ObservationSpace() (*common.Space, error) {
+	return &common.Space{
 		Type: "Tuple",
-		Subspaces: []*gym.Space{
+		Subspaces: []*common.Space{
 			{Type: "Discrete", N: 32},
 			{Type: "Discrete", N: 11},
 			{Type: "Discrete", N: 2},
@@ -149,7 +148,7 @@ func (e *Environment) Close() error { return nil }
 // Step performs the provided action and returns the next observation,
 // the reward for this action, and whether this episode is terminated.
 // If the action is invalid, truncated will be true. Info is always empty.
-func (e *Environment) Step(action any) (obs gym.Obs, reward float64, terminated bool, truncated bool, info any) {
+func (e *Environment) Step(action any) (obs common.Obs, reward float64, terminated bool, truncated bool, info any) {
 	actionInt, ok := action.(int)
 	if !ok {
 		log.Printf("ERROR: Blackjack: invalid action type %T; must be int", action)
@@ -188,7 +187,7 @@ func (e *Environment) Step(action any) (obs gym.Obs, reward float64, terminated 
 }
 
 // Reset resets to a brand new episode.
-func (e *Environment) Reset() (obs gym.Obs, info any) {
+func (e *Environment) Reset() (obs common.Obs, info any) {
 	e.dealer = drawHand()
 	e.player = drawHand()
 	return e.getObs(), nil
@@ -196,7 +195,7 @@ func (e *Environment) Reset() (obs gym.Obs, info any) {
 
 type obsT [3]int
 
-var _ gym.Obs = obsT{}
+var _ common.Obs = obsT{}
 
 func (o obsT) Unmarshal(dst any) error {
 	switch v := dst.(type) {
@@ -210,7 +209,7 @@ func (o obsT) Unmarshal(dst any) error {
 	return nil
 }
 
-func (e *Environment) getObs() (obs gym.Obs) {
+func (e *Environment) getObs() (obs common.Obs) {
 	result := obsT{sumHand(e.player), e.dealer[0], 0}
 	if usableAce(e.player) {
 		result[2] = 1

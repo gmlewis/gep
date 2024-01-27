@@ -8,29 +8,28 @@ import (
 	"flag"
 	"log"
 	"os"
+	"sync"
 	"time"
 
+	"github.com/gmlewis/gep/v2/common"
 	gym "github.com/gmlewis/gep/v2/gymnasium"
 	"github.com/gmlewis/gep/v2/model"
 )
 
 const (
-	environment     = "Blackjack-v1"
-	defaultMinSteps = 1e8
-	defaultMaxSteps = 2e8
+	environment  = "Blackjack-v1"
+	defaultSteps = 1e4
 )
 
 var (
-	debug          = flag.Bool("d", false, "Show debug information")
-	episodesPerInd = flag.Int("epi", 1000, "Episodes per individual") // TODO
-	headSize       = flag.Int("hs", 100, "Head size of karva expressions")
-	maxIndividuals = flag.Int("mi", 100, "Maximum individuals in population")
-	numConsts      = flag.Int("nc", 2, "Number of constants in karva expressions")
-	numEnvs        = flag.Int("ne", 1000, "Number of concurrent Blackjack environments")
-	showHelp       = flag.Bool("h", false, "Show help message")
-	showTime       = flag.Bool("t", false, "Display timestamps")
-	minSteps       = flag.Int("min", defaultMinSteps, "Minimum number of steps to run")
-	maxSteps       = flag.Int("max", defaultMaxSteps, "Maximum number of steps to run")
+	debug           = flag.Bool("d", false, "Show debug information")
+	episodesPerStep = flag.Int("eps", 1000, "Episodes to run per step")
+	headSize        = flag.Int("hs", 100, "Head size of karva expressions")
+	numConsts       = flag.Int("nc", 2, "Number of constants in karva expressions")
+	numIndividuals  = flag.Int("ni", 10, "Number of individuals in population")
+	numSteps        = flag.Int("s", defaultSteps, "Number of total steps to run")
+	showHelp        = flag.Bool("h", false, "Show help message")
+	showTime        = flag.Bool("t", false, "Display timestamps")
 )
 
 func usage() {
@@ -55,78 +54,132 @@ func main() {
 		showUsageAndExit(0)
 	}
 
-	if *debug {
-		log.Printf("Running %v concurrent blackjack tables with %v episodes per individual", *numEnvs, *episodesPerInd)
+	log.Printf("Running %v concurrent blackjack tables for %v steps with %v episodes per step", *numIndividuals, *numSteps, *episodesPerStep)
+
+	actionSpace, obsSpace, err := gym.GetSpaces(environment)
+	log.Printf("%v Action space: %+v", environment, actionSpace)
+	for i, subspace := range actionSpace.Subspaces {
+		log.Printf("Action subspace[%v]: %+v", i, *subspace)
+	}
+	log.Printf("%v Observation space: %+v", environment, obsSpace)
+	for i, subspace := range obsSpace.Subspaces {
+		log.Printf("Observation subspace[%v]: %+v", i, *subspace)
 	}
 
-	env, err := gym.Make(environment)
-	check("gym.Make(%q, %q): %v", environment, err)
-	defer env.Close()
-
-	actionSpace, err := env.ActionSpace()
-	check("ActionSpace: %v", err)
-	log.Printf("Action space: %+v", actionSpace)
-	for i, subSpace := range actionSpace.Subspaces {
-		log.Printf("SubSpace[%v]: %+v", i, subSpace)
-	}
-
-	obsSpace, err := env.ObservationSpace()
-	check("ObservationSpace: %v", err)
-	log.Printf("Observation space: %+v", obsSpace)
-	for i, sub := range obsSpace.Subspaces {
-		log.Printf("Observation subspace[%v]: %+v", i, *sub)
-	}
-
-	opts := []model.GymnasiumAgentOption{
+	opts := []model.GymnasiumAgentsOption{
 		model.WithHeadSize(*headSize),
 		model.WithNumConstants(*numConsts),
-		model.WithMaxIndividuals(*maxIndividuals),
+		model.WithNumIndividuals(*numIndividuals),
 	}
-	agent, err := model.NewGymnasiumAgent(actionSpace, obsSpace, opts...)
-	check("NewGymnasium: %v", err)
+	agents, err := model.NewGymnasiumAgents(actionSpace, obsSpace, opts...)
+	check("NewAgents: %v", err)
 
-	lastObs, _ := env.Reset()
-	log.Printf("env.Reset: lastObj=%T=%s", lastObs, lastObs)
+	makeEvaluateAgentFunc := func(agentIdx int) func(episodeSteps int, obs common.Obs, action any) error {
+		return func(episodeSteps int, obs common.Obs, action any) error {
+			return agents.EvaluateAgent(agentIdx, episodeSteps, obs, action)
+		}
+	}
+	makeRewardAgentFunc := func(agentIdx int) func(reward float64) {
+		return func(reward float64) {
+			agents.RewardAgent(agentIdx, reward)
+		}
+	}
+
+	casino := &casinoT{
+		tables: make([]*tableT, 0, *numIndividuals),
+	}
+	for agentIdx := 0; agentIdx < *numIndividuals; agentIdx++ {
+		env, err := gym.Make(environment)
+		check("gym.Make: %v", err)
+		casino.tables = append(casino.tables, &tableT{
+			env:           env,
+			evaluateAgent: makeEvaluateAgentFunc(agentIdx),
+			rewardAgent:   makeRewardAgentFunc(agentIdx),
+		})
+	}
 
 	startTime := time.Now()
-	var episodeReward float64
-	var episodeSteps int
-	var totalSteps int
-	for (episodeReward < 1.0 || totalSteps < *minSteps) && totalSteps < *maxSteps {
-		var action int
-		// TODO: integrate Evaluate into loop.
-		// err := agent.Evaluate(episodeSteps, lastObs, &action)
-		// check("Evaluate(%v): %v", lastObs, err)
-		err := env.SampleAction(&action)
-		check("env.SampleAction: %v", err)
 
-		obs, reward, terminated, truncated, _ := env.Step(action)
-		check("Step(%v): %v", action, err)
-		episodeReward += reward
-		totalSteps++
-		episodeSteps++
-		if *debug || totalSteps%(*minSteps/100) == 0 {
-			log.Printf("Step #%v: episodeSteps=%v, obs=%v, action=%v, reward=%v, episodeReward=%v, terminated=%v", totalSteps, episodeSteps, lastObs, action, reward, episodeReward, terminated)
+	for i := 1; i < *numSteps; i++ {
+		casino.runEpisodes(*episodesPerStep)
+		if *debug || i%(*numSteps/100) == 0 {
+			agents.SortIndividuals()
+			log.Printf("Step #%v: numEpisodes=%v, best: %v", i, *episodesPerStep*i, agents.Individuals[0])
 		}
-		lastObs = obs
-
-		if terminated || truncated {
-			err := agent.Evolve(episodeReward)
-			check("Evolve(%v): %v", episodeReward, err)
-			lastObs, _ = env.Reset()
-			episodeSteps = 0
-			episodeReward = 0
-		}
+		agents.Evolve()
 	}
+	// Run one final set of episodes to generate final scores:
+	casino.runEpisodes(*episodesPerStep)
 
 	seconds := time.Since(startTime).Seconds()
-	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", totalSteps, seconds, float64(totalSteps)/seconds)
+	log.Printf("Processed %v steps in %v seconds (%v steps/sec)", *numSteps, seconds, float64(*numSteps)/seconds)
+
+	// Sort the agents by score
+	agents.SortIndividuals()
 
 	log.Printf("\nFinal population:")
-	for i, individual := range agent.Individuals {
+	for i, individual := range agents.Individuals {
 		log.Printf("Individual #%v: %v", i+1, individual)
 	}
 	log.Printf("Done.")
+}
+
+type casinoT struct {
+	tables []*tableT
+}
+
+type tableT struct {
+	env           gym.Environment
+	evaluateAgent func(episodeSteps int, obs common.Obs, action any) error
+	rewardAgent   func(reward float64)
+}
+
+func (c *casinoT) runEpisodes(numEpisodes int) {
+	// Run all tables concurrently for numEpisodes
+	var wg sync.WaitGroup
+	wg.Add(len(c.tables))
+	for _, table := range c.tables {
+		go func(table *tableT) {
+			table.runEpisodes(numEpisodes)
+			wg.Done()
+		}(table)
+	}
+	wg.Wait()
+}
+
+func (t *tableT) runEpisodes(numEpisodes int) {
+	lastObs, _ := t.env.Reset()
+	// if *debug {
+	// 	log.Printf("env.Reset: lastObj=%T=%s", lastObs, lastObs)
+	// }
+
+	// Run numEpisodes
+	var totalReward float64
+	var episode, episodeSteps int
+	for episode < numEpisodes {
+		var action int
+		err := t.evaluateAgent(episodeSteps, lastObs, &action)
+		check("Evaluate(%v): %v", lastObs, err)
+
+		obs, reward, terminated, truncated, _ := t.env.Step(action)
+		check("Step(%v): %v", action, err)
+
+		totalReward += reward
+		// if *debug || totalSteps%(*minSteps/100) == 0 {
+		// 	log.Printf("Step #%v: episodeSteps=%v, obs=%v, action=%v, reward=%v, episodeReward=%v, terminated=%v", totalSteps, episodeSteps, lastObs, action, reward, episodeReward, terminated)
+		// }
+
+		if terminated || truncated {
+			lastObs, _ = t.env.Reset()
+			episode++
+			episodeSteps = 0
+		} else {
+			lastObs = obs
+			episodeSteps++
+		}
+	}
+
+	t.rewardAgent(totalReward)
 }
 
 func check(fmt string, args ...any) {

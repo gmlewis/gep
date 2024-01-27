@@ -6,7 +6,6 @@ package genome
 
 import (
 	"log"
-	"sync"
 
 	intN "github.com/gmlewis/gep/v2/functions/int_nodes"
 )
@@ -32,15 +31,15 @@ func (g *Genome) EvalInt(in []int) int {
 func (g *Genome) EvalIntTuple(in []int) []int {
 	result := make([]int, len(g.Genes))
 
-	var wg sync.WaitGroup
+	// var wg sync.WaitGroup
 	for i := 0; i < len(g.Genes); i++ {
-		wg.Add(1)
-		go func(i int) {
-			result[i] = g.Genes[i].EvalInt(in)
-			wg.Done()
-		}(i)
+		// wg.Add(1)
+		// go func(i int) {
+		result[i] = g.Genes[i].EvalInt(in)
+		// wg.Done()
+		// }(i)
 	}
-	wg.Wait()
+	// wg.Wait()
 
 	return result
 }
