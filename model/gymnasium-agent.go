@@ -7,7 +7,6 @@ package model
 import (
 	"cmp"
 	"fmt"
-	"log"
 	"sort"
 
 	"github.com/gmlewis/gep/v2/functions"
@@ -312,24 +311,3 @@ func clamp[T cmp.Ordered](v, min, max T) T {
 	}
 	return v
 }
-
-func check(fmt string, args ...any) {
-	err := args[len(args)-1]
-	if err != nil {
-		log.Fatalf(fmt, args...)
-	}
-}
-
-// For debugging...
-/*
-type intObsT struct {
-	i int
-}
-
-func (i *intObsT) Unmarshal(dst any) error {
-	if v, ok := dst.(*int); ok {
-		*v = i.i
-	}
-	return nil
-}
-*/

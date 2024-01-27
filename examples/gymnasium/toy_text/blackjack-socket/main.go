@@ -43,9 +43,12 @@ func showUsageAndExit(exitCode int) {
 }
 
 func main() {
-	log.SetFlags(0) // disable output of timestamp from log.* functions.
 	flag.Usage = usage
 	flag.Parse()
+
+	if !*showTime {
+		log.SetFlags(0) // disable output of timestamp from log.* functions.
+	}
 
 	if *showHelp {
 		showUsageAndExit(0)

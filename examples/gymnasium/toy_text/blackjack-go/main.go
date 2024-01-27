@@ -26,6 +26,7 @@ var (
 	headSize       = flag.Int("hs", 100, "Head size of karva expressions")
 	maxIndividuals = flag.Int("mi", 100, "Maximum individuals in population")
 	numConsts      = flag.Int("nc", 2, "Number of constants in karva expressions")
+	numEnvs        = flag.Int("ne", 1000, "Number of concurrent Blackjack environments")
 	showHelp       = flag.Bool("h", false, "Show help message")
 	showTime       = flag.Bool("t", false, "Display timestamps")
 	minSteps       = flag.Int("min", defaultMinSteps, "Minimum number of steps to run")
@@ -43,12 +44,19 @@ func showUsageAndExit(exitCode int) {
 }
 
 func main() {
-	log.SetFlags(0) // disable output of timestamp from log.* functions.
 	flag.Usage = usage
 	flag.Parse()
 
+	if !*showTime {
+		log.SetFlags(0) // disable output of timestamp from log.* functions.
+	}
+
 	if *showHelp {
 		showUsageAndExit(0)
+	}
+
+	if *debug {
+		log.Printf("Running %v concurrent blackjack tables with %v episodes per individual", *numEnvs, *episodesPerInd)
 	}
 
 	env, err := gym.Make(environment)

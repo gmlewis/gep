@@ -101,10 +101,7 @@ import (
 	"slices"
 
 	gym "github.com/gmlewis/gym-socket-api/binding-go"
-	jsoniter "github.com/json-iterator/go"
 )
-
-var jsoncomp = jsoniter.ConfigCompatibleWithStandardLibrary
 
 // Environment represents a Blackjack environment.
 type Environment struct {

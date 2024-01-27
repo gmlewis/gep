@@ -7,8 +7,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"math/rand"
-	"time"
 
 	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
@@ -30,10 +28,6 @@ var srTests = []struct {
 	{[]float64{14}, 41370},
 	{[]float64{15}, 54240},
 	{[]float64{20}, 168420},
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
 }
 
 func validateFunc(g *genome.Genome) float64 {

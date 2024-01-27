@@ -8,7 +8,6 @@ package grammars
 
 import (
 	"encoding/xml"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -261,7 +260,7 @@ type Grammar struct {
 func loadGrammar(path string) (*Grammar, error) {
 	v := &Grammar{}
 
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		log.Printf("unable to read file %q: %q", path, err)
 		return nil, err
