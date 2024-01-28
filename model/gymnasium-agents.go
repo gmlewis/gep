@@ -121,11 +121,7 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 	// var genes []*gene.Gene
 	switch ga.ObsSpace.Type {
 	case "Discrete":
-		funcs := []gene.FuncWeight{
-			{Symbol: "+", Weight: 1},
-			{Symbol: "-", Weight: 5},
-			{Symbol: "*", Weight: 5},
-		}
+		funcWeights := gene.AllSymbolsEqualWeights(functions.Int)
 		// for i := 0; i < numGenes; i++ {
 		// 	genes = append(genes, gene.RandomNew(headSize, tailSize, 1, numConstants, funcs, functions.Int))
 		// }
@@ -135,7 +131,7 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 			numTerminals++
 		}
 		gen := New(
-			funcs,
+			funcWeights,
 			functions.Int,
 			ga.numIndividuals,
 			ga.headSize,
@@ -148,17 +144,13 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 
 	case "Tuple":
 		funcType := functions.Int
-		funcs := []gene.FuncWeight{
-			{Symbol: "+", Weight: 1},
-			{Symbol: "-", Weight: 5},
-			{Symbol: "*", Weight: 5},
-		}
+		funcWeights := gene.AllSymbolsEqualWeights(functions.Int)
 		numTerminals := len(ga.ObsSpace.Subspaces)
 		if ga.appendEpisodeSteps {
 			numTerminals++
 		}
 		gen := New(
-			funcs,
+			funcWeights,
 			funcType,
 			ga.numIndividuals,
 			ga.headSize,
@@ -227,19 +219,17 @@ func (ga *GymnasiumAgents) SortIndividuals() {
 // (ranging from negative (bad) to positive (good)).
 func (ga *GymnasiumAgents) Evolve() error {
 	ga.SortIndividuals()
-	bestScore := ga.Individuals[0].Score
 
-	// Preserve a copy of the best performing individual which
-	// will be added back into the population after replication,
-	// mutation, and crossover.
-	ng := ga.Individuals[0].Dup()
+	// // Preserve a copy of the best performing individual which
+	// // will be added back into the population after replication,
+	// // mutation, and crossover.
+	// ng := ga.Individuals[0].Dup()
 	gen := &Generation{Individuals: ga.Individuals}
-	if bestScore > 0 {
-		gen.replication()
-	}
+	// gen.replication()  // This seems to eliminate all diversity - investigate
 	gen.mutation()
 	// gen.crossover() // TODO
-	ga.Individuals = append(gen.Individuals[0:ga.numIndividuals-1], ng)
+	// gen.Individuals[ga.numIndividuals-1] = ng
+	ga.Individuals = gen.Individuals
 
 	if len(ga.Individuals) != ga.numIndividuals {
 		log.Fatalf("programming error: got %v individuals, want %v", len(ga.Individuals), ga.numIndividuals)

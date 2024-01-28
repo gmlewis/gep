@@ -8,6 +8,7 @@ package gene
 import (
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -19,13 +20,9 @@ import (
 	vin "github.com/gmlewis/gep/v2/functions/vector_int_nodes"
 )
 
-// FuncWeight contains the symbol name and its weight to be used during
-// a run of the GEP algorithm. A symbol with weight 5, for example, will
-// be five times more likely to be used than a symbol with weight 1.
-type FuncWeight struct {
-	Symbol string
-	Weight int
-}
+const (
+	constRange = 100
+)
 
 // Gene contains all the information needed to represent a single gene
 // in a GEP expression.
@@ -99,10 +96,10 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 	for i := 0; i < numTerminals; i++ {
 		choiceSlice = append(choiceSlice, fmt.Sprintf("d%v", i))
 	}
-	var constants []float64
+	constants := make([]float64, 0, numConstants)
 	for i := 0; i < numConstants; i++ {
 		choiceSlice = append(choiceSlice, fmt.Sprintf("c%v", i))
-		constants = append(constants, rand.Float64())
+		constants = append(constants, math.Round(constRange*rand.Float64()))
 	}
 	for _, f := range functions {
 		for i := 0; i < f.Weight; i++ {
@@ -138,7 +135,7 @@ func (g Gene) String() string {
 			if err != nil {
 				log.Fatalf("bad constant name: %v", s)
 			}
-			syms = append(syms, fmt.Sprintf("%v(%.2f)", s, g.Constants[i]))
+			syms = append(syms, fmt.Sprintf("%v(%v)", s, g.Constants[i]))
 		} else {
 			syms = append(syms, s)
 		}

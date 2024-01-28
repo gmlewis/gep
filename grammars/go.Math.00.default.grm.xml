@@ -17,7 +17,7 @@
     <function idx="4" symbol="Mod" terminals="2" uniontype="">gepMod(x0,x1)</function>
     <function idx="5" symbol="Pow" terminals="2" uniontype="">math.Pow(x0,x1)</function>
     <function idx="6" symbol="Sqrt" terminals="1" uniontype="">math.Sqrt(x0)</function>
-    <function idx="7" symbol="Exp" terminals="1" uniontype="">math.E{CHARX}p(x0)</function>
+    <function idx="7" symbol="Exp" terminals="1" uniontype="">math.Exp(x0)</function>
     <function idx="8" symbol="Pow10" terminals="1" uniontype="">math.Pow(10.0,x0)</function>
     <function idx="9" symbol="Ln" terminals="1" uniontype="">math.Log(x0)</function>
     <function idx="10" symbol="Log" terminals="1" uniontype="">math.Log10(x0)</function>
@@ -46,9 +46,9 @@
     <function idx="92" symbol="Min2" terminals="2" uniontype="{tempvarname} = math.Min({tempvarname},{member})">math.Min(x0,x1)</function>
     <function idx="93" symbol="Min3" terminals="3" uniontype="">gepMin3(x0,x1,x2)</function>
     <function idx="94" symbol="Min4" terminals="4" uniontype="">gepMin4(x0,x1,x2,x3)</function>
-    <function idx="95" symbol="Max2" terminals="2" uniontype="{tempvarname} = math.Ma{CHARX}({tempvarname},{member})">math.Ma{CHARX}(x0,x1)</function>
-    <function idx="96" symbol="Max3" terminals="3" uniontype="">gepMa{CHARX}3(x0,x1,x2)</function>
-    <function idx="97" symbol="Max4" terminals="4" uniontype="">gepMa{CHARX}4(x0,x1,x2,x3)</function>
+    <function idx="95" symbol="Max2" terminals="2" uniontype="{tempvarname} = math.Ma{CHARX}({tempvarname},{member})">math.Max(x0,x1)</function>
+    <function idx="96" symbol="Max3" terminals="3" uniontype="">gepMax3(x0,x1,x2)</function>
+    <function idx="97" symbol="Max4" terminals="4" uniontype="">gepMax4(x0,x1,x2,x3)</function>
     <function idx="98" symbol="Avg2" terminals="2" uniontype="{tempvarname} = ({tempvarname} + {member}) / 2.0">((x0+x1)/2.0)</function>
     <function idx="99" symbol="Avg3" terminals="3" uniontype="">((x0+x1+x2)/3.0)</function>
     <function idx="100" symbol="Avg4" terminals="4" uniontype="">((x0+x1+x2+x3)/4.0)</function>
@@ -127,9 +127,9 @@
     <function idx="312" symbol="AMin2" terminals="2" uniontype="{tempvarname} = gepAMin2({tempvarname},{member})">gepAMin2(x0,x1)</function>
     <function idx="313" symbol="AMin3" terminals="3" uniontype="">gepAMin3(x0,x1,x2)</function>
     <function idx="314" symbol="AMin4" terminals="4" uniontype="">gepAMin4(x0,x1,x2,x3)</function>
-    <function idx="315" symbol="AMax2" terminals="2" uniontype="">gepAMa{CHARX}2(x0,x1)</function>
-    <function idx="316" symbol="AMax3" terminals="3" uniontype="">gepAMa{CHARX}3(x0,x1,x2)</function>
-    <function idx="317" symbol="AMax4" terminals="4" uniontype="">gepAMa{CHARX}4(x0,x1,x2,x3)</function>
+    <function idx="315" symbol="AMax2" terminals="2" uniontype="">gepAMax2(x0,x1)</function>
+    <function idx="316" symbol="AMax3" terminals="3" uniontype="">gepAMax3(x0,x1,x2)</function>
+    <function idx="317" symbol="AMax4" terminals="4" uniontype="">gepAMax4(x0,x1,x2,x3)</function>
     <function idx="42" symbol="OR1" terminals="2" uniontype="">gepOR1(x0,x1)</function>
     <function idx="43" symbol="OR2" terminals="2" uniontype="">gepOR2(x0,x1)</function>
     <function idx="109" symbol="OR3" terminals="2" uniontype="">gepOR3(x0,x1)</function>

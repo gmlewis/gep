@@ -16,7 +16,7 @@
       <function idx="10003" symbol="Nand" terminals="2" uniontype="{tempvarname} = gepNand({tempvarname},{member})">gepNand(x0,x1)</function>
       <function idx="10004" symbol="Nor" terminals="2" uniontype="{tempvarname} = gepNor({tempvarname},{member})">gepNor(x0,x1)</function>
       <function idx="10005" symbol="Xor" terminals="2" uniontype="{tempvarname} = {tempvarname} != {member}">(x0 != x1)</function>
-      <function idx="10006" symbol="Nxor" terminals="2" uniontype="{tempvarname} = gepN{CHARX}or({tempvarname},{member})">gepN{CHARX}or(x0,x1)</function>
+      <function idx="10006" symbol="Nxor" terminals="2" uniontype="{tempvarname} = gepN{CHARX}or({tempvarname},{member})">gepNxor(x0,x1)</function>
 
       <function idx="10007" symbol="And3" terminals="3" uniontype="">gepAnd3(x0,x1,x2)</function>
       <function idx="10008" symbol="Or3" terminals="3" uniontype="">gepOr3(x0,x1,x2)</function>
@@ -51,7 +51,7 @@
       <function idx="10033" symbol="GT3" terminals="3" uniontype="">gepGT3(x0,x1,x2)</function>
       <function idx="10034" symbol="LOE3" terminals="3" uniontype="">gepLOE3(x0,x1,x2)</function>
       <function idx="10035" symbol="GOE3" terminals="3" uniontype="">gepGOE3(x0,x1,x2)</function>
-      <function idx="10036" symbol="Mux" terminals="3" uniontype="">gepMu{CHARX}(x0,x1,x2)</function>
+      <function idx="10036" symbol="Mux" terminals="3" uniontype="">gepMux(x0,x1,x2)</function>
       <function idx="10037" symbol="If" terminals="3" uniontype="">gepIf(x0,x1,x2)</function>
       <function idx="10038" symbol="Maj" terminals="3" uniontype="">gepMaj(x0,x1,x2)</function>
       <function idx="10039" symbol="Min" terminals="3" uniontype="">gepMin(x0,x1,x2)</function>

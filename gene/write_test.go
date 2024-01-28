@@ -35,7 +35,7 @@ func TestExpression_Bool(t *testing.T) {
 }
 
 func TestConstants_Float64(t *testing.T) {
-	want := "(d[0]+0.50)"
+	want := "(d[0]+0.5)"
 	g := New("+.d0.c1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0", functions.Float64)
 	g.Constants = []float64{0.1, 0.5}
 	grammar, err := grammars.LoadGoMathGrammar()

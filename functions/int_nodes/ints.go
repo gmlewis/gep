@@ -9,6 +9,7 @@ package intNodes
 
 import (
 	"log"
+	"math"
 
 	"github.com/gmlewis/gep/v2/functions"
 )
@@ -54,32 +55,39 @@ func (n IntNode) VectorIntFunction([]functions.VectorInt) functions.VectorInt {
 	return functions.VectorInt{}
 }
 
+func safeDiv(a, b int) int {
+	if b == 0 {
+		return math.MaxInt
+	}
+	return a / b
+}
+
 // Int lists all the available integer functions for this package.
 var Int = functions.FuncMap{
 	// TODO(gmlewis): Change functions to operate on the entire length of the slice.
 	"+":     IntNode{0, "+", 2, func(x []int) int { return (x[0] + x[1]) }},
 	"-":     IntNode{1, "-", 2, func(x []int) int { return (x[0] - x[1]) }},
 	"*":     IntNode{2, "*", 2, func(x []int) int { return (x[0] * x[1]) }},
-	"/":     IntNode{3, "/", 2, func(x []int) int { return (x[0] / x[1]) }},
+	"/":     IntNode{3, "/", 2, func(x []int) int { return (safeDiv(x[0], x[1])) }},
 	"Neg":   IntNode{17, "Neg", 1, func(x []int) int { return (-(x[0])) }},
 	"Nop":   IntNode{16, "Nop", 1, func(x []int) int { return (x[0]) }},
 	"Add3":  IntNode{84, "Add3", 3, func(x []int) int { return (x[0] + x[1] + x[2]) }},
 	"Sub3":  IntNode{86, "Sub3", 3, func(x []int) int { return (x[0] - x[1] - x[2]) }},
 	"Mul3":  IntNode{88, "Mul3", 3, func(x []int) int { return (x[0] * x[1] * x[2]) }},
-	"Div3":  IntNode{90, "Div3", 3, func(x []int) int { return (x[0] / x[1] / x[2]) }},
+	"Div3":  IntNode{90, "Div3", 3, func(x []int) int { return safeDiv(safeDiv(x[0], x[1]), x[2]) }},
 	"Add4":  IntNode{85, "Add4", 4, func(x []int) int { return (x[0] + x[1] + x[2] + x[3]) }},
 	"Sub4":  IntNode{87, "Sub4", 4, func(x []int) int { return (x[0] - x[1] - x[2] - x[3]) }},
 	"Mul4":  IntNode{89, "Mul4", 4, func(x []int) int { return (x[0] * x[1] * x[2] * x[3]) }},
-	"Div4":  IntNode{91, "Div4", 4, func(x []int) int { return (x[0] / x[1] / x[2] / x[3]) }},
+	"Div4":  IntNode{91, "Div4", 4, func(x []int) int { return safeDiv(safeDiv(safeDiv(x[0], x[1]), x[2]), x[3]) }},
 	"Min2":  IntNode{92, "Min2", 2, func(x []int) int { return gepMin2(x[0], x[1]) }},
 	"Min3":  IntNode{93, "Min3", 3, func(x []int) int { return gepMin3(x[0], x[1], x[2]) }},
 	"Min4":  IntNode{94, "Min4", 4, func(x []int) int { return gepMin4(x[0], x[1], x[2], x[3]) }},
 	"Max2":  IntNode{95, "Max2", 2, func(x []int) int { return gepMax2(x[0], x[1]) }},
 	"Max3":  IntNode{96, "Max3", 3, func(x []int) int { return gepMax3(x[0], x[1], x[2]) }},
 	"Max4":  IntNode{97, "Max4", 4, func(x []int) int { return gepMax4(x[0], x[1], x[2], x[3]) }},
-	"Avg2":  IntNode{98, "Avg2", 2, func(x []int) int { return ((x[0] + x[1]) / 2.0) }},
-	"Avg3":  IntNode{99, "Avg3", 3, func(x []int) int { return ((x[0] + x[1] + x[2]) / 3.0) }},
-	"Avg4":  IntNode{100, "Avg4", 4, func(x []int) int { return ((x[0] + x[1] + x[2] + x[3]) / 4.0) }},
+	"Avg2":  IntNode{98, "Avg2", 2, func(x []int) int { return ((x[0] + x[1]) / 2) }},
+	"Avg3":  IntNode{99, "Avg3", 3, func(x []int) int { return ((x[0] + x[1] + x[2]) / 3) }},
+	"Avg4":  IntNode{100, "Avg4", 4, func(x []int) int { return ((x[0] + x[1] + x[2] + x[3]) / 4) }},
 	"Zero":  IntNode{70, "Zero", 1, func(x []int) int { return 0 }},
 	"One":   IntNode{71, "One", 1, func(x []int) int { return 1 }},
 	"Zero2": IntNode{72, "Zero2", 2, func(x []int) int { return 0 }},

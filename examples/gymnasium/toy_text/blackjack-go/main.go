@@ -19,15 +19,15 @@ import (
 
 const (
 	environment  = "Blackjack-v1"
-	defaultSteps = 1e4
+	defaultSteps = 1e6
 )
 
 var (
-	debug           = flag.Bool("d", false, "Show debug information with 2 individuals in series with 2 steps and 2 episodes per step")
-	episodesPerStep = flag.Int("eps", 1000, "Episodes to run per step")
-	headSize        = flag.Int("hs", 100, "Head size of karva expressions")
+	debug           = flag.Bool("d", false, "Show debug information with 3 individuals in series with 2 steps and 2 episodes per step")
+	episodesPerStep = flag.Int("eps", 100, "Episodes to run per step")
+	headSize        = flag.Int("hs", 20, "Head size of karva expressions")
 	numConsts       = flag.Int("nc", 2, "Number of constants in karva expressions")
-	numIndividuals  = flag.Int("ni", 10, "Number of individuals in population")
+	numIndividuals  = flag.Int("ni", 100, "Number of individuals in population")
 	numSteps        = flag.Int("s", defaultSteps, "Number of total steps to run")
 	showHelp        = flag.Bool("h", false, "Show help message")
 	showTime        = flag.Bool("t", false, "Display timestamps")
@@ -59,7 +59,7 @@ func main() {
 	check("grammars.LoadGoMathGrammar: %v", err)
 	helpers := grammars.HelperMap{}
 	if *debug {
-		*numIndividuals = 2
+		*numIndividuals = 3
 		*numSteps = 2
 		*episodesPerStep = 2
 		log.Printf("RUNNING IN DEBUG MODE")
@@ -89,6 +89,15 @@ func main() {
 	agents, err := model.NewGymnasiumAgents(actionSpace, obsSpace, opts...)
 	check("NewAgents: %v", err)
 
+	if *debug {
+		log.Printf("\n\nInitial population of agents:")
+		for agentIdx := 0; agentIdx < *numIndividuals; agentIdx++ {
+			expr, err := agents.Individuals[agentIdx].Expression(grammar, helpers)
+			check("Expression: %v", err)
+			log.Printf("AgentIdx=%v: %v", agentIdx, expr)
+		}
+	}
+
 	makeEvaluateAgentFunc := func(agentIdx int) func(episodeSteps int, obs common.Obs, action any) error {
 		return func(episodeSteps int, obs common.Obs, action any) error {
 			return agents.EvaluateAgent(agentIdx, episodeSteps, obs, action)
@@ -117,11 +126,19 @@ func main() {
 
 	for i := 1; i <= *numSteps; i++ {
 		casino.runEpisodes(*episodesPerStep)
+
 		if *debug || i%(*numSteps/100) == 0 {
 			agents.SortIndividuals()
-			expr, err := agents.Individuals[0].Expression(grammar, helpers)
-			check("Expression: %v", err)
-			log.Printf("Step #%v: numEpisodes=%v, best: %v", i, *episodesPerStep*i, expr)
+			log.Printf("")
+			for agentIdx := 0; agentIdx < *numIndividuals; agentIdx++ {
+				individual := agents.Individuals[agentIdx]
+				expr, err := individual.Expression(grammar, helpers)
+				check("Expression: %v", err)
+				log.Printf("AgentIdx=%v: Step #%v: numEpisodes=%v: %v\n\tkarva: %v", agentIdx, i, *episodesPerStep*i, expr, individual)
+				if !*debug {
+					break
+				}
+			}
 		}
 
 		if i < *numSteps {
@@ -139,7 +156,7 @@ func main() {
 	for i, individual := range agents.Individuals {
 		expr, err := individual.Expression(grammar, helpers)
 		check("Expression: %v", err)
-		log.Printf("Individual #%v: %v", i+1, expr)
+		log.Printf("Individual #%v: %v\n\tkarva: %v", i+1, expr, individual)
 	}
 	log.Printf("Done.")
 }
@@ -156,6 +173,7 @@ type tableT struct {
 
 func (c *casinoT) runEpisodes(numEpisodes int) {
 	if *debug { // Run tables serially in debug mode
+		log.Printf("")
 		for i, table := range c.tables {
 			log.Printf("runEpisodes for table[%v]", i)
 			table.runEpisodes(numEpisodes)

@@ -11,35 +11,35 @@
    <!--Use {CHARX} as an escape for the x in the definition of the functions.-->
    <functions count="258">
       <function idx="10000" symbol="Not" terminals="1" uniontype="">(!(x0))</function>
-      <function idx="10001" symbol="And" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({tempvarname},{tempvarname},{member})">gepMu{CHARX}(x0,x0,x1)</function>
-      <function idx="10002" symbol="Or" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({tempvarname},{member},{tempvarname})">gepMu{CHARX}(x0,x1,x0)</function>
-      <function idx="10003" symbol="Nand" terminals="2" uniontype="{tempvarname} = !(gepMu{CHARX}({tempvarname},{tempvarname},{member}))">(!(gepMu{CHARX}(x0,x0,x1)))</function>
-      <function idx="10004" symbol="Nor" terminals="2" uniontype="{tempvarname} = !(gepMu{CHARX}({tempvarname},{member},{tempvarname}))">(!(gepMu{CHARX}(x0,x1,x0)))</function>
-      <function idx="10005" symbol="Xor" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}(!{tempvarname},!{member},{member})">gepMu{CHARX}((!(x0)),(!(x1)),x1)</function>
-      <function idx="10006" symbol="Nxor" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({tempvarname},!{member},{member})">gepMu{CHARX}(x0,(!(x1)),x1)</function>
+      <function idx="10001" symbol="And" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({tempvarname},{tempvarname},{member})">gepMux(x0,x0,x1)</function>
+      <function idx="10002" symbol="Or" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({tempvarname},{member},{tempvarname})">gepMux(x0,x1,x0)</function>
+      <function idx="10003" symbol="Nand" terminals="2" uniontype="{tempvarname} = !(gepMu{CHARX}({tempvarname},{tempvarname},{member}))">(!(gepMux(x0,x0,x1)))</function>
+      <function idx="10004" symbol="Nor" terminals="2" uniontype="{tempvarname} = !(gepMu{CHARX}({tempvarname},{member},{tempvarname}))">(!(gepMux(x0,x1,x0)))</function>
+      <function idx="10005" symbol="Xor" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}(!{tempvarname},!{member},{member})">gepMux((!(x0)),(!(x1)),x1)</function>
+      <function idx="10006" symbol="Nxor" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({tempvarname},!{member},{member})">gepMux(x0,(!(x1)),x1)</function>
 
-      <function idx="10007" symbol="And3" terminals="3" uniontype="">gepMu{CHARX}(x1,x1,gepMu{CHARX}(x2,x2,x0))</function>
-      <function idx="10008" symbol="Or3" terminals="3" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x2,x1,x2),x0)</function>
-      <function idx="10009" symbol="Nand3" terminals="3" uniontype="">(!(gepMu{CHARX}(x2,x2,gepMu{CHARX}(x1,x1,x0))))</function>
-      <function idx="10010" symbol="Nor3" terminals="3" uniontype="">(!(gepMu{CHARX}(x0,gepMu{CHARX}(x1,x2,x1),x0)))</function>
-      <function idx="10011" symbol="Odd3" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x2)),x2),(!(x0)),x0)</function>
-      <function idx="10012" symbol="Even3" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,(!(x0)),x0),x1,(!(x1)))</function>
+      <function idx="10007" symbol="And3" terminals="3" uniontype="">gepMux(x1,x1,gepMux(x2,x2,x0))</function>
+      <function idx="10008" symbol="Or3" terminals="3" uniontype="">gepMux(x0,gepMux(x2,x1,x2),x0)</function>
+      <function idx="10009" symbol="Nand3" terminals="3" uniontype="">(!(gepMux(x2,x2,gepMux(x1,x1,x0))))</function>
+      <function idx="10010" symbol="Nor3" terminals="3" uniontype="">(!(gepMux(x0,gepMux(x1,x2,x1),x0)))</function>
+      <function idx="10011" symbol="Odd3" terminals="3" uniontype="">gepMux(gepMux(x1,(!(x2)),x2),(!(x0)),x0)</function>
+      <function idx="10012" symbol="Even3" terminals="3" uniontype="">gepMux(gepMux(x2,(!(x0)),x0),x1,(!(x1)))</function>
 
-      <function idx="10013" symbol="And4" terminals="4" uniontype="">gepMu{CHARX}(x2,x2,gepMu{CHARX}(x0,x0,gepMu{CHARX}(x3,x3,x1)))</function>
-      <function idx="10014" symbol="Or4" terminals="4" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x0,gepMu{CHARX}(x1,x3,x1),x0),x2)</function>
-      <function idx="10015" symbol="Nand4" terminals="4" uniontype="">(!(gepMu{CHARX}(x1,x1,gepMu{CHARX}(x3,x3,gepMu{CHARX}(x0,x0,x2)))))</function>
-      <function idx="10016" symbol="Nor4" terminals="4" uniontype="">(!(gepMu{CHARX}(x3,gepMu{CHARX}(x0,gepMu{CHARX}(x1,x2,x1),x0),x3)))</function>
-      <function idx="10017" symbol="Odd4" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x0,(!(x0))),gepMu{CHARX}(x3,x1,(!(x1))),gepMu{CHARX}(x3,(!(x1)),x1))</function>
-      <function idx="10018" symbol="Even4" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(gepMu{CHARX}(x1,x3,(!(x3))),x0,(!(x0))),(!(x2)),x2)</function>
+      <function idx="10013" symbol="And4" terminals="4" uniontype="">gepMux(x2,x2,gepMux(x0,x0,gepMux(x3,x3,x1)))</function>
+      <function idx="10014" symbol="Or4" terminals="4" uniontype="">gepMux(x2,gepMux(x0,gepMux(x1,x3,x1),x0),x2)</function>
+      <function idx="10015" symbol="Nand4" terminals="4" uniontype="">(!(gepMux(x1,x1,gepMux(x3,x3,gepMux(x0,x0,x2)))))</function>
+      <function idx="10016" symbol="Nor4" terminals="4" uniontype="">(!(gepMux(x3,gepMux(x0,gepMux(x1,x2,x1),x0),x3)))</function>
+      <function idx="10017" symbol="Odd4" terminals="4" uniontype="">gepMux(gepMux(x2,x0,(!(x0))),gepMux(x3,x1,(!(x1))),gepMux(x3,(!(x1)),x1))</function>
+      <function idx="10018" symbol="Even4" terminals="4" uniontype="">gepMux(gepMux(gepMux(x1,x3,(!(x3))),x0,(!(x0))),(!(x2)),x2)</function>
 
       <function idx="10019" symbol="Id" terminals="1" uniontype="">(x0)</function>
       <function idx="10020" symbol="Zero" terminals="1" uniontype="">(false)</function>
       <function idx="10021" symbol="One" terminals="1" uniontype="">(true)</function>
 
-      <function idx="10022" symbol="LT" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}(!{member},!{tempvarname},{member})">gepMu{CHARX}((!(x1)),(!(x0)),x1)</function>
-      <function idx="10023" symbol="GT" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}(!{tempvarname},!{member},{tempvarname})">gepMu{CHARX}((!(x0)),(!(x1)),x0)</function>
-      <function idx="10024" symbol="LOE" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({member},!{tempvarname},{member})">gepMu{CHARX}(x1,(!(x0)),x1)</function>
-      <function idx="10025" symbol="GOE" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({tempvarname},!{member},{tempvarname})">gepMu{CHARX}(x0,(!(x1)),x0)</function>
+      <function idx="10022" symbol="LT" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}(!{member},!{tempvarname},{member})">gepMux((!(x1)),(!(x0)),x1)</function>
+      <function idx="10023" symbol="GT" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}(!{tempvarname},!{member},{tempvarname})">gepMux((!(x0)),(!(x1)),x0)</function>
+      <function idx="10024" symbol="LOE" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({member},!{tempvarname},{member})">gepMux(x1,(!(x0)),x1)</function>
+      <function idx="10025" symbol="GOE" terminals="2" uniontype="{tempvarname} = gepMu{CHARX}({tempvarname},!{member},{tempvarname})">gepMux(x0,(!(x1)),x0)</function>
       <function idx="10026" symbol="NotA" terminals="2" uniontype="">(!(x0))</function>
       <function idx="10027" symbol="NotB" terminals="2" uniontype="">(!(x1))</function>
       <function idx="10028" symbol="IdA" terminals="2" uniontype="">(x0)</function>
@@ -47,272 +47,272 @@
       <function idx="10030" symbol="Zero2" terminals="2" uniontype="">(false)</function>
       <function idx="10031" symbol="One2" terminals="2" uniontype="">(true)</function>
 
-      <function idx="10032" symbol="LT3" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,x1,x2),x2,x0)</function>
-      <function idx="10033" symbol="GT3" terminals="3" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x1,x0,x2),(!(x2)))</function>
-      <function idx="10034" symbol="LOE3" terminals="3" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x1,x0,x2),x2)</function>
-      <function idx="10035" symbol="GOE3" terminals="3" uniontype="">gepMu{CHARX}(x1,(!(x1)),gepMu{CHARX}(x2,x1,x0))</function>
-      <function idx="10036" symbol="Mux" terminals="3" uniontype="">gepMu{CHARX}(x0,x1,x2)</function>
-      <function idx="10037" symbol="If" terminals="3" uniontype="">gepMu{CHARX}(x0,x2,x1)</function>
-      <function idx="10038" symbol="Maj" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,x2,x0),x2,x0)</function>
-      <function idx="10039" symbol="Min" terminals="3" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x2,x1,x0),x1,x0)))</function>
-      <function idx="10040" symbol="2Off" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x2,gepMu{CHARX}(x2,x0,x1)),x1,(!(x1)))</function>
-      <function idx="10041" symbol="2On" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,gepMu{CHARX}(x0,x2,x1),x0),x2,(!(x2)))</function>
+      <function idx="10032" symbol="LT3" terminals="3" uniontype="">gepMux(gepMux(x1,x1,x2),x2,x0)</function>
+      <function idx="10033" symbol="GT3" terminals="3" uniontype="">gepMux(x2,gepMux(x1,x0,x2),(!(x2)))</function>
+      <function idx="10034" symbol="LOE3" terminals="3" uniontype="">gepMux(x2,gepMux(x1,x0,x2),x2)</function>
+      <function idx="10035" symbol="GOE3" terminals="3" uniontype="">gepMux(x1,(!(x1)),gepMux(x2,x1,x0))</function>
+      <function idx="10036" symbol="Mux" terminals="3" uniontype="">gepMux(x0,x1,x2)</function>
+      <function idx="10037" symbol="If" terminals="3" uniontype="">gepMux(x0,x2,x1)</function>
+      <function idx="10038" symbol="Maj" terminals="3" uniontype="">gepMux(gepMux(x1,x2,x0),x2,x0)</function>
+      <function idx="10039" symbol="Min" terminals="3" uniontype="">(!(gepMux(gepMux(x2,x1,x0),x1,x0)))</function>
+      <function idx="10040" symbol="2Off" terminals="3" uniontype="">gepMux(gepMux(x0,x2,gepMux(x2,x0,x1)),x1,(!(x1)))</function>
+      <function idx="10041" symbol="2On" terminals="3" uniontype="">gepMux(gepMux(x1,gepMux(x0,x2,x1),x0),x2,(!(x2)))</function>
 
-      <function idx="10042" symbol="LM3A1" terminals="3" uniontype="">gepMu{CHARX}(x2,x0,x1)</function>
-      <function idx="10043" symbol="LM3A2" terminals="3" uniontype="">gepMu{CHARX}(x2,x0,(!(x1)))</function>
-      <function idx="10044" symbol="LM3A3" terminals="3" uniontype="">gepMu{CHARX}(x2,(!(x0)),x1)</function>
-      <function idx="10045" symbol="LM3A4" terminals="3" uniontype="">(!(gepMu{CHARX}(x2,x0,x1)))</function>
+      <function idx="10042" symbol="LM3A1" terminals="3" uniontype="">gepMux(x2,x0,x1)</function>
+      <function idx="10043" symbol="LM3A2" terminals="3" uniontype="">gepMux(x2,x0,(!(x1)))</function>
+      <function idx="10044" symbol="LM3A3" terminals="3" uniontype="">gepMux(x2,(!(x0)),x1)</function>
+      <function idx="10045" symbol="LM3A4" terminals="3" uniontype="">(!(gepMux(x2,x0,x1)))</function>
 
-      <function idx="10046" symbol="LM3B1" terminals="3" uniontype="">gepMu{CHARX}(x2,x1,x0)</function>
-      <function idx="10047" symbol="LM3B2" terminals="3" uniontype="">gepMu{CHARX}(x2,(!(x1)),x0)</function>
-      <function idx="10048" symbol="LM3B3" terminals="3" uniontype="">gepMu{CHARX}(x2,x1,(!(x0)))</function>
-      <function idx="10049" symbol="LM3B4" terminals="3" uniontype="">(!(gepMu{CHARX}(x2,x1,x0)))</function>
+      <function idx="10046" symbol="LM3B1" terminals="3" uniontype="">gepMux(x2,x1,x0)</function>
+      <function idx="10047" symbol="LM3B2" terminals="3" uniontype="">gepMux(x2,(!(x1)),x0)</function>
+      <function idx="10048" symbol="LM3B3" terminals="3" uniontype="">gepMux(x2,x1,(!(x0)))</function>
+      <function idx="10049" symbol="LM3B4" terminals="3" uniontype="">(!(gepMux(x2,x1,x0)))</function>
 
-      <function idx="10050" symbol="LM3C1" terminals="3" uniontype="">gepMu{CHARX}(x1,x0,x2)</function>
-      <function idx="10051" symbol="LM3C2" terminals="3" uniontype="">gepMu{CHARX}(x1,x0,(!(x2)))</function>
-      <function idx="10052" symbol="LM3C3" terminals="3" uniontype="">gepMu{CHARX}(x1,(!(x0)),x2)</function>
-      <function idx="10053" symbol="LM3C4" terminals="3" uniontype="">(!(gepMu{CHARX}(x1,x0,x2)))</function>
+      <function idx="10050" symbol="LM3C1" terminals="3" uniontype="">gepMux(x1,x0,x2)</function>
+      <function idx="10051" symbol="LM3C2" terminals="3" uniontype="">gepMux(x1,x0,(!(x2)))</function>
+      <function idx="10052" symbol="LM3C3" terminals="3" uniontype="">gepMux(x1,(!(x0)),x2)</function>
+      <function idx="10053" symbol="LM3C4" terminals="3" uniontype="">(!(gepMux(x1,x0,x2)))</function>
 
-      <function idx="10054" symbol="LM3D1" terminals="3" uniontype="">gepMu{CHARX}(x1,x2,x0)</function>
-      <function idx="10055" symbol="LM3D2" terminals="3" uniontype="">gepMu{CHARX}(x1,(!(x2)),x0)</function>
-      <function idx="10056" symbol="LM3D3" terminals="3" uniontype="">gepMu{CHARX}(x1,x2,(!(x0)))</function>
-      <function idx="10057" symbol="LM3D4" terminals="3" uniontype="">(!(gepMu{CHARX}(x1,x2,x0)))</function>
+      <function idx="10054" symbol="LM3D1" terminals="3" uniontype="">gepMux(x1,x2,x0)</function>
+      <function idx="10055" symbol="LM3D2" terminals="3" uniontype="">gepMux(x1,(!(x2)),x0)</function>
+      <function idx="10056" symbol="LM3D3" terminals="3" uniontype="">gepMux(x1,x2,(!(x0)))</function>
+      <function idx="10057" symbol="LM3D4" terminals="3" uniontype="">(!(gepMux(x1,x2,x0)))</function>
 
-      <function idx="10058" symbol="LM3E1" terminals="3" uniontype="">gepMu{CHARX}(x0,x2,(!(x1)))</function>
-      <function idx="10059" symbol="LM3E2" terminals="3" uniontype="">gepMu{CHARX}(x0,(!(x2)),x1)</function>
-      <function idx="10060" symbol="LM3E3" terminals="3" uniontype="">(!(gepMu{CHARX}(x0,x2,x1)))</function>
+      <function idx="10058" symbol="LM3E1" terminals="3" uniontype="">gepMux(x0,x2,(!(x1)))</function>
+      <function idx="10059" symbol="LM3E2" terminals="3" uniontype="">gepMux(x0,(!(x2)),x1)</function>
+      <function idx="10060" symbol="LM3E3" terminals="3" uniontype="">(!(gepMux(x0,x2,x1)))</function>
 
-      <function idx="10061" symbol="LM3F1" terminals="3" uniontype="">gepMu{CHARX}(x0,(!(x1)),x2)</function>
-      <function idx="10062" symbol="LM3F2" terminals="3" uniontype="">gepMu{CHARX}(x0,x1,(!(x2)))</function>
-      <function idx="10063" symbol="LM3F3" terminals="3" uniontype="">(!(gepMu{CHARX}(x0,x1,x2)))</function>
+      <function idx="10061" symbol="LM3F1" terminals="3" uniontype="">gepMux(x0,(!(x1)),x2)</function>
+      <function idx="10062" symbol="LM3F2" terminals="3" uniontype="">gepMux(x0,x1,(!(x2)))</function>
+      <function idx="10063" symbol="LM3F3" terminals="3" uniontype="">(!(gepMux(x0,x1,x2)))</function>
 
-      <function idx="10064" symbol="LM3G1" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x2,x1),gepMu{CHARX}(x0,x1,x2),(!(x1)))</function>
-      <function idx="10065" symbol="LM3G2" terminals="3" uniontype="">gepMu{CHARX}(x0,(!(gepMu{CHARX}(x1,x2,x1))),gepMu{CHARX}(x1,x1,x2))</function>
-      <function idx="10066" symbol="LM3G3" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x2,x1),gepMu{CHARX}(x0,x2,x1),(!(x1)))</function>
-      <function idx="10067" symbol="LM3G4" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x0,x1),gepMu{CHARX}(x2,x0,x1),(!(x1)))</function>
+      <function idx="10064" symbol="LM3G1" terminals="3" uniontype="">gepMux(gepMux(x2,x2,x1),gepMux(x0,x1,x2),(!(x1)))</function>
+      <function idx="10065" symbol="LM3G2" terminals="3" uniontype="">gepMux(x0,(!(gepMux(x1,x2,x1))),gepMux(x1,x1,x2))</function>
+      <function idx="10066" symbol="LM3G3" terminals="3" uniontype="">gepMux(gepMux(x2,x2,x1),gepMux(x0,x2,x1),(!(x1)))</function>
+      <function idx="10067" symbol="LM3G4" terminals="3" uniontype="">gepMux(gepMux(x0,x0,x1),gepMux(x2,x0,x1),(!(x1)))</function>
 
-      <function idx="10068" symbol="LM3H1" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,x2,x0),(!(x2)),x1)</function>
-      <function idx="10069" symbol="LM3H2" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x2,x1),(!(x0)),x1)</function>
-      <function idx="10070" symbol="LM3H3" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x1,x0),x0,(!(x2)))</function>
-      <function idx="10071" symbol="LM3H4" terminals="3" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x2,x1,x2),(!(x0)))</function>
+      <function idx="10068" symbol="LM3H1" terminals="3" uniontype="">gepMux(gepMux(x1,x2,x0),(!(x2)),x1)</function>
+      <function idx="10069" symbol="LM3H2" terminals="3" uniontype="">gepMux(gepMux(x2,x2,x1),(!(x0)),x1)</function>
+      <function idx="10070" symbol="LM3H3" terminals="3" uniontype="">gepMux(gepMux(x0,x1,x0),x0,(!(x2)))</function>
+      <function idx="10071" symbol="LM3H4" terminals="3" uniontype="">gepMux(x0,gepMux(x2,x1,x2),(!(x0)))</function>
 
-      <function idx="10072" symbol="LT3A" terminals="3" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x1,x1,x0),x1,x2)))</function>
-      <function idx="10073" symbol="GT3A" terminals="3" uniontype="">(!(gepMu{CHARX}(x1,gepMu{CHARX}(x2,x0,x1),x2)))</function>
-      <function idx="10074" symbol="LOE3A" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x1,x0),x0,x2)</function>
-      <function idx="10075" symbol="GOE3A" terminals="3" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x0,x1,x2),x0)</function>
-      <function idx="10076" symbol="ET3A" terminals="3" uniontype="">gepMu{CHARX}(x1,x0,gepMu{CHARX}(x0,(!(x2)),x2))</function>
-      <function idx="10077" symbol="NET3A" terminals="3" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x1,(!(x0)),x0),(!(x1)))</function>
+      <function idx="10072" symbol="LT3A" terminals="3" uniontype="">(!(gepMux(gepMux(x1,x1,x0),x1,x2)))</function>
+      <function idx="10073" symbol="GT3A" terminals="3" uniontype="">(!(gepMux(x1,gepMux(x2,x0,x1),x2)))</function>
+      <function idx="10074" symbol="LOE3A" terminals="3" uniontype="">gepMux(gepMux(x2,x1,x0),x0,x2)</function>
+      <function idx="10075" symbol="GOE3A" terminals="3" uniontype="">gepMux(x2,gepMux(x0,x1,x2),x0)</function>
+      <function idx="10076" symbol="ET3A" terminals="3" uniontype="">gepMux(x1,x0,gepMux(x0,(!(x2)),x2))</function>
+      <function idx="10077" symbol="NET3A" terminals="3" uniontype="">gepMux(x2,gepMux(x1,(!(x0)),x0),(!(x1)))</function>
 
-      <function idx="10078" symbol="LT3B" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x0,x1),x1,x2)</function>
-      <function idx="10079" symbol="GT3B" terminals="3" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x2,x0,x1),x2)</function>
-      <function idx="10080" symbol="LOE3B" terminals="3" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x0,x0,x1),x0,x2)))</function>
-      <function idx="10081" symbol="GOE3B" terminals="3" uniontype="">(!(gepMu{CHARX}(x2,gepMu{CHARX}(x0,x1,x2),x0)))</function>
-      <function idx="10082" symbol="ET3B" terminals="3" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x1,(!(x0)),x0),(!(x0)))</function>
-      <function idx="10083" symbol="NET3B" terminals="3" uniontype="">gepMu{CHARX}(x0,x1,gepMu{CHARX}(x1,(!(x2)),x2))</function>
+      <function idx="10078" symbol="LT3B" terminals="3" uniontype="">gepMux(gepMux(x0,x0,x1),x1,x2)</function>
+      <function idx="10079" symbol="GT3B" terminals="3" uniontype="">gepMux(x1,gepMux(x2,x0,x1),x2)</function>
+      <function idx="10080" symbol="LOE3B" terminals="3" uniontype="">(!(gepMux(gepMux(x0,x0,x1),x0,x2)))</function>
+      <function idx="10081" symbol="GOE3B" terminals="3" uniontype="">(!(gepMux(x2,gepMux(x0,x1,x2),x0)))</function>
+      <function idx="10082" symbol="ET3B" terminals="3" uniontype="">gepMux(x2,gepMux(x1,(!(x0)),x0),(!(x0)))</function>
+      <function idx="10083" symbol="NET3B" terminals="3" uniontype="">gepMux(x0,x1,gepMux(x1,(!(x2)),x2))</function>
 
-      <function idx="10084" symbol="LT3C" terminals="3" uniontype="">gepMu{CHARX}(x1,x2,gepMu{CHARX}(x2,x1,x0))</function>
-      <function idx="10085" symbol="GT3C" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x1,x0),x2,x1)</function>
-      <function idx="10086" symbol="LOE3C" terminals="3" uniontype="">(!(gepMu{CHARX}(x2,x0,gepMu{CHARX}(x0,x2,x1))))</function>
-      <function idx="10087" symbol="GOE3C" terminals="3" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x0,x1,x0),x2,x0)))</function>
-      <function idx="10088" symbol="ET3C" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x2)),x1),x0,(!(x0)))</function>
-      <function idx="10089" symbol="NET3C" terminals="3" uniontype="">gepMu{CHARX}(x2,x1,gepMu{CHARX}(x0,(!(x1)),x1))</function>
+      <function idx="10084" symbol="LT3C" terminals="3" uniontype="">gepMux(x1,x2,gepMux(x2,x1,x0))</function>
+      <function idx="10085" symbol="GT3C" terminals="3" uniontype="">gepMux(gepMux(x0,x1,x0),x2,x1)</function>
+      <function idx="10086" symbol="LOE3C" terminals="3" uniontype="">(!(gepMux(x2,x0,gepMux(x0,x2,x1))))</function>
+      <function idx="10087" symbol="GOE3C" terminals="3" uniontype="">(!(gepMux(gepMux(x0,x1,x0),x2,x0)))</function>
+      <function idx="10088" symbol="ET3C" terminals="3" uniontype="">gepMux(gepMux(x1,(!(x2)),x1),x0,(!(x0)))</function>
+      <function idx="10089" symbol="NET3C" terminals="3" uniontype="">gepMux(x2,x1,gepMux(x0,(!(x1)),x1))</function>
 
-      <function idx="10090" symbol="T004" terminals="3" uniontype="">gepMu{CHARX}(x1,x1,(!(gepMu{CHARX}(x2,x0,x2))))</function>
-      <function idx="10091" symbol="T008" terminals="3" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x2,x0,x1),(!(x0)))</function>
-      <function idx="10092" symbol="T009" terminals="3" uniontype="">(!(gepMu{CHARX}(x0,gepMu{CHARX}(x1,x2,(!(x2))),x0)))</function>
-      <function idx="10093" symbol="T032" terminals="3" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x2,x1,x0),(!(x1)))</function>
+      <function idx="10090" symbol="T004" terminals="3" uniontype="">gepMux(x1,x1,(!(gepMux(x2,x0,x2))))</function>
+      <function idx="10091" symbol="T008" terminals="3" uniontype="">gepMux(x0,gepMux(x2,x0,x1),(!(x0)))</function>
+      <function idx="10092" symbol="T009" terminals="3" uniontype="">(!(gepMux(x0,gepMux(x1,x2,(!(x2))),x0)))</function>
+      <function idx="10093" symbol="T032" terminals="3" uniontype="">gepMux(x1,gepMux(x2,x1,x0),(!(x1)))</function>
 
-      <function idx="10094" symbol="T033" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x2)),x0),x0,(!(x0)))</function>
-      <function idx="10095" symbol="T041" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,(!(x1)),x1),gepMu{CHARX}(x1,x0,x2),(!(x0)))</function>
-      <function idx="10096" symbol="T055" terminals="3" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x2,x0,x2),x2,x1)))</function>
-      <function idx="10097" symbol="T057" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x2)),x0),x1,(!(x1)))</function>
+      <function idx="10094" symbol="T033" terminals="3" uniontype="">gepMux(gepMux(x1,(!(x2)),x0),x0,(!(x0)))</function>
+      <function idx="10095" symbol="T041" terminals="3" uniontype="">gepMux(gepMux(x2,(!(x1)),x1),gepMux(x1,x0,x2),(!(x0)))</function>
+      <function idx="10096" symbol="T055" terminals="3" uniontype="">(!(gepMux(gepMux(x2,x0,x2),x2,x1)))</function>
+      <function idx="10097" symbol="T057" terminals="3" uniontype="">gepMux(gepMux(x0,(!(x2)),x0),x1,(!(x1)))</function>
 
-      <function idx="10098" symbol="T064" terminals="3" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x1,x2,x0),(!(x2)))</function>
-      <function idx="10099" symbol="T065" terminals="3" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x0,(!(x1)),x1),(!(x2)))</function>
-      <function idx="10100" symbol="T069" terminals="3" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x2,x1,x2),x0,x2)))</function>
-      <function idx="10101" symbol="T073" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x0)),x0),gepMu{CHARX}(x2,x2,x1),(!(x2)))</function>
+      <function idx="10098" symbol="T064" terminals="3" uniontype="">gepMux(x2,gepMux(x1,x2,x0),(!(x2)))</function>
+      <function idx="10099" symbol="T065" terminals="3" uniontype="">gepMux(x2,gepMux(x0,(!(x1)),x1),(!(x2)))</function>
+      <function idx="10100" symbol="T069" terminals="3" uniontype="">(!(gepMux(gepMux(x2,x1,x2),x0,x2)))</function>
+      <function idx="10101" symbol="T073" terminals="3" uniontype="">gepMux(gepMux(x1,(!(x0)),x0),gepMux(x2,x2,x1),(!(x2)))</function>
 
-      <function idx="10102" symbol="T081" terminals="3" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x1,x2,x0),x1,x2)))</function>
-      <function idx="10103" symbol="T089" terminals="3" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x1,(!(x2)),x2),(!(x2)))</function>
-      <function idx="10104" symbol="T093" terminals="3" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x0,x1,x2),x2,x0)))</function>
-      <function idx="10105" symbol="T096" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x2,x1),x2,(!(x2)))</function>
+      <function idx="10102" symbol="T081" terminals="3" uniontype="">(!(gepMux(gepMux(x1,x2,x0),x1,x2)))</function>
+      <function idx="10103" symbol="T089" terminals="3" uniontype="">gepMux(x0,gepMux(x1,(!(x2)),x2),(!(x2)))</function>
+      <function idx="10104" symbol="T093" terminals="3" uniontype="">(!(gepMux(gepMux(x0,x1,x2),x2,x0)))</function>
+      <function idx="10105" symbol="T096" terminals="3" uniontype="">gepMux(gepMux(x0,x2,x1),x2,(!(x2)))</function>
 
-      <function idx="10106" symbol="T101" terminals="3" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x2,(!(x0)),x0),(!(x2)))</function>
-      <function idx="10107" symbol="T109" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x1)),x1),gepMu{CHARX}(x2,x1,x2),(!(x2)))</function>
-      <function idx="10108" symbol="T111" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x1)),x2),x1,(!(x1)))</function>
-      <function idx="10109" symbol="T121" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x0)),x0),gepMu{CHARX}(x0,x2,x0),(!(x2)))</function>
+      <function idx="10106" symbol="T101" terminals="3" uniontype="">gepMux(x1,gepMux(x2,(!(x0)),x0),(!(x2)))</function>
+      <function idx="10107" symbol="T109" terminals="3" uniontype="">gepMux(gepMux(x0,(!(x1)),x1),gepMux(x2,x1,x2),(!(x2)))</function>
+      <function idx="10108" symbol="T111" terminals="3" uniontype="">gepMux(gepMux(x0,(!(x1)),x2),x1,(!(x1)))</function>
+      <function idx="10109" symbol="T121" terminals="3" uniontype="">gepMux(gepMux(x1,(!(x0)),x0),gepMux(x0,x2,x0),(!(x2)))</function>
 
-      <function idx="10110" symbol="T123" terminals="3" uniontype="">(!(gepMu{CHARX}(x1,x1,gepMu{CHARX}(x2,(!(x0)),x0))))</function>
-      <function idx="10111" symbol="T125" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,(!(x0)),x1),x0,(!(x0)))</function>
-      <function idx="10112" symbol="T154" terminals="3" uniontype="">gepMu{CHARX}(x0,x2,gepMu{CHARX}(x1,(!(x2)),x2))</function>
-      <function idx="10113" symbol="T223" terminals="3" uniontype="">gepMu{CHARX}(x0,(!(x0)),gepMu{CHARX}(x2,x0,x1))</function>
+      <function idx="10110" symbol="T123" terminals="3" uniontype="">(!(gepMux(x1,x1,gepMux(x2,(!(x0)),x0))))</function>
+      <function idx="10111" symbol="T125" terminals="3" uniontype="">gepMux(gepMux(x2,(!(x0)),x1),x0,(!(x0)))</function>
+      <function idx="10112" symbol="T154" terminals="3" uniontype="">gepMux(x0,x2,gepMux(x1,(!(x2)),x2))</function>
+      <function idx="10113" symbol="T223" terminals="3" uniontype="">gepMux(x0,(!(x0)),gepMux(x2,x0,x1))</function>
 
-      <function idx="10114" symbol="T239" terminals="3" uniontype="">gepMu{CHARX}(x0,(!(x0)),gepMu{CHARX}(x2,x1,x2))</function>
-      <function idx="10115" symbol="T249" terminals="3" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x2,x1),(!(x1)),x1)</function>
-      <function idx="10116" symbol="T251" terminals="3" uniontype="">gepMu{CHARX}(x1,(!(x1)),gepMu{CHARX}(x2,x0,x2))</function>
-      <function idx="10117" symbol="T253" terminals="3" uniontype="">gepMu{CHARX}(x2,(!(x2)),gepMu{CHARX}(x0,x1,x0))</function>
+      <function idx="10114" symbol="T239" terminals="3" uniontype="">gepMux(x0,(!(x0)),gepMux(x2,x1,x2))</function>
+      <function idx="10115" symbol="T249" terminals="3" uniontype="">gepMux(gepMux(x0,x2,x1),(!(x1)),x1)</function>
+      <function idx="10116" symbol="T251" terminals="3" uniontype="">gepMux(x1,(!(x1)),gepMux(x2,x0,x2))</function>
+      <function idx="10117" symbol="T253" terminals="3" uniontype="">gepMux(x2,(!(x2)),gepMux(x0,x1,x0))</function>
 
-      <function idx="10118" symbol="LT4" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x3,x0),gepMu{CHARX}(x1,x1,x3),(!(x2)))</function>
-      <function idx="10119" symbol="GT4" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(gepMu{CHARX}(x3,x2,x3),x0,x1),(!(x1)))</function>
-      <function idx="10120" symbol="LOE4" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x0,x3),(!(x2)),gepMu{CHARX}(x3,x1,x3))</function>
-      <function idx="10121" symbol="GOE4" terminals="4" uniontype="">gepMu{CHARX}(x2,(!(x2)),gepMu{CHARX}(gepMu{CHARX}(x1,x0,x3),x2,x0))</function>
+      <function idx="10118" symbol="LT4" terminals="4" uniontype="">gepMux(gepMux(x2,x3,x0),gepMux(x1,x1,x3),(!(x2)))</function>
+      <function idx="10119" symbol="GT4" terminals="4" uniontype="">gepMux(x1,gepMux(gepMux(x3,x2,x3),x0,x1),(!(x1)))</function>
+      <function idx="10120" symbol="LOE4" terminals="4" uniontype="">gepMux(gepMux(x2,x0,x3),(!(x2)),gepMux(x3,x1,x3))</function>
+      <function idx="10121" symbol="GOE4" terminals="4" uniontype="">gepMux(x2,(!(x2)),gepMux(gepMux(x1,x0,x3),x2,x0))</function>
 
-      <function idx="10122" symbol="Tie" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(gepMu{CHARX}(x0,x3,(!(x3))),gepMu{CHARX}(gepMu{CHARX}(x1,x3,x2),x2,x3),x1),x2,(!(x2)))</function>
-      <function idx="10123" symbol="Ntie" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(gepMu{CHARX}(x1,x3,(!(x3))),gepMu{CHARX}(gepMu{CHARX}(x0,x2,x3),x3,x2),x0),(!(x2)),x2)</function>
-      <function idx="10124" symbol="3Off" terminals="4" uniontype="">(!(gepMu{CHARX}(x2,gepMu{CHARX}(gepMu{CHARX}(x0,x3,gepMu{CHARX}(x3,x0,x1)),(!(x1)),x1),x2)))</function>
-      <function idx="10125" symbol="3On" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x3,(!(x3))),gepMu{CHARX}(gepMu{CHARX}(x3,x2,x1),x2,(!(x2))),gepMu{CHARX}(x2,x2,x1))</function>
+      <function idx="10122" symbol="Tie" terminals="4" uniontype="">gepMux(gepMux(gepMux(x0,x3,(!(x3))),gepMux(gepMux(x1,x3,x2),x2,x3),x1),x2,(!(x2)))</function>
+      <function idx="10123" symbol="Ntie" terminals="4" uniontype="">gepMux(gepMux(gepMux(x1,x3,(!(x3))),gepMux(gepMux(x0,x2,x3),x3,x2),x0),(!(x2)),x2)</function>
+      <function idx="10124" symbol="3Off" terminals="4" uniontype="">(!(gepMux(x2,gepMux(gepMux(x0,x3,gepMux(x3,x0,x1)),(!(x1)),x1),x2)))</function>
+      <function idx="10125" symbol="3On" terminals="4" uniontype="">gepMux(gepMux(x0,x3,(!(x3))),gepMux(gepMux(x3,x2,x1),x2,(!(x2))),gepMux(x2,x2,x1))</function>
 
-      <function idx="10126" symbol="LM4A1" terminals="4" uniontype="">gepMu{CHARX}(x3,x0,gepMu{CHARX}(x2,x1,x3))</function>
-      <function idx="10127" symbol="LM4A2" terminals="4" uniontype="">gepMu{CHARX}(x3,x0,gepMu{CHARX}(x1,x3,x2))</function>
-      <function idx="10128" symbol="LM4A3" terminals="4" uniontype="">gepMu{CHARX}(x3,x0,gepMu{CHARX}(x2,x3,x1))</function>
-      <function idx="10129" symbol="LM4A4" terminals="4" uniontype="">gepMu{CHARX}(x3,x0,(!(gepMu{CHARX}(x1,x1,x2))))</function>
-      <function idx="10130" symbol="LM4A5" terminals="4" uniontype="">gepMu{CHARX}(x3,(!(x0)),gepMu{CHARX}(x1,x2,x1))</function>
-      <function idx="10131" symbol="LM4A6" terminals="4" uniontype="">gepMu{CHARX}(x3,(!(x0)),gepMu{CHARX}(x1,x3,x2))</function>
-      <function idx="10132" symbol="LM4A7" terminals="4" uniontype="">gepMu{CHARX}(x3,(!(x0)),gepMu{CHARX}(x2,x3,x1))</function>
-      <function idx="10133" symbol="LM4A8" terminals="4" uniontype="">(!(gepMu{CHARX}(x3,x0,gepMu{CHARX}(x2,x2,x1))))</function>
+      <function idx="10126" symbol="LM4A1" terminals="4" uniontype="">gepMux(x3,x0,gepMux(x2,x1,x3))</function>
+      <function idx="10127" symbol="LM4A2" terminals="4" uniontype="">gepMux(x3,x0,gepMux(x1,x3,x2))</function>
+      <function idx="10128" symbol="LM4A3" terminals="4" uniontype="">gepMux(x3,x0,gepMux(x2,x3,x1))</function>
+      <function idx="10129" symbol="LM4A4" terminals="4" uniontype="">gepMux(x3,x0,(!(gepMux(x1,x1,x2))))</function>
+      <function idx="10130" symbol="LM4A5" terminals="4" uniontype="">gepMux(x3,(!(x0)),gepMux(x1,x2,x1))</function>
+      <function idx="10131" symbol="LM4A6" terminals="4" uniontype="">gepMux(x3,(!(x0)),gepMux(x1,x3,x2))</function>
+      <function idx="10132" symbol="LM4A7" terminals="4" uniontype="">gepMux(x3,(!(x0)),gepMux(x2,x3,x1))</function>
+      <function idx="10133" symbol="LM4A8" terminals="4" uniontype="">(!(gepMux(x3,x0,gepMux(x2,x2,x1))))</function>
 
-      <function idx="10134" symbol="LM4B1" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(x1,x1,x2),x0)</function>
-      <function idx="10135" symbol="LM4B2" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(x1,x2,x3),x0)</function>
-      <function idx="10136" symbol="LM4B3" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(x2,x1,x3),x0)</function>
-      <function idx="10137" symbol="LM4B4" terminals="4" uniontype="">gepMu{CHARX}(x3,(!(gepMu{CHARX}(x2,x1,x2))),x0)</function>
-      <function idx="10138" symbol="LM4B5" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(x1,x1,x2),(!(x0)))</function>
-      <function idx="10139" symbol="LM4B6" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(x1,x2,x3),(!(x0)))</function>
-      <function idx="10140" symbol="LM4B7" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(x2,x1,x3),(!(x0)))</function>
-      <function idx="10141" symbol="LM4B8" terminals="4" uniontype="">(!(gepMu{CHARX}(x3,gepMu{CHARX}(x1,x2,x1),x0)))</function>
+      <function idx="10134" symbol="LM4B1" terminals="4" uniontype="">gepMux(x3,gepMux(x1,x1,x2),x0)</function>
+      <function idx="10135" symbol="LM4B2" terminals="4" uniontype="">gepMux(x3,gepMux(x1,x2,x3),x0)</function>
+      <function idx="10136" symbol="LM4B3" terminals="4" uniontype="">gepMux(x3,gepMux(x2,x1,x3),x0)</function>
+      <function idx="10137" symbol="LM4B4" terminals="4" uniontype="">gepMux(x3,(!(gepMux(x2,x1,x2))),x0)</function>
+      <function idx="10138" symbol="LM4B5" terminals="4" uniontype="">gepMux(x3,gepMux(x1,x1,x2),(!(x0)))</function>
+      <function idx="10139" symbol="LM4B6" terminals="4" uniontype="">gepMux(x3,gepMux(x1,x2,x3),(!(x0)))</function>
+      <function idx="10140" symbol="LM4B7" terminals="4" uniontype="">gepMux(x3,gepMux(x2,x1,x3),(!(x0)))</function>
+      <function idx="10141" symbol="LM4B8" terminals="4" uniontype="">(!(gepMux(x3,gepMux(x1,x2,x1),x0)))</function>
 
-      <function idx="10142" symbol="LM4C1" terminals="4" uniontype="">gepMu{CHARX}(x1,x0,gepMu{CHARX}(x2,x3,x1))</function>
-      <function idx="10143" symbol="LM4C2" terminals="4" uniontype="">gepMu{CHARX}(x1,x0,gepMu{CHARX}(x2,x1,x3))</function>
-      <function idx="10144" symbol="LM4C3" terminals="4" uniontype="">gepMu{CHARX}(x1,x0,gepMu{CHARX}(x3,x1,x2))</function>
-      <function idx="10145" symbol="LM4C4" terminals="4" uniontype="">gepMu{CHARX}(x1,x0,(!(gepMu{CHARX}(x2,x2,x3))))</function>
-      <function idx="10146" symbol="LM4C5" terminals="4" uniontype="">gepMu{CHARX}(x1,(!(x0)),gepMu{CHARX}(x3,x2,x1))</function>
-      <function idx="10147" symbol="LM4C6" terminals="4" uniontype="">gepMu{CHARX}(x1,(!(x0)),gepMu{CHARX}(x2,x1,x3))</function>
-      <function idx="10148" symbol="LM4C7" terminals="4" uniontype="">gepMu{CHARX}(x1,(!(x0)),gepMu{CHARX}(x3,x1,x2))</function>
-      <function idx="10149" symbol="LM4C8" terminals="4" uniontype="">(!(gepMu{CHARX}(x1,x0,gepMu{CHARX}(x3,x3,x2))))</function>
+      <function idx="10142" symbol="LM4C1" terminals="4" uniontype="">gepMux(x1,x0,gepMux(x2,x3,x1))</function>
+      <function idx="10143" symbol="LM4C2" terminals="4" uniontype="">gepMux(x1,x0,gepMux(x2,x1,x3))</function>
+      <function idx="10144" symbol="LM4C3" terminals="4" uniontype="">gepMux(x1,x0,gepMux(x3,x1,x2))</function>
+      <function idx="10145" symbol="LM4C4" terminals="4" uniontype="">gepMux(x1,x0,(!(gepMux(x2,x2,x3))))</function>
+      <function idx="10146" symbol="LM4C5" terminals="4" uniontype="">gepMux(x1,(!(x0)),gepMux(x3,x2,x1))</function>
+      <function idx="10147" symbol="LM4C6" terminals="4" uniontype="">gepMux(x1,(!(x0)),gepMux(x2,x1,x3))</function>
+      <function idx="10148" symbol="LM4C7" terminals="4" uniontype="">gepMux(x1,(!(x0)),gepMux(x3,x1,x2))</function>
+      <function idx="10149" symbol="LM4C8" terminals="4" uniontype="">(!(gepMux(x1,x0,gepMux(x3,x3,x2))))</function>
 
-      <function idx="10150" symbol="LM4D1" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x2,x2,x3),x0)</function>
-      <function idx="10151" symbol="LM4D2" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x2,x3,x1),x0)</function>
-      <function idx="10152" symbol="LM4D3" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x3,x2,x1),x0)</function>
-      <function idx="10153" symbol="LM4D4" terminals="4" uniontype="">gepMu{CHARX}(x1,(!(gepMu{CHARX}(x2,x3,x2))),x0)</function>
-      <function idx="10154" symbol="LM4D5" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x2,x1,x3),(!(x0)))</function>
-      <function idx="10155" symbol="LM4D6" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x2,x3,x1),(!(x0)))</function>
-      <function idx="10156" symbol="LM4D7" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x3,x2,x1),(!(x0)))</function>
-      <function idx="10157" symbol="LM4D8" terminals="4" uniontype="">(!(gepMu{CHARX}(x1,gepMu{CHARX}(x3,x2,x3),x0)))</function>
+      <function idx="10150" symbol="LM4D1" terminals="4" uniontype="">gepMux(x1,gepMux(x2,x2,x3),x0)</function>
+      <function idx="10151" symbol="LM4D2" terminals="4" uniontype="">gepMux(x1,gepMux(x2,x3,x1),x0)</function>
+      <function idx="10152" symbol="LM4D3" terminals="4" uniontype="">gepMux(x1,gepMux(x3,x2,x1),x0)</function>
+      <function idx="10153" symbol="LM4D4" terminals="4" uniontype="">gepMux(x1,(!(gepMux(x2,x3,x2))),x0)</function>
+      <function idx="10154" symbol="LM4D5" terminals="4" uniontype="">gepMux(x1,gepMux(x2,x1,x3),(!(x0)))</function>
+      <function idx="10155" symbol="LM4D6" terminals="4" uniontype="">gepMux(x1,gepMux(x2,x3,x1),(!(x0)))</function>
+      <function idx="10156" symbol="LM4D7" terminals="4" uniontype="">gepMux(x1,gepMux(x3,x2,x1),(!(x0)))</function>
+      <function idx="10157" symbol="LM4D8" terminals="4" uniontype="">(!(gepMux(x1,gepMux(x3,x2,x3),x0)))</function>
 
-      <function idx="10158" symbol="LM4E1" terminals="4" uniontype="">gepMu{CHARX}(x2,x0,gepMu{CHARX}(x3,x1,x3))</function>
-      <function idx="10159" symbol="LM4E2" terminals="4" uniontype="">gepMu{CHARX}(x2,x0,gepMu{CHARX}(x1,x2,x3))</function>
-      <function idx="10160" symbol="LM4E3" terminals="4" uniontype="">gepMu{CHARX}(x2,x0,gepMu{CHARX}(x3,x2,x1))</function>
-      <function idx="10161" symbol="LM4E4" terminals="4" uniontype="">gepMu{CHARX}(x2,x0,(!(gepMu{CHARX}(x1,x1,x3))))</function>
-      <function idx="10162" symbol="LM4E5" terminals="4" uniontype="">gepMu{CHARX}(x2,(!(x0)),gepMu{CHARX}(x3,x1,x2))</function>
-      <function idx="10163" symbol="LM4E6" terminals="4" uniontype="">gepMu{CHARX}(x2,(!(x0)),gepMu{CHARX}(x1,x2,x3))</function>
-      <function idx="10164" symbol="LM4E7" terminals="4" uniontype="">gepMu{CHARX}(x2,(!(x0)),gepMu{CHARX}(x3,x2,x1))</function>
-      <function idx="10165" symbol="LM4E8" terminals="4" uniontype="">(!(gepMu{CHARX}(x2,x0,gepMu{CHARX}(x3,x3,x1))))</function>
+      <function idx="10158" symbol="LM4E1" terminals="4" uniontype="">gepMux(x2,x0,gepMux(x3,x1,x3))</function>
+      <function idx="10159" symbol="LM4E2" terminals="4" uniontype="">gepMux(x2,x0,gepMux(x1,x2,x3))</function>
+      <function idx="10160" symbol="LM4E3" terminals="4" uniontype="">gepMux(x2,x0,gepMux(x3,x2,x1))</function>
+      <function idx="10161" symbol="LM4E4" terminals="4" uniontype="">gepMux(x2,x0,(!(gepMux(x1,x1,x3))))</function>
+      <function idx="10162" symbol="LM4E5" terminals="4" uniontype="">gepMux(x2,(!(x0)),gepMux(x3,x1,x2))</function>
+      <function idx="10163" symbol="LM4E6" terminals="4" uniontype="">gepMux(x2,(!(x0)),gepMux(x1,x2,x3))</function>
+      <function idx="10164" symbol="LM4E7" terminals="4" uniontype="">gepMux(x2,(!(x0)),gepMux(x3,x2,x1))</function>
+      <function idx="10165" symbol="LM4E8" terminals="4" uniontype="">(!(gepMux(x2,x0,gepMux(x3,x3,x1))))</function>
 
-      <function idx="10166" symbol="LM4F1" terminals="4" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x3,x2,x1),x0)</function>
-      <function idx="10167" symbol="LM4F2" terminals="4" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x1,x3,x2),x0)</function>
-      <function idx="10168" symbol="LM4F3" terminals="4" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x3,x1,x2),x0)</function>
-      <function idx="10169" symbol="LM4F4" terminals="4" uniontype="">gepMu{CHARX}(x2,(!(gepMu{CHARX}(x3,x1,x3))),x0)</function>
-      <function idx="10170" symbol="LM4F5" terminals="4" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x3,x3,x1),(!(x0)))</function>
-      <function idx="10171" symbol="LM4F6" terminals="4" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x1,x3,x2),(!(x0)))</function>
-      <function idx="10172" symbol="LM4F7" terminals="4" uniontype="">gepMu{CHARX}(x2,gepMu{CHARX}(x3,x1,x2),(!(x0)))</function>
-      <function idx="10173" symbol="LM4F8" terminals="4" uniontype="">(!(gepMu{CHARX}(x2,gepMu{CHARX}(x3,x1,x3),x0)))</function>
+      <function idx="10166" symbol="LM4F1" terminals="4" uniontype="">gepMux(x2,gepMux(x3,x2,x1),x0)</function>
+      <function idx="10167" symbol="LM4F2" terminals="4" uniontype="">gepMux(x2,gepMux(x1,x3,x2),x0)</function>
+      <function idx="10168" symbol="LM4F3" terminals="4" uniontype="">gepMux(x2,gepMux(x3,x1,x2),x0)</function>
+      <function idx="10169" symbol="LM4F4" terminals="4" uniontype="">gepMux(x2,(!(gepMux(x3,x1,x3))),x0)</function>
+      <function idx="10170" symbol="LM4F5" terminals="4" uniontype="">gepMux(x2,gepMux(x3,x3,x1),(!(x0)))</function>
+      <function idx="10171" symbol="LM4F6" terminals="4" uniontype="">gepMux(x2,gepMux(x1,x3,x2),(!(x0)))</function>
+      <function idx="10172" symbol="LM4F7" terminals="4" uniontype="">gepMux(x2,gepMux(x3,x1,x2),(!(x0)))</function>
+      <function idx="10173" symbol="LM4F8" terminals="4" uniontype="">(!(gepMux(x2,gepMux(x3,x1,x3),x0)))</function>
 
-      <function idx="10174" symbol="LM4G1" terminals="4" uniontype="">gepMu{CHARX}(x0,x3,gepMu{CHARX}(x1,x2,x1))</function>
-      <function idx="10175" symbol="LM4G2" terminals="4" uniontype="">gepMu{CHARX}(x0,x3,gepMu{CHARX}(x1,x0,x2))</function>
-      <function idx="10176" symbol="LM4G3" terminals="4" uniontype="">gepMu{CHARX}(x0,x3,gepMu{CHARX}(x2,x0,x1))</function>
-      <function idx="10177" symbol="LM4G4" terminals="4" uniontype="">gepMu{CHARX}(x0,x3,(!(gepMu{CHARX}(x1,x1,x2))))</function>
-      <function idx="10178" symbol="LM4G5" terminals="4" uniontype="">gepMu{CHARX}(x0,(!(x3)),gepMu{CHARX}(x1,x2,x1))</function>
-      <function idx="10179" symbol="LM4G6" terminals="4" uniontype="">gepMu{CHARX}(x0,(!(x3)),gepMu{CHARX}(x1,x0,x2))</function>
-      <function idx="10180" symbol="LM4G7" terminals="4" uniontype="">gepMu{CHARX}(x0,(!(x3)),gepMu{CHARX}(x2,x0,x1))</function>
-      <function idx="10181" symbol="LM4G8" terminals="4" uniontype="">(!(gepMu{CHARX}(x0,x3,gepMu{CHARX}(x2,x2,x1))))</function>
+      <function idx="10174" symbol="LM4G1" terminals="4" uniontype="">gepMux(x0,x3,gepMux(x1,x2,x1))</function>
+      <function idx="10175" symbol="LM4G2" terminals="4" uniontype="">gepMux(x0,x3,gepMux(x1,x0,x2))</function>
+      <function idx="10176" symbol="LM4G3" terminals="4" uniontype="">gepMux(x0,x3,gepMux(x2,x0,x1))</function>
+      <function idx="10177" symbol="LM4G4" terminals="4" uniontype="">gepMux(x0,x3,(!(gepMux(x1,x1,x2))))</function>
+      <function idx="10178" symbol="LM4G5" terminals="4" uniontype="">gepMux(x0,(!(x3)),gepMux(x1,x2,x1))</function>
+      <function idx="10179" symbol="LM4G6" terminals="4" uniontype="">gepMux(x0,(!(x3)),gepMux(x1,x0,x2))</function>
+      <function idx="10180" symbol="LM4G7" terminals="4" uniontype="">gepMux(x0,(!(x3)),gepMux(x2,x0,x1))</function>
+      <function idx="10181" symbol="LM4G8" terminals="4" uniontype="">(!(gepMux(x0,x3,gepMux(x2,x2,x1))))</function>
 
-      <function idx="10182" symbol="LM4H1" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x2,x0,x1),x3)</function>
-      <function idx="10183" symbol="LM4H2" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x1,x2,x0),x3)</function>
-      <function idx="10184" symbol="LM4H3" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x2,x1,x0),x3)</function>
-      <function idx="10185" symbol="LM4H4" terminals="4" uniontype="">gepMu{CHARX}(x0,(!(gepMu{CHARX}(x1,x2,x1))),x3)</function>
-      <function idx="10186" symbol="LM4H5" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x1,x0,x2),(!(x3)))</function>
-      <function idx="10187" symbol="LM4H6" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x1,x2,x0),(!(x3)))</function>
-      <function idx="10188" symbol="LM4H7" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x2,x1,x0),(!(x3)))</function>
-      <function idx="10189" symbol="LM4H8" terminals="4" uniontype="">(!(gepMu{CHARX}(x0,gepMu{CHARX}(x2,x1,x2),x3)))</function>
+      <function idx="10182" symbol="LM4H1" terminals="4" uniontype="">gepMux(x0,gepMux(x2,x0,x1),x3)</function>
+      <function idx="10183" symbol="LM4H2" terminals="4" uniontype="">gepMux(x0,gepMux(x1,x2,x0),x3)</function>
+      <function idx="10184" symbol="LM4H3" terminals="4" uniontype="">gepMux(x0,gepMux(x2,x1,x0),x3)</function>
+      <function idx="10185" symbol="LM4H4" terminals="4" uniontype="">gepMux(x0,(!(gepMux(x1,x2,x1))),x3)</function>
+      <function idx="10186" symbol="LM4H5" terminals="4" uniontype="">gepMux(x0,gepMux(x1,x0,x2),(!(x3)))</function>
+      <function idx="10187" symbol="LM4H6" terminals="4" uniontype="">gepMux(x0,gepMux(x1,x2,x0),(!(x3)))</function>
+      <function idx="10188" symbol="LM4H7" terminals="4" uniontype="">gepMux(x0,gepMux(x2,x1,x0),(!(x3)))</function>
+      <function idx="10189" symbol="LM4H8" terminals="4" uniontype="">(!(gepMux(x0,gepMux(x2,x1,x2),x3)))</function>
 
-      <function idx="10190" symbol="LM4I1" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x2,x2,x3),x3,gepMu{CHARX}(x0,x0,x1))))</function>
-      <function idx="10191" symbol="LM4I2" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x1,x1,x0),x0,gepMu{CHARX}(x2,x2,x3))))</function>
-      <function idx="10192" symbol="LM4I3" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x0,x0,x3),x3,gepMu{CHARX}(x2,x2,x1))))</function>
-      <function idx="10193" symbol="LM4I4" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x0,x0,x3),x0,gepMu{CHARX}(x2,x2,x1))))</function>
-      <function idx="10194" symbol="LM4I5" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x2,x3,x2),gepMu{CHARX}(x0,x1,x0),x3)))</function>
-      <function idx="10195" symbol="LM4I6" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x1,x0,x1),gepMu{CHARX}(x2,x3,x2),x0)))</function>
-      <function idx="10196" symbol="LM4I7" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x0,x3,x0),gepMu{CHARX}(x1,x2,x1),x3)))</function>
-      <function idx="10197" symbol="LM4I8" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x3,x0,x3),gepMu{CHARX}(x1,x2,x1),x0)))</function>
+      <function idx="10190" symbol="LM4I1" terminals="4" uniontype="">(!(gepMux(gepMux(x2,x2,x3),x3,gepMux(x0,x0,x1))))</function>
+      <function idx="10191" symbol="LM4I2" terminals="4" uniontype="">(!(gepMux(gepMux(x1,x1,x0),x0,gepMux(x2,x2,x3))))</function>
+      <function idx="10192" symbol="LM4I3" terminals="4" uniontype="">(!(gepMux(gepMux(x0,x0,x3),x3,gepMux(x2,x2,x1))))</function>
+      <function idx="10193" symbol="LM4I4" terminals="4" uniontype="">(!(gepMux(gepMux(x0,x0,x3),x0,gepMux(x2,x2,x1))))</function>
+      <function idx="10194" symbol="LM4I5" terminals="4" uniontype="">(!(gepMux(gepMux(x2,x3,x2),gepMux(x0,x1,x0),x3)))</function>
+      <function idx="10195" symbol="LM4I6" terminals="4" uniontype="">(!(gepMux(gepMux(x1,x0,x1),gepMux(x2,x3,x2),x0)))</function>
+      <function idx="10196" symbol="LM4I7" terminals="4" uniontype="">(!(gepMux(gepMux(x0,x3,x0),gepMux(x1,x2,x1),x3)))</function>
+      <function idx="10197" symbol="LM4I8" terminals="4" uniontype="">(!(gepMux(gepMux(x3,x0,x3),gepMux(x1,x2,x1),x0)))</function>
 
-      <function idx="10198" symbol="LT4A" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x1,x3,x2),x3)</function>
-      <function idx="10199" symbol="GT4A" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x0,x3,x2),x3)</function>
-      <function idx="10200" symbol="LOE4A" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(x0,x2,x3),x2)</function>
-      <function idx="10201" symbol="GOE4A" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x1,x2,x3),x2)</function>
-      <function idx="10202" symbol="ET4A" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x1)),x1),x3,x2)</function>
-      <function idx="10203" symbol="NET4A" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x1)),x1),x2,x3)</function>
+      <function idx="10198" symbol="LT4A" terminals="4" uniontype="">gepMux(x0,gepMux(x1,x3,x2),x3)</function>
+      <function idx="10199" symbol="GT4A" terminals="4" uniontype="">gepMux(x1,gepMux(x0,x3,x2),x3)</function>
+      <function idx="10200" symbol="LOE4A" terminals="4" uniontype="">gepMux(x1,gepMux(x0,x2,x3),x2)</function>
+      <function idx="10201" symbol="GOE4A" terminals="4" uniontype="">gepMux(x0,gepMux(x1,x2,x3),x2)</function>
+      <function idx="10202" symbol="ET4A" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x1)),x1),x3,x2)</function>
+      <function idx="10203" symbol="NET4A" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x1)),x1),x2,x3)</function>
 
-      <function idx="10204" symbol="LT4B" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x1)),x0),gepMu{CHARX}(x2,x0,x3),(!(x3)))</function>
-      <function idx="10205" symbol="GT4B" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x0)),x1),gepMu{CHARX}(x3,x3,x2),(!(x3)))</function>
-      <function idx="10206" symbol="LOE4B" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x3,x1),gepMu{CHARX}(x3,x0,x1),gepMu{CHARX}(x2,x2,x3))</function>
-      <function idx="10207" symbol="GOE4B" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,x3,x0),gepMu{CHARX}(x3,x1,x0),gepMu{CHARX}(x2,x2,x3))</function>
-      <function idx="10208" symbol="ET4B" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x0)),x0),(!(x3)),gepMu{CHARX}(x3,x3,x2))</function>
-      <function idx="10209" symbol="NET4B" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x1)),x1),gepMu{CHARX}(x2,x2,x3),(!(x3)))</function>
+      <function idx="10204" symbol="LT4B" terminals="4" uniontype="">gepMux(gepMux(x1,(!(x1)),x0),gepMux(x2,x0,x3),(!(x3)))</function>
+      <function idx="10205" symbol="GT4B" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x0)),x1),gepMux(x3,x3,x2),(!(x3)))</function>
+      <function idx="10206" symbol="LOE4B" terminals="4" uniontype="">gepMux(gepMux(x0,x3,x1),gepMux(x3,x0,x1),gepMux(x2,x2,x3))</function>
+      <function idx="10207" symbol="GOE4B" terminals="4" uniontype="">gepMux(gepMux(x1,x3,x0),gepMux(x3,x1,x0),gepMux(x2,x2,x3))</function>
+      <function idx="10208" symbol="ET4B" terminals="4" uniontype="">gepMux(gepMux(x1,(!(x0)),x0),(!(x3)),gepMux(x3,x3,x2))</function>
+      <function idx="10209" symbol="NET4B" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x1)),x1),gepMux(x2,x2,x3),(!(x3)))</function>
 
-      <function idx="10210" symbol="LT4C" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x3)),x0),gepMu{CHARX}(x3,x2,x1),(!(x3)))</function>
-      <function idx="10211" symbol="GT4C" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x0)),x1),gepMu{CHARX}(x3,x2,x0),(!(x3)))</function>
-      <function idx="10212" symbol="LOE4C" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x0)),x1),(!(x3)),gepMu{CHARX}(x3,x2,x3))</function>
-      <function idx="10213" symbol="GOE4C" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x1,x3),gepMu{CHARX}(x3,x2,x3),gepMu{CHARX}(x3,x1,x0))</function>
-      <function idx="10214" symbol="ET4C" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x1)),x1),(!(x3)),gepMu{CHARX}(x3,x2,x3))</function>
-      <function idx="10215" symbol="NET4C" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x1)),x1),gepMu{CHARX}(x3,x2,x3),(!(x3)))</function>
+      <function idx="10210" symbol="LT4C" terminals="4" uniontype="">gepMux(gepMux(x1,(!(x3)),x0),gepMux(x3,x2,x1),(!(x3)))</function>
+      <function idx="10211" symbol="GT4C" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x0)),x1),gepMux(x3,x2,x0),(!(x3)))</function>
+      <function idx="10212" symbol="LOE4C" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x0)),x1),(!(x3)),gepMux(x3,x2,x3))</function>
+      <function idx="10213" symbol="GOE4C" terminals="4" uniontype="">gepMux(gepMux(x0,x1,x3),gepMux(x3,x2,x3),gepMux(x3,x1,x0))</function>
+      <function idx="10214" symbol="ET4C" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x1)),x1),(!(x3)),gepMux(x3,x2,x3))</function>
+      <function idx="10215" symbol="NET4C" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x1)),x1),gepMux(x3,x2,x3),(!(x3)))</function>
 
-      <function idx="10216" symbol="LT4D" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x3,x0,x2),gepMu{CHARX}(x0,x1,x2),x3)))</function>
-      <function idx="10217" symbol="GT4D" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x0)),x1),x3,(!(gepMu{CHARX}(x2,x2,x3))))</function>
-      <function idx="10218" symbol="LOE4D" terminals="4" uniontype="">gepMu{CHARX}(x0,x0,gepMu{CHARX}(x3,(!(x1)),gepMu{CHARX}(x2,x3,x1)))</function>
-      <function idx="10219" symbol="GOE4D" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x2,x3),gepMu{CHARX}(x0,x1,x3),x0)</function>
-      <function idx="10220" symbol="ET4D" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(x1,x0,(!(x0))),gepMu{CHARX}(gepMu{CHARX}(x2,x1,x0),x0,x1))</function>
-      <function idx="10221" symbol="NET4D" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x1,(!(x1))),(!(gepMu{CHARX}(x2,x2,x3))),gepMu{CHARX}(x1,x3,x0))</function>
+      <function idx="10216" symbol="LT4D" terminals="4" uniontype="">(!(gepMux(gepMux(x3,x0,x2),gepMux(x0,x1,x2),x3)))</function>
+      <function idx="10217" symbol="GT4D" terminals="4" uniontype="">gepMux(gepMux(x1,(!(x0)),x1),x3,(!(gepMux(x2,x2,x3))))</function>
+      <function idx="10218" symbol="LOE4D" terminals="4" uniontype="">gepMux(x0,x0,gepMux(x3,(!(x1)),gepMux(x2,x3,x1)))</function>
+      <function idx="10219" symbol="GOE4D" terminals="4" uniontype="">gepMux(gepMux(x2,x2,x3),gepMux(x0,x1,x3),x0)</function>
+      <function idx="10220" symbol="ET4D" terminals="4" uniontype="">gepMux(x3,gepMux(x1,x0,(!(x0))),gepMux(gepMux(x2,x1,x0),x0,x1))</function>
+      <function idx="10221" symbol="NET4D" terminals="4" uniontype="">gepMux(gepMux(x0,x1,(!(x1))),(!(gepMux(x2,x2,x3))),gepMux(x1,x3,x0))</function>
 
-      <function idx="10222" symbol="LT4E" terminals="4" uniontype="">gepMu{CHARX}(x0,x1,x2)</function>
-      <function idx="10223" symbol="GT4E" terminals="4" uniontype="">gepMu{CHARX}(x0,x0,gepMu{CHARX}(x1,(!(x3)),x2))</function>
-      <function idx="10224" symbol="LOE4E" terminals="4" uniontype="">(!(gepMu{CHARX}(x0,x0,gepMu{CHARX}(x1,(!(x2)),x3))))</function>
-      <function idx="10225" symbol="GOE4E" terminals="4" uniontype="">(!(gepMu{CHARX}(x0,x1,x3)))</function>
-      <function idx="10226" symbol="ET4E" terminals="4" uniontype="">(!(gepMu{CHARX}(x0,x1,gepMu{CHARX}(x1,(!(x2)),x3))))</function>
-      <function idx="10227" symbol="NET4E" terminals="4" uniontype="">gepMu{CHARX}(x0,x1,gepMu{CHARX}(x1,(!(x3)),x2))</function>
+      <function idx="10222" symbol="LT4E" terminals="4" uniontype="">gepMux(x0,x1,x2)</function>
+      <function idx="10223" symbol="GT4E" terminals="4" uniontype="">gepMux(x0,x0,gepMux(x1,(!(x3)),x2))</function>
+      <function idx="10224" symbol="LOE4E" terminals="4" uniontype="">(!(gepMux(x0,x0,gepMux(x1,(!(x2)),x3))))</function>
+      <function idx="10225" symbol="GOE4E" terminals="4" uniontype="">(!(gepMux(x0,x1,x3)))</function>
+      <function idx="10226" symbol="ET4E" terminals="4" uniontype="">(!(gepMux(x0,x1,gepMux(x1,(!(x2)),x3))))</function>
+      <function idx="10227" symbol="NET4E" terminals="4" uniontype="">gepMux(x0,x1,gepMux(x1,(!(x3)),x2))</function>
 
-      <function idx="10228" symbol="Q0002" terminals="4" uniontype="">gepMu{CHARX}(x3,x3,(!(gepMu{CHARX}(gepMu{CHARX}(x2,x0,x3),x1,x3))))</function>
-      <function idx="10229" symbol="Q001C" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x1,x2),x2,(!(gepMu{CHARX}(x3,x2,x3))))</function>
-      <function idx="10230" symbol="Q0048" terminals="4" uniontype="">gepMu{CHARX}(x2,x2,gepMu{CHARX}(gepMu{CHARX}(x0,x3,x1),x1,(!(x1))))</function>
-      <function idx="10231" symbol="Q0800" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(gepMu{CHARX}(x2,x1,x3),x1,x0),(!(x1)))</function>
-      <function idx="10232" symbol="Q3378" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(gepMu{CHARX}(x2,x2,x3),x1,(!(x1))),(!(x2)))</function>
+      <function idx="10228" symbol="Q0002" terminals="4" uniontype="">gepMux(x3,x3,(!(gepMux(gepMux(x2,x0,x3),x1,x3))))</function>
+      <function idx="10229" symbol="Q001C" terminals="4" uniontype="">gepMux(gepMux(x0,x1,x2),x2,(!(gepMux(x3,x2,x3))))</function>
+      <function idx="10230" symbol="Q0048" terminals="4" uniontype="">gepMux(x2,x2,gepMux(gepMux(x0,x3,x1),x1,(!(x1))))</function>
+      <function idx="10231" symbol="Q0800" terminals="4" uniontype="">gepMux(x1,gepMux(gepMux(x2,x1,x3),x1,x0),(!(x1)))</function>
+      <function idx="10232" symbol="Q3378" terminals="4" uniontype="">gepMux(x0,gepMux(gepMux(x2,x2,x3),x1,(!(x1))),(!(x2)))</function>
 
-      <function idx="10233" symbol="Q3475" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x2,x1,x0),gepMu{CHARX}(x3,x0,x3),gepMu{CHARX}(x1,x3,x2))))</function>
-      <function idx="10234" symbol="Q3CB0" terminals="4" uniontype="">gepMu{CHARX}(x2,x1,gepMu{CHARX}(x0,gepMu{CHARX}(x1,x1,x3),(!(x1))))</function>
-      <function idx="10235" symbol="Q3DEF" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x0,x0,x1),gepMu{CHARX}(gepMu{CHARX}(x2,x3,x1),x1,x0),x2)))</function>
-      <function idx="10236" symbol="Q3DFF" terminals="4" uniontype="">(!(gepMu{CHARX}(x0,x0,gepMu{CHARX}(x2,gepMu{CHARX}(x1,x3,x2),x1))))</function>
-      <function idx="10237" symbol="Q4200" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(gepMu{CHARX}(x2,x1,x3),gepMu{CHARX}(x0,x3,x1),x3),x3,(!(x3)))</function>
+      <function idx="10233" symbol="Q3475" terminals="4" uniontype="">(!(gepMux(gepMux(x2,x1,x0),gepMux(x3,x0,x3),gepMux(x1,x3,x2))))</function>
+      <function idx="10234" symbol="Q3CB0" terminals="4" uniontype="">gepMux(x2,x1,gepMux(x0,gepMux(x1,x1,x3),(!(x1))))</function>
+      <function idx="10235" symbol="Q3DEF" terminals="4" uniontype="">(!(gepMux(gepMux(x0,x0,x1),gepMux(gepMux(x2,x3,x1),x1,x0),x2)))</function>
+      <function idx="10236" symbol="Q3DFF" terminals="4" uniontype="">(!(gepMux(x0,x0,gepMux(x2,gepMux(x1,x3,x2),x1))))</function>
+      <function idx="10237" symbol="Q4200" terminals="4" uniontype="">gepMux(gepMux(gepMux(x2,x1,x3),gepMux(x0,x3,x1),x3),x3,(!(x3)))</function>
 
-      <function idx="10238" symbol="Q4C11" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x3,(!(x2)),x0),x0,(!(gepMu{CHARX}(x2,x0,x1))))</function>
-      <function idx="10239" symbol="Q5100" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x0,x3),gepMu{CHARX}(x1,x1,x0),(!(x3)))</function>
-      <function idx="10240" symbol="Q5EEF" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,gepMu{CHARX}(x3,x1,x3),(!(x1))),(!(x3)),gepMu{CHARX}(x2,x3,x2))</function>
-      <function idx="10241" symbol="Q5EFF" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,(!(x1)),x3),gepMu{CHARX}(x2,x1,x2),(!(x1)))</function>
-      <function idx="10242" symbol="Q6A6D" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x0)),x2),x3,(!(gepMu{CHARX}(gepMu{CHARX}(x2,x0,x3),x3,x1))))</function>
+      <function idx="10238" symbol="Q4C11" terminals="4" uniontype="">gepMux(gepMux(x3,(!(x2)),x0),x0,(!(gepMux(x2,x0,x1))))</function>
+      <function idx="10239" symbol="Q5100" terminals="4" uniontype="">gepMux(gepMux(x2,x0,x3),gepMux(x1,x1,x0),(!(x3)))</function>
+      <function idx="10240" symbol="Q5EEF" terminals="4" uniontype="">gepMux(gepMux(x0,gepMux(x3,x1,x3),(!(x1))),(!(x3)),gepMux(x2,x3,x2))</function>
+      <function idx="10241" symbol="Q5EFF" terminals="4" uniontype="">gepMux(gepMux(x0,(!(x1)),x3),gepMux(x2,x1,x2),(!(x1)))</function>
+      <function idx="10242" symbol="Q6A6D" terminals="4" uniontype="">gepMux(gepMux(x1,(!(x0)),x2),x3,(!(gepMux(gepMux(x2,x0,x3),x3,x1))))</function>
 
-      <function idx="10243" symbol="Q6F75" terminals="4" uniontype="">(!(gepMu{CHARX}(gepMu{CHARX}(x3,x2,x1),gepMu{CHARX}(x0,x3,x1),gepMu{CHARX}(x2,x2,x3))))</function>
-      <function idx="10244" symbol="Q74C4" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,x2,x0),x2,(!(gepMu{CHARX}(x3,x3,x2))))</function>
-      <function idx="10245" symbol="Q7DA3" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x1,(!(x2)),gepMu{CHARX}(x0,x3,x2)),x0,(!(gepMu{CHARX}(x3,x3,x0))))</function>
-      <function idx="10246" symbol="Q8304" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,gepMu{CHARX}(x3,x2,x1),(!(x2))),gepMu{CHARX}(x3,x3,x1),(!(x1)))</function>
-      <function idx="10247" symbol="Q8430" terminals="4" uniontype="">gepMu{CHARX}(x0,gepMu{CHARX}(x2,x1,x0),gepMu{CHARX}(x3,gepMu{CHARX}(x1,x2,x3),gepMu{CHARX}(x1,x1,x2)))</function>
+      <function idx="10243" symbol="Q6F75" terminals="4" uniontype="">(!(gepMux(gepMux(x3,x2,x1),gepMux(x0,x3,x1),gepMux(x2,x2,x3))))</function>
+      <function idx="10244" symbol="Q74C4" terminals="4" uniontype="">gepMux(gepMux(x1,x2,x0),x2,(!(gepMux(x3,x3,x2))))</function>
+      <function idx="10245" symbol="Q7DA3" terminals="4" uniontype="">gepMux(gepMux(x1,(!(x2)),gepMux(x0,x3,x2)),x0,(!(gepMux(x3,x3,x0))))</function>
+      <function idx="10246" symbol="Q8304" terminals="4" uniontype="">gepMux(gepMux(x0,gepMux(x3,x2,x1),(!(x2))),gepMux(x3,x3,x1),(!(x1)))</function>
+      <function idx="10247" symbol="Q8430" terminals="4" uniontype="">gepMux(x0,gepMux(x2,x1,x0),gepMux(x3,gepMux(x1,x2,x3),gepMux(x1,x1,x2)))</function>
 
-      <function idx="10248" symbol="Q8543" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(gepMu{CHARX}(x3,x3,x1),gepMu{CHARX}(x0,x2,x3),x0),(!(x1)),gepMu{CHARX}(x2,x2,x1))</function>
-      <function idx="10249" symbol="Q9D80" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x2,x3,x1),x0,gepMu{CHARX}(x2,x2,x3))</function>
-      <function idx="10250" symbol="QA092" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x2,x0),gepMu{CHARX}(x1,gepMu{CHARX}(x3,x2,x3),(!(x3))),gepMu{CHARX}(x3,x3,x1))</function>
-      <function idx="10251" symbol="QB36A" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(gepMu{CHARX}((!(x1)),x2,x1),(!(x0)),x0),(!(gepMu{CHARX}(x0,x3,x2))),x3)</function>
-      <function idx="10252" symbol="QCBCF" terminals="4" uniontype="">gepMu{CHARX}(gepMu{CHARX}(x0,x1,x2),(!(x1)),gepMu{CHARX}(x1,x3,x2))</function>
+      <function idx="10248" symbol="Q8543" terminals="4" uniontype="">gepMux(gepMux(gepMux(x3,x3,x1),gepMux(x0,x2,x3),x0),(!(x1)),gepMux(x2,x2,x1))</function>
+      <function idx="10249" symbol="Q9D80" terminals="4" uniontype="">gepMux(gepMux(x2,x3,x1),x0,gepMux(x2,x2,x3))</function>
+      <function idx="10250" symbol="QA092" terminals="4" uniontype="">gepMux(gepMux(x0,x2,x0),gepMux(x1,gepMux(x3,x2,x3),(!(x3))),gepMux(x3,x3,x1))</function>
+      <function idx="10251" symbol="QB36A" terminals="4" uniontype="">gepMux(gepMux(gepMux((!(x1)),x2,x1),(!(x0)),x0),(!(gepMux(x0,x3,x2))),x3)</function>
+      <function idx="10252" symbol="QCBCF" terminals="4" uniontype="">gepMux(gepMux(x0,x1,x2),(!(x1)),gepMux(x1,x3,x2))</function>
 
-      <function idx="10253" symbol="QEEB1" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(x2,(!(x0)),x0),gepMu{CHARX}(x0,x1,x3))</function>
-      <function idx="10254" symbol="QEFFF" terminals="4" uniontype="">gepMu{CHARX}(x3,(!(gepMu{CHARX}(gepMu{CHARX}(x2,x0,x3),x3,x1))),x3)</function>
-      <function idx="10255" symbol="QFF7B" terminals="4" uniontype="">gepMu{CHARX}(x0,(!(gepMu{CHARX}(gepMu{CHARX}(x2,x2,x1),gepMu{CHARX}(x3,x2,x0),x3))),x0)</function>
-      <function idx="10256" symbol="QFFF6" terminals="4" uniontype="">gepMu{CHARX}(x1,gepMu{CHARX}(gepMu{CHARX}(x3,x0,x2),gepMu{CHARX}(x2,x3,x2),x0),x1)</function>
-      <function idx="10257" symbol="QFFFB" terminals="4" uniontype="">gepMu{CHARX}(x3,gepMu{CHARX}(gepMu{CHARX}(x1,x2,x3),(!(x3)),x0),x3)</function>
+      <function idx="10253" symbol="QEEB1" terminals="4" uniontype="">gepMux(x3,gepMux(x2,(!(x0)),x0),gepMux(x0,x1,x3))</function>
+      <function idx="10254" symbol="QEFFF" terminals="4" uniontype="">gepMux(x3,(!(gepMux(gepMux(x2,x0,x3),x3,x1))),x3)</function>
+      <function idx="10255" symbol="QFF7B" terminals="4" uniontype="">gepMux(x0,(!(gepMux(gepMux(x2,x2,x1),gepMux(x3,x2,x0),x3))),x0)</function>
+      <function idx="10256" symbol="QFFF6" terminals="4" uniontype="">gepMux(x1,gepMux(gepMux(x3,x0,x2),gepMux(x2,x3,x2),x0),x1)</function>
+      <function idx="10257" symbol="QFFFB" terminals="4" uniontype="">gepMux(x3,gepMux(gepMux(x1,x2,x3),(!(x3)),x0),x3)</function>
 
 </functions>
    
