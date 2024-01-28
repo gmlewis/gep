@@ -14,10 +14,6 @@ The definitive book about GEP is available here:
 
 - http://www.amazon.com/Gene-Expression-Programming-Mathematical-Computational/dp/3642069320
 
-The lightning talk I gave about GEP at GopherCon 2014 is available here:
-
-- http://go-talks.appspot.com/github.com/gmlewis/gep/gophercon2014/gep-in-go/gep-in-go.slide#1
-
 This is not an official Google product.
 
 ## Status
