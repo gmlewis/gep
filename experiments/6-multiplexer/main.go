@@ -110,7 +110,7 @@ func main() {
 		{Symbol: "Nor", Weight: 20},
 	}
 	numIn := len(multiTests[0].in)
-	population := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "And", validateMulti)
+	population := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "And", validateMulti, false)
 	solution := population.Evolve(20000)
 
 	// Write out the Go source code for the solution.

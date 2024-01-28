@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"strings"
 
 	"github.com/gmlewis/gep/v2/functions"
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
@@ -23,6 +24,8 @@ type Generation struct {
 	Individuals []*genome.Genome
 	Funcs       []gene.FuncWeight
 	ScoringFunc genome.ScoringFunc
+
+	debug bool
 }
 
 // New creates a new random generation of the model.
@@ -44,11 +47,13 @@ func New(
 	numTerminals,
 	numConstants int,
 	linkFunc string,
-	sf genome.ScoringFunc) *Generation {
+	sf genome.ScoringFunc,
+	debug bool) *Generation {
 	r := &Generation{
 		Individuals: make([]*genome.Genome, numIndividuals),
 		Funcs:       fs,
 		ScoringFunc: sf,
+		debug:       debug,
 	}
 	n := maxArity(fs, funcType)
 	tailSize := headSize*(n-1) + 1
@@ -143,15 +148,76 @@ func (g *Generation) singleMutation(index int) {
 
 func (g *Generation) mutation() {
 	// Determine the total number of individuals to mutate
-	numIndividuals := 1 + rand.Intn(len(g.Individuals)-1)
-	for i := 0; i < numIndividuals; i++ {
+	numMutations := 1 + rand.Intn(len(g.Individuals)-1)
+	for i := 0; i < numMutations; i++ {
 		// Pick a random genome
 		genomeNum := rand.Intn(len(g.Individuals))
 		g.singleMutation(genomeNum)
 	}
 }
 
-// TODO: implement crossover
+func (g *Generation) singleCrossover(idx1, idx2 int) {
+	genome1 := g.Individuals[idx1]
+	genome2 := g.Individuals[idx2]
+
+	// Pick a random gene from genome1 and genome2
+	geneIdx1 := rand.Intn(len(genome1.Genes))
+	gene1 := genome1.Genes[geneIdx1]
+	geneIdx2 := rand.Intn(len(genome2.Genes))
+	gene2 := genome2.Genes[geneIdx2]
+
+	if len(gene1.Symbols) != len(gene2.Symbols) || gene1.HeadSize != gene2.HeadSize {
+		log.Fatalf("programming error: gene1: %v symbols (headSize=%v), gene2: %v symbols (headSize=%v)", len(gene1.Symbols), gene1.HeadSize, len(gene2.Symbols), gene2.HeadSize)
+	}
+
+	// Pick a random location within the head of both gene's symbols to crossover.
+	// The length of both symbols slices will stay the same.
+	symbolIdx := rand.Intn(gene1.HeadSize)
+	head1, tail1 := gene1.Symbols[:gene1.HeadSize], gene1.Symbols[gene1.HeadSize:]
+	head2, tail2 := gene2.Symbols[:gene2.HeadSize], gene2.Symbols[gene2.HeadSize:]
+	newSyms1 := append([]string{}, head2[symbolIdx:]...)
+	newSyms1 = append(newSyms1, head1[:symbolIdx]...)
+	newSyms1 = append(newSyms1, tail1...)
+	newSyms2 := append([]string{}, head1[symbolIdx:]...)
+	newSyms2 = append(newSyms2, head2[:symbolIdx]...)
+	newSyms2 = append(newSyms2, tail2...)
+
+	if len(newSyms1) != len(newSyms2) || len(newSyms1) != len(gene1.Symbols) {
+		log.Fatalf("programming error: newSyms1: %v symbols, newSyms2: %v symbols, gene1: %v symbols", len(newSyms1), len(newSyms2), len(gene1.Symbols))
+	}
+
+	if g.debug {
+		log.Printf("singleCrossover:\nbefore genome[%v].gene[%v]=%v\nbefore genome[%v].gene[%v]=%v\nafter genome[%v].gene[%v]=%v\nafter genome[%v].gene[%v]=%v",
+			idx1, geneIdx1, strings.Join(gene1.Symbols, "."),
+			idx2, geneIdx2, strings.Join(gene2.Symbols, "."),
+			idx1, geneIdx1, strings.Join(newSyms1, "."),
+			idx2, geneIdx2, strings.Join(newSyms2, "."))
+	}
+
+	gene1.Symbols = newSyms1
+	gene2.Symbols = newSyms2
+}
+
+func (g *Generation) crossover() {
+	if len(g.Individuals) < 2 {
+		return
+	}
+
+	// Determine the total number of individuals pairs to crossover
+	numCrossovers := 1 + rand.Intn(len(g.Individuals)-1)
+	for i := 0; i < numCrossovers; i++ {
+		// Pick two random genomes
+		genomeNum1 := rand.Intn(len(g.Individuals))
+		var genomeNum2 int
+		for {
+			genomeNum2 = rand.Intn(len(g.Individuals))
+			if genomeNum2 != genomeNum1 {
+				break
+			}
+		}
+		g.singleCrossover(genomeNum1, genomeNum2)
+	}
+}
 
 // getBest evaluates all individuals and returns a pointer to the best one.
 func (g *Generation) getBest() *genome.Genome {

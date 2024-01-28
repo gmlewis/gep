@@ -37,7 +37,7 @@ func BenchmarkReplication(b *testing.B) {
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
+	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
 	for i := 0; i < b.N; i++ {
 		e.replication()
 	}
@@ -49,7 +49,7 @@ func BenchmarkMutation(b *testing.B) {
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
+	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
 	for i := 0; i < b.N; i++ {
 		e.mutation()
 	}

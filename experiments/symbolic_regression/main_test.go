@@ -21,7 +21,7 @@ func BenchmarkValidateFunc(b *testing.B) {
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	e := model.New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil)
+	e := model.New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
 	var v float64
 	for i := 0; i < b.N; i++ {
 		v = validateFunc(e.Individuals[0])

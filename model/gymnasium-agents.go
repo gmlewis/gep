@@ -139,7 +139,8 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 			numTerminals,
 			ga.numConstants,
 			"tuple",
-			nil)
+			nil,
+			ga.debug)
 		return gen.Individuals, nil
 
 	case "Tuple":
@@ -158,7 +159,8 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 			numTerminals,
 			ga.numConstants,
 			"tuple",
-			nil)
+			nil,
+			ga.debug)
 		return gen.Individuals, nil
 
 	// case "MultiBinary":
@@ -220,15 +222,15 @@ func (ga *GymnasiumAgents) SortIndividuals() {
 func (ga *GymnasiumAgents) Evolve() error {
 	ga.SortIndividuals()
 
-	// // Preserve a copy of the best performing individual which
-	// // will be added back into the population after replication,
-	// // mutation, and crossover.
-	// ng := ga.Individuals[0].Dup()
-	gen := &Generation{Individuals: ga.Individuals}
+	// Preserve a copy of the best performing individual which
+	// will be added back into the population after replication,
+	// mutation, and crossover.
+	bestInd := ga.Individuals[0].Dup()
+	gen := &Generation{Individuals: ga.Individuals, debug: ga.debug}
 	// gen.replication()  // This seems to eliminate all diversity - investigate
 	gen.mutation()
-	// gen.crossover() // TODO
-	// gen.Individuals[ga.numIndividuals-1] = ng
+	gen.crossover()
+	gen.Individuals[ga.numIndividuals-1] = bestInd // Overwrite lowest performer
 	ga.Individuals = gen.Individuals
 
 	if len(ga.Individuals) != ga.numIndividuals {

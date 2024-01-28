@@ -52,7 +52,7 @@ func main() {
 		{Symbol: "Or", Weight: 20},
 	}
 	numIn := len(parityTests[0].in)
-	population := model.New(funcs, functions.Bool, 30, 7, 3, numIn, 0, "And", validateParity)
+	population := model.New(funcs, functions.Bool, 30, 7, 3, numIn, 0, "And", validateParity, false)
 	solution := population.Evolve(10000)
 
 	// Write out the Go source code for the solution.

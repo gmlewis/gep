@@ -49,7 +49,7 @@ func main() {
 		{Symbol: "Or", Weight: 5},
 	}
 	numIn := len(nandTests[0].in)
-	population := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand)
+	population := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand, false)
 	solution := population.Evolve(1000)
 
 	// Write out the Go source code for the solution.

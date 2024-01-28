@@ -65,7 +65,7 @@ func main() {
 		{Symbol: "*", Weight: 1},
 	}
 	numIn := len(srTests[0].in)
-	population := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc)
+	population := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc, false)
 	solution := population.Evolve(10000)
 
 	// Write out the Go source code for the solution.

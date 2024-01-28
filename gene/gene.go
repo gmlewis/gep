@@ -41,7 +41,7 @@ type Gene struct {
 	vif  func([]functions.VectorInt) functions.VectorInt // vector of integers generated function
 
 	SymbolMap   map[string]int // do not use directly.  Use SymbolCount() instead.
-	headSize    int
+	HeadSize    int
 	choiceSlice []string
 	// numTerminals is the number of inputs to the genetic program.
 	// It is important to retain this information in order to correctly
@@ -111,7 +111,7 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 		Symbols:      make([]string, 0, headSize+tailSize),
 		Constants:    constants,
 		funcType:     funcType,
-		headSize:     headSize,
+		HeadSize:     headSize,
 		choiceSlice:  choiceSlice,
 		numTerminals: numTerminals + numConstants,
 	}
@@ -176,9 +176,9 @@ func (g *Gene) SymbolCount(sym string) int {
 func (g *Gene) Mutate() {
 	position := rand.Intn(len(g.Symbols))
 	if g.numTerminals < 2 {
-		position %= g.headSize // Force choice to be within the head
+		position %= g.HeadSize // Force choice to be within the head
 	}
-	if position < g.headSize {
+	if position < g.HeadSize {
 		if len(g.choiceSlice) < 2 {
 			log.Printf("error: must have choice of more than one function")
 			return
@@ -219,7 +219,7 @@ func (g *Gene) Dup() *Gene {
 		bf:           g.bf,
 		intF:         g.intF,
 		mf:           g.mf,
-		headSize:     g.headSize,
+		HeadSize:     g.HeadSize,
 		choiceSlice:  make([]string, len(g.choiceSlice)),
 		numTerminals: g.numTerminals,
 	}
@@ -258,8 +258,8 @@ func CheckEqual(g1 *Gene, g2 *Gene) error {
 			return fmt.Errorf("g1.choiceSlice[%v]=%v != g2.choiceSlice[%v]=%v", i, v1, i, g2.choiceSlice[i])
 		}
 	}
-	if g1.headSize != g2.headSize {
-		return fmt.Errorf("g1.headSize=%v != g2.headSize=%v", g1.headSize, g2.headSize)
+	if g1.HeadSize != g2.HeadSize {
+		return fmt.Errorf("g1.HeadSize=%v != g2.HeadSize=%v", g1.HeadSize, g2.HeadSize)
 	}
 	if g1.numTerminals != g2.numTerminals {
 		return fmt.Errorf("g1.numTerminals=%v != g2.numTerminals=%v", g1.numTerminals, g2.numTerminals)
