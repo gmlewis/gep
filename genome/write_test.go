@@ -6,6 +6,7 @@ package genome
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/gmlewis/gep/v2/functions"
@@ -112,5 +113,29 @@ func gepNor(x, y bool) bool {
 	gn.Write(b, grammar)
 	if b.String() != want {
 		t.Errorf("gen.Write() got:\n%v\nwant:\n%v", b.String(), want)
+	}
+}
+
+func TestGenerateCode_MissingLinkFunctionReturnsError(t *testing.T) {
+	g1 := gene.New("d0", functions.Bool)
+	gn := New([]*gene.Gene{g1}, "MissingLink")
+	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
+	if err != nil {
+		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
+	}
+
+	d := &dump{
+		gr:     grammar,
+		genome: gn,
+		subs: map[string]string{
+			"CHARX": "X",
+		},
+	}
+	_, err = d.generateCode()
+	if err == nil {
+		t.Fatalf("generateCode() error = nil, want non-nil")
+	}
+	if !strings.Contains(err.Error(), "MissingLink") {
+		t.Fatalf("generateCode() error = %q, want mention of missing link function", err)
 	}
 }

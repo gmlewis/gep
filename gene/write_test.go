@@ -5,6 +5,7 @@
 package gene
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/gmlewis/gep/v2/functions"
@@ -55,5 +56,39 @@ func TestConstants_Float64(t *testing.T) {
 
 	if len(helpers) != 0 {
 		t.Errorf("helpers got length %v, want 0", len(helpers))
+	}
+}
+
+func TestExpression_InvalidTerminalIndexReturnsError(t *testing.T) {
+	g := New("d1", functions.Float64)
+	g.numTerminals = 1
+	grammar, err := grammars.LoadGoMathGrammar()
+	if err != nil {
+		t.Fatalf("unable to LoadGoMathGrammar(): %v", err)
+	}
+
+	_, err = g.Expression(grammar, make(grammars.HelperMap))
+	if err == nil {
+		t.Fatalf("g.Expression() error = nil, want non-nil")
+	}
+	if !strings.Contains(err.Error(), `terminal symbol name "d1"`) || !strings.Contains(err.Error(), "exceeds number of terminals") {
+		t.Fatalf("g.Expression() error = %q, want terminal index error", err)
+	}
+}
+
+func TestExpression_InvalidConstantIndexReturnsError(t *testing.T) {
+	g := New("c1", functions.Float64)
+	g.Constants = []float64{0.5}
+	grammar, err := grammars.LoadGoMathGrammar()
+	if err != nil {
+		t.Fatalf("unable to LoadGoMathGrammar(): %v", err)
+	}
+
+	_, err = g.Expression(grammar, make(grammars.HelperMap))
+	if err == nil {
+		t.Fatalf("g.Expression() error = nil, want non-nil")
+	}
+	if !strings.Contains(err.Error(), `constant symbol name "c1"`) || !strings.Contains(err.Error(), "exceeds length of constant slice") {
+		t.Fatalf("g.Expression() error = %q, want constant index error", err)
 	}
 }

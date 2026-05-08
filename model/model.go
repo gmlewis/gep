@@ -8,6 +8,7 @@ package model
 import (
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"strings"
 
@@ -221,7 +222,7 @@ func (g *Generation) crossover() {
 
 // getBest evaluates all individuals and returns a pointer to the best one.
 func (g *Generation) getBest() *genome.Genome {
-	bestScore := 0.0
+	bestScore := math.Inf(-1)
 	bestGenome := g.Individuals[0]
 	c := make(chan *genome.Genome)
 	for i := 0; i < len(g.Individuals); i++ { // Evaluate individuals concurrently

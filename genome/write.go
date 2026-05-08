@@ -69,7 +69,7 @@ func (d *dump) generateCode() ([]byte, error) {
 	helpers := make(grammars.HelperMap)
 	s, ok := d.gr.Functions.FuncMap[d.genome.LinkFunc]
 	if !ok {
-		return nil, fmt.Errorf("unable to find grammar linking function: %v", s.Symbol())
+		return nil, fmt.Errorf("unable to find grammar linking function: %v", d.genome.LinkFunc)
 	}
 
 	glf, ok := s.(*grammars.Function)
