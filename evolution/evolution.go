@@ -2,23 +2,36 @@
 // Use of this source code is governed by the Apache 2.0
 // license that can be found in the LICENSE file.
 
-// Package evolution provides a typed generic GEP evolution engine built on the
-// core package.
+// Package evolution provides a typed generic GEP (Gene Expression Programming)
+// evolution engine built on top of the core package.
 //
-// This is Phase 3 of the GEP modernization roadmap: the evolution engine is
-// rebuilt as an explicit, configurable, and independently testable subsystem.
-// The package currently implements the foundation layer:
+// The package is parameterised by the numeric type T used inside genomes (e.g.
+// float64, int) and exposes the following building blocks:
 //
-//   - Individual[T] – a scored typed genome.
-//   - Generation[T] – a population of individuals with configuration.
-//   - New / NewWithSeed – constructors that create random populations.
-//   - Evaluate – concurrent fitness evaluation for all individuals.
-//   - BestIndividual – best-fitness lookup (supports both max and min goals).
+//   - Individual[T] – a genome together with its most-recently evaluated fitness score.
+//   - Generation[T] – a population of individuals with pluggable scoring, selection,
+//     and stopping criteria.
+//   - New / NewWithSeed – constructors that create random populations; the seeded
+//     variant produces fully deterministic populations and evolution trajectories.
+//   - Evaluate – concurrent per-individual fitness evaluation.
+//   - BestIndividual – returns the best individual, respecting both maximization
+//     and minimization orientations.
 //   - Select – roulette-wheel (fitness-proportionate) selection.
-//   - Evolve – a basic evolution loop (evaluate → stop-check → select → elitism).
+//   - Evolve – runs the complete evolution loop (evaluate → stop-check → select →
+//     elitism) for a given number of iterations.
 //
-// Genetic operators (mutation, recombination, transposition) are wired in
-// subsequent milestones.
+// Typical usage:
+//
+//	cat := core.NewCatalog[float64]()
+//	// ... register function nodes ...
+//	link, _ := core.NewLinkFunc[float64]("+", func(v []float64) float64 { ... })
+//
+//	gen, _ := evolution.NewWithSeed(42, cat, 50, 7, 3, 2, 0, link,
+//	    func(g core.Genome[float64]) float64 { return fitness(g) })
+//	gen.StopFunc = func(best evolution.Individual[float64]) bool {
+//	    return best.Score >= 1000.0
+//	}
+//	result := gen.Evolve(500)
 package evolution
 
 import (
@@ -266,9 +279,6 @@ func (g *Generation[T]) Select() {
 //
 // If the loop completes without triggering the stopping criterion, Evolve
 // performs a final Evaluate and returns BestIndividual.
-//
-// Genetic operators (mutation, recombination, transposition) are wired in
-// subsequent milestones; only selection and elitism are applied here.
 func (g *Generation[T]) Evolve(iterations int) Individual[T] {
 	for i := 0; i < iterations; i++ {
 		g.Evaluate()
