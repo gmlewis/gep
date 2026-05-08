@@ -233,9 +233,6 @@ func (g *Gene) Dup() *Gene {
 
 // InvalidateCache clears all cached generated functions and symbol counts.
 func (g *Gene) InvalidateCache() {
-	if g == nil {
-		return
-	}
 	g.SymbolMap = nil
 	g.bf = nil
 	g.intF = nil
