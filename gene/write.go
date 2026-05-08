@@ -6,7 +6,6 @@ package gene
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -14,7 +13,7 @@ import (
 )
 
 func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Grammar, helpers grammars.HelperMap) (string, error) {
-	if symbolIndex > len(g.Symbols) {
+	if symbolIndex >= len(g.Symbols) {
 		return "", fmt.Errorf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
 	}
 
@@ -34,7 +33,7 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 
 		args := argOrder[symbolIndex]
 		if len(args) < f.Terminals() {
-			log.Fatalf("programming error: symbol %q args length mismatch: len(args)=%v, want %v; check FuncType", sym, len(args), f.Terminals())
+			return "", fmt.Errorf("programming error: symbol %q args length mismatch: len(args)=%v, want %v; check FuncType", sym, len(args), f.Terminals())
 		}
 
 		for i := 0; i < f.Terminals(); i++ {
@@ -55,8 +54,8 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 			return "", fmt.Errorf("unable to parse variable index: sym=%v", sym)
 		}
 
-		if n := g.numTerminals - len(g.Constants); index > n {
-			log.Fatalf("programming error: terminal symbol name %q exceeds number of terminals (%v)", sym, n)
+		if n := g.numTerminals - len(g.Constants); index >= n {
+			return "", fmt.Errorf("programming error: terminal symbol name %q exceeds number of terminals (%v)", sym, n)
 		}
 		return fmt.Sprintf("d[%v]", index), nil
 	}
@@ -67,8 +66,8 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 			return "", fmt.Errorf("unable to parse constant index: sym=%v", sym)
 		}
 
-		if index > len(g.Constants) {
-			log.Fatalf("programming error: constant symbol name %q exceeds length of constant slice (%v)", sym, len(g.Constants))
+		if index >= len(g.Constants) {
+			return "", fmt.Errorf("programming error: constant symbol name %q exceeds length of constant slice (%v)", sym, len(g.Constants))
 		}
 		return fmt.Sprintf("%v", g.Constants[index]), nil
 	}

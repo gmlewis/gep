@@ -221,15 +221,15 @@ func (g *Generation) crossover() {
 
 // getBest evaluates all individuals and returns a pointer to the best one.
 func (g *Generation) getBest() *genome.Genome {
+	var bestGenome *genome.Genome
 	bestScore := 0.0
-	bestGenome := g.Individuals[0]
 	c := make(chan *genome.Genome)
 	for i := 0; i < len(g.Individuals); i++ { // Evaluate individuals concurrently
 		go g.Individuals[i].EvaluateWithScore(g.ScoringFunc, c)
 	}
 	for i := 0; i < len(g.Individuals); i++ { // Collect and return the highest scoring Genome
 		gn := <-c
-		if gn.Score > bestScore {
+		if bestGenome == nil || gn.Score > bestScore {
 			bestGenome = gn
 			bestScore = gn.Score
 		}

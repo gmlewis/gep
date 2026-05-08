@@ -12,6 +12,34 @@ import (
 	"github.com/gmlewis/gep/v2/genome"
 )
 
+func TestGetBestHandlesAllNegativeScores(t *testing.T) {
+	g := &Generation{
+		Individuals: []*genome.Genome{
+			{},
+			{},
+			{},
+		},
+	}
+	g.ScoringFunc = func(gn *genome.Genome) float64 {
+		switch gn {
+		case g.Individuals[0]:
+			return -10
+		case g.Individuals[1]:
+			return -3
+		default:
+			return -7
+		}
+	}
+
+	best := g.getBest()
+	if best != g.Individuals[1] {
+		t.Fatalf("getBest() returned %p, want %p", best, g.Individuals[1])
+	}
+	if best.Score != -3 {
+		t.Fatalf("best score = %v, want -3", best.Score)
+	}
+}
+
 func TestMaxArity(t *testing.T) {
 	funcs := []gene.FuncWeight{
 		{Symbol: "+", Weight: 1},
