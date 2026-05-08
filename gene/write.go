@@ -6,7 +6,6 @@ package gene
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -34,7 +33,7 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 
 		args := argOrder[symbolIndex]
 		if len(args) < f.Terminals() {
-			log.Fatalf("programming error: symbol %q args length mismatch: len(args)=%v, want %v; check FuncType", sym, len(args), f.Terminals())
+			return "", fmt.Errorf("programming error: symbol %q args length mismatch: len(args)=%v, want %v; check FuncType", sym, len(args), f.Terminals())
 		}
 
 		for i := 0; i < f.Terminals(); i++ {

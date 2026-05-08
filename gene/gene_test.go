@@ -12,6 +12,29 @@ import (
 	"github.com/gmlewis/gep/v2/functions"
 )
 
+func TestNew_InvalidSymbolIndexesDoNotExit(t *testing.T) {
+	g := New("dX.cY", functions.Float64)
+	if g == nil {
+		t.Fatalf("New() = nil, want non-nil")
+	}
+	if got := len(g.Constants); got != 0 {
+		t.Fatalf("len(g.Constants) = %v, want 0", got)
+	}
+}
+
+func TestSymbolCount_UnknownFuncTypeReturnsZero(t *testing.T) {
+	g := New("d0", functions.FuncType(999))
+	if got := g.SymbolCount("d0"); got != 0 {
+		t.Fatalf("SymbolCount() = %v, want 0", got)
+	}
+}
+
+func TestAllSymbolsEqualWeights_UnknownFuncTypeReturnsNil(t *testing.T) {
+	if got := AllSymbolsEqualWeights(functions.FuncType(999)); got != nil {
+		t.Fatalf("AllSymbolsEqualWeights(unknown) = %v, want nil", got)
+	}
+}
+
 var nandTests = []struct {
 	in   []bool
 	want bool

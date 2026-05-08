@@ -32,7 +32,8 @@ func AllSymbolsEqualWeights(funcType functions.FuncType) []FuncWeight {
 	case functions.VectorInts:
 		lookup = vin.VectorIntFuncs
 	default:
-		log.Fatalf("unknown funcType: %v", funcType)
+		log.Printf("unknown funcType: %v", funcType)
+		return nil
 	}
 
 	result := make([]FuncWeight, 0, len(lookup))

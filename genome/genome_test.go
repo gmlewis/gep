@@ -914,6 +914,20 @@ func TestMutate(t *testing.T) {
 	}
 }
 
+func TestEvaluateWithScore_NilScoringFuncDoesNotExit(t *testing.T) {
+	g := &Genome{}
+	c := make(chan *Genome, 1)
+	g.EvaluateWithScore(nil, c)
+
+	got := <-c
+	if got != g {
+		t.Fatalf("EvaluateWithScore(nil, c) sent %p, want %p", got, g)
+	}
+	if !math.IsInf(g.Score, -1) {
+		t.Fatalf("g.Score = %v, want -Inf", g.Score)
+	}
+}
+
 func BenchmarkMutate(b *testing.B) {
 	headSize := 7
 	maxArity := 2
