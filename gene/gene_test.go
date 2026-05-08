@@ -371,6 +371,20 @@ func TestDup(t *testing.T) {
 	validateMath(t, nand, test.in, test.want)
 }
 
+func TestDup_DoesNotReuseSourceCachedFunctions(t *testing.T) {
+	g := New("c0", functions.Float64)
+	g.Constants = []float64{2}
+	if got := g.EvalMath(nil); got != 2 {
+		t.Fatalf("g.EvalMath(nil) = %v, want 2", got)
+	}
+
+	dup := g.Dup()
+	dup.Constants[0] = 7
+	if got := dup.EvalMath(nil); got != 7 {
+		t.Fatalf("dup.EvalMath(nil) = %v, want 7", got)
+	}
+}
+
 func TestMutate(t *testing.T) {
 	headSize := 7
 	maxArity := 2

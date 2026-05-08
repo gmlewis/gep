@@ -126,3 +126,32 @@ func TestSingleCrossover_MismatchedGenesDoesNotMutate(t *testing.T) {
 		t.Fatalf("genome[1] symbols changed: got %v, want %v", got, want)
 	}
 }
+
+func TestSingleCrossover_InvalidatesGeneCaches(t *testing.T) {
+	gene1 := gene.New("d0", functions.Float64)
+	gene1.HeadSize = 1
+	gene2 := gene.New("d1", functions.Float64)
+	gene2.HeadSize = 1
+
+	if got := gene1.EvalMath([]float64{10, 20}); got != 10 {
+		t.Fatalf("gene1.EvalMath(before) = %v, want 10", got)
+	}
+	if got := gene2.EvalMath([]float64{10, 20}); got != 20 {
+		t.Fatalf("gene2.EvalMath(before) = %v, want 20", got)
+	}
+
+	g := &Generation{
+		Individuals: []*genome.Genome{
+			{Genes: []*gene.Gene{gene1}},
+			{Genes: []*gene.Gene{gene2}},
+		},
+	}
+	g.singleCrossover(0, 1)
+
+	if got := gene1.EvalMath([]float64{10, 20}); got != 20 {
+		t.Fatalf("gene1.EvalMath(after) = %v, want 20", got)
+	}
+	if got := gene2.EvalMath([]float64{10, 20}); got != 10 {
+		t.Fatalf("gene2.EvalMath(after) = %v, want 10", got)
+	}
+}
