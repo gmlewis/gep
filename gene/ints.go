@@ -32,7 +32,7 @@ func (g *Gene) buildIntTree(symbolIndex int, argOrder [][]int) func([]int) int {
 	if symbolIndex >= len(g.Symbols) {
 		log.Printf("buildIntTree(%v, %#v, ...)", symbolIndex, argOrder)
 		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
-		return func(a []int) int { return 0.0 }
+		return func(a []int) int { return 0 }
 	}
 	sym := g.Symbols[symbolIndex]
 	g.SymbolMap[sym]++
@@ -58,7 +58,7 @@ func (g *Gene) buildIntTree(symbolIndex int, argOrder [][]int) func([]int) int {
 				return func(in []int) int {
 					if index >= len(in) {
 						log.Printf("error evaluating gene %q: index %v >= d length (%v)", sym, index, len(in))
-						return 0.0
+						return 0
 					}
 					return in[index]
 				}
@@ -70,7 +70,7 @@ func (g *Gene) buildIntTree(symbolIndex int, argOrder [][]int) func([]int) int {
 				return func(in []int) int {
 					if index >= len(g.Constants) {
 						log.Printf("error evaluating gene %q: index %v >= c length (%v)", sym, index, len(g.Constants))
-						return 0.0
+						return 0
 					}
 					return int(g.Constants[index])
 				}
@@ -78,5 +78,5 @@ func (g *Gene) buildIntTree(symbolIndex int, argOrder [][]int) func([]int) int {
 		}
 	}
 	log.Printf("unable to return function: unknown gene symbol %q", sym)
-	return func(in []int) int { return 0.0 }
+	return func(in []int) int { return 0 }
 }
