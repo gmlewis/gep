@@ -199,6 +199,10 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 
 	gene1.Symbols = newSyms1
 	gene2.Symbols = newSyms2
+	gene1.InvalidateCache()
+	gene2.InvalidateCache()
+	genome1.SymbolMap = nil
+	genome2.SymbolMap = nil
 }
 
 func (g *Generation) crossover() {

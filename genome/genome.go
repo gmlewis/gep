@@ -102,6 +102,7 @@ func (g *Genome) Mutate(numMutations int) {
 		g.Genes[n].Mutate()
 		// fmt.Printf("after:\n%v\n", g.Genes[n])
 	}
+	g.SymbolMap = nil
 }
 
 // Dup duplicates the genome into the provided destination genome.

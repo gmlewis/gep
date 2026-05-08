@@ -208,11 +208,7 @@ func (g *Gene) Mutate() {
 		// fmt.Printf("\nChanging terminal #%v from %q to %q\n", position, g.Symbols[position], terminal)
 		g.Symbols[position] = terminal
 	}
-	// Invalidate the cached function
-	g.bf = nil
-	g.intF = nil
-	g.mf = nil
-	g.vif = nil
+	g.InvalidateCache()
 }
 
 // Dup duplicates the gene into the provided destination gene.
@@ -225,9 +221,6 @@ func (g *Gene) Dup() *Gene {
 		Symbols:      make([]string, len(g.Symbols)),
 		Constants:    make([]float64, len(g.Constants)),
 		funcType:     g.funcType,
-		bf:           g.bf,
-		intF:         g.intF,
-		mf:           g.mf,
 		HeadSize:     g.HeadSize,
 		choiceSlice:  make([]string, len(g.choiceSlice)),
 		numTerminals: g.numTerminals,
@@ -236,6 +229,18 @@ func (g *Gene) Dup() *Gene {
 	copy(r.Constants, g.Constants)
 	copy(r.choiceSlice, g.choiceSlice)
 	return r
+}
+
+// InvalidateCache clears all cached generated functions and symbol counts.
+func (g *Gene) InvalidateCache() {
+	if g == nil {
+		return
+	}
+	g.SymbolMap = nil
+	g.bf = nil
+	g.intF = nil
+	g.mf = nil
+	g.vif = nil
 }
 
 // CheckEqual is used for testing purposes only (exported to use in genome_test.go).
