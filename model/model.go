@@ -25,6 +25,10 @@ type Generation struct {
 	Individuals []*genome.Genome
 	Funcs       []gene.FuncWeight
 	ScoringFunc genome.ScoringFunc
+	// MinimizeScore controls score orientation in selection and best-genome
+	// tracking. When false (default), higher scores are better. When true,
+	// lower scores are treated as better.
+	MinimizeScore bool
 	// StopFunc is an optional callback that is called after each generation's
 	// best genome is evaluated. When StopFunc returns true, evolution halts
 	// early and the best genome is returned. When nil, the default stopping
@@ -52,6 +56,13 @@ func (g *Generation) randFloat64() float64 {
 		return g.rng.Float64()
 	}
 	return rand.Float64()
+}
+
+func (g *Generation) effectiveScore(score float64) float64 {
+	if g.MinimizeScore {
+		return -score
+	}
+	return score
 }
 
 // New creates a new random generation of the model.
@@ -176,11 +187,12 @@ func (g *Generation) replication() {
 	// roulette wheel selection - see www.youtube.com/watch?v=aHLslaWO-AQ
 	minWeight, maxWeight := 0.0, 0.0
 	for i, v := range g.Individuals {
-		if i == 0 || v.Score > maxWeight {
-			maxWeight = v.Score
+		score := g.effectiveScore(v.Score)
+		if i == 0 || score > maxWeight {
+			maxWeight = score
 		}
-		if i == 0 || v.Score < minWeight {
-			minWeight = v.Score
+		if i == 0 || score < minWeight {
+			minWeight = score
 		}
 	}
 	// Map minWidth->maxWeight to 0.1->1
@@ -197,7 +209,7 @@ func (g *Generation) replication() {
 	beta := 0.0
 	for i := 0; i < len(g.Individuals); i++ {
 		beta += g.randFloat64() * 2.0
-		scaledScore := f(g.Individuals[index].Score)
+		scaledScore := f(g.effectiveScore(g.Individuals[index].Score))
 		for beta > scaledScore {
 			beta -= scaledScore
 			index = (index + 1) % len(g.Individuals)
@@ -305,9 +317,10 @@ func (g *Generation) getBest() *genome.Genome {
 	}
 	for i := 0; i < len(g.Individuals); i++ { // Collect and return the highest scoring Genome
 		gn := <-c
-		if gn.Score > bestScore {
+		effectiveScore := g.effectiveScore(gn.Score)
+		if effectiveScore > bestScore {
 			bestGenome = gn
-			bestScore = gn.Score
+			bestScore = effectiveScore
 		}
 	}
 	return bestGenome

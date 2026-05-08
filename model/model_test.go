@@ -110,6 +110,30 @@ func TestGetBestHandlesAllNegativeScores(t *testing.T) {
 	}
 }
 
+func TestGetBest_MinimizeScore(t *testing.T) {
+	g1 := &genome.Genome{}
+	g2 := &genome.Genome{}
+	g3 := &genome.Genome{}
+	scores := map[*genome.Genome]float64{
+		g1: 100,
+		g2: 10,
+		g3: 50,
+	}
+	g := &Generation{
+		Individuals:   []*genome.Genome{g1, g2, g3},
+		ScoringFunc:   func(gn *genome.Genome) float64 { return scores[gn] },
+		MinimizeScore: true,
+	}
+
+	got := g.getBest()
+	if got != g2 {
+		t.Fatalf("getBest() = %p (score=%v), want %p (score=%v)", got, scores[got], g2, scores[g2])
+	}
+	if scores[got] != 10 {
+		t.Fatalf("getBest() score = %v, want 10", scores[got])
+	}
+}
+
 func TestSingleCrossover_MismatchedGenesDoesNotMutate(t *testing.T) {
 	gene1 := &gene.Gene{Symbols: []string{"d0"}, HeadSize: 1}
 	gene2 := &gene.Gene{Symbols: []string{"d0", "d1"}, HeadSize: 2}
