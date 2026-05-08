@@ -85,22 +85,6 @@ type Generation[T any] struct {
 	rng *rand.Rand
 }
 
-// randIntn returns a random int in [0, n) using g.rng when non-nil.
-func (g *Generation[T]) randIntn(n int) int {
-	if g.rng != nil {
-		return g.rng.Intn(n)
-	}
-	return rand.Intn(n) //nolint:gosec
-}
-
-// randFloat64 returns a random float64 in [0.0, 1.0) using g.rng when non-nil.
-func (g *Generation[T]) randFloat64() float64 {
-	if g.rng != nil {
-		return g.rng.Float64()
-	}
-	return rand.Float64() //nolint:gosec
-}
-
 // effectiveScore maps a raw score to an internal "higher is better" scale so
 // that both maximization and minimization can share the same selection logic.
 func (g *Generation[T]) effectiveScore(score float64) float64 {
