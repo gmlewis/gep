@@ -92,3 +92,19 @@ func TestExpression_InvalidConstantIndexReturnsError(t *testing.T) {
 		t.Fatalf("g.Expression() error = %q, want constant index error", err)
 	}
 }
+
+func TestBuildExp_ArgsLengthMismatchReturnsError(t *testing.T) {
+	g := New("+.d0.d0", functions.Float64)
+	grammar, err := grammars.LoadGoMathGrammar()
+	if err != nil {
+		t.Fatalf("unable to LoadGoMathGrammar(): %v", err)
+	}
+
+	_, err = g.buildExp(0, [][]int{{1}}, grammar, make(grammars.HelperMap))
+	if err == nil {
+		t.Fatalf("g.buildExp() error = nil, want non-nil")
+	}
+	if !strings.Contains(err.Error(), "args length mismatch") {
+		t.Fatalf("g.buildExp() error = %q, want args length mismatch", err)
+	}
+}

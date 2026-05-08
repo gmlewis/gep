@@ -31,6 +31,12 @@ func TestMaxArity(t *testing.T) {
 	}
 }
 
+func TestMaxArity_UnknownFuncTypeReturnsZero(t *testing.T) {
+	if got := maxArity(nil, functions.FuncType(999)); got != 0 {
+		t.Fatalf("maxArity(nil, unknown) = %v, want 0", got)
+	}
+}
+
 func BenchmarkReplication(b *testing.B) {
 	funcs := []gene.FuncWeight{
 		{Symbol: "+", Weight: 1},
@@ -100,5 +106,23 @@ func TestGetBestHandlesAllNegativeScores(t *testing.T) {
 	}
 	if scores[got] != -1 {
 		t.Fatalf("getBest() score = %v, want -1", scores[got])
+	}
+}
+
+func TestSingleCrossover_MismatchedGenesDoesNotMutate(t *testing.T) {
+	gene1 := &gene.Gene{Symbols: []string{"d0"}, HeadSize: 1}
+	gene2 := &gene.Gene{Symbols: []string{"d0", "d1"}, HeadSize: 2}
+	g := &Generation{
+		Individuals: []*genome.Genome{
+			{Genes: []*gene.Gene{gene1}},
+			{Genes: []*gene.Gene{gene2}},
+		},
+	}
+	g.singleCrossover(0, 1)
+	if got, want := g.Individuals[0].Genes[0].Symbols, []string{"d0"}; len(got) != len(want) || got[0] != want[0] {
+		t.Fatalf("genome[0] symbols changed: got %v, want %v", got, want)
+	}
+	if got, want := g.Individuals[1].Genes[0].Symbols, []string{"d0", "d1"}; len(got) != len(want) || got[0] != want[0] || got[1] != want[1] {
+		t.Fatalf("genome[1] symbols changed: got %v, want %v", got, want)
 	}
 }

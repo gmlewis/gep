@@ -168,7 +168,8 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 	gene2 := genome2.Genes[geneIdx2]
 
 	if len(gene1.Symbols) != len(gene2.Symbols) || gene1.HeadSize != gene2.HeadSize {
-		log.Fatalf("programming error: gene1: %v symbols (headSize=%v), gene2: %v symbols (headSize=%v)", len(gene1.Symbols), gene1.HeadSize, len(gene2.Symbols), gene2.HeadSize)
+		log.Printf("programming error: gene1: %v symbols (headSize=%v), gene2: %v symbols (headSize=%v)", len(gene1.Symbols), gene1.HeadSize, len(gene2.Symbols), gene2.HeadSize)
+		return
 	}
 
 	// Pick a random location within the head of both gene's symbols to crossover.
@@ -184,7 +185,8 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 	newSyms2 = append(newSyms2, tail2...)
 
 	if len(newSyms1) != len(newSyms2) || len(newSyms1) != len(gene1.Symbols) {
-		log.Fatalf("programming error: newSyms1: %v symbols, newSyms2: %v symbols, gene1: %v symbols", len(newSyms1), len(newSyms2), len(gene1.Symbols))
+		log.Printf("programming error: newSyms1: %v symbols, newSyms2: %v symbols, gene1: %v symbols", len(newSyms1), len(newSyms2), len(gene1.Symbols))
+		return
 	}
 
 	if g.debug {
@@ -249,7 +251,8 @@ func maxArity(fs []gene.FuncWeight, funcType functions.FuncType) int {
 	case functions.Float64:
 		lookup = mn.Math
 	default:
-		log.Fatalf("unknown funcType: %v", funcType)
+		log.Printf("unknown funcType: %v", funcType)
+		return 0
 	}
 
 	r := 0

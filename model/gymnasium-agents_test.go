@@ -155,3 +155,25 @@ func TestProcessObservations(t *testing.T) {
 		})
 	}
 }
+
+func TestEvolve_LengthMismatchReturnsError(t *testing.T) {
+	actionSpace := &common.Space{Type: "Discrete", N: 2}
+	obsSpace := &common.Space{
+		Type: "Tuple",
+		Subspaces: []*common.Space{
+			{Type: "Discrete", N: 32},
+			{Type: "Discrete", N: 11},
+			{Type: "Discrete", N: 2},
+		},
+	}
+
+	agents, err := NewGymnasiumAgents(actionSpace, obsSpace)
+	if err != nil {
+		t.Fatal(err)
+	}
+	agents.numIndividuals++
+
+	if err := agents.Evolve(); err == nil {
+		t.Fatalf("Evolve() error = nil, want non-nil")
+	}
+}

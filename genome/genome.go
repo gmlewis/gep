@@ -14,6 +14,7 @@ package genome
 import (
 	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"strings"
 
@@ -128,7 +129,10 @@ type ScoringFunc func(g *Genome) float64
 // EvaluateWithScore scores a genome and sends the result to a channel.
 func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
 	if sf == nil {
-		log.Fatalf("genome.EvaluateWithScore: ScoringFunc must not be nil")
+		log.Printf("genome.EvaluateWithScore: ScoringFunc must not be nil")
+		g.Score = math.Inf(-1)
+		c <- g
+		return
 	}
 	g.Score = sf(g)
 	c <- g

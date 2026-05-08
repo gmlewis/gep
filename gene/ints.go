@@ -31,7 +31,7 @@ func (g *Gene) buildIntTree(symbolIndex int, argOrder [][]int) func([]int) int {
 	// log.Infof("buildIntTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex >= len(g.Symbols) {
 		log.Printf("buildIntTree(%v, %#v, ...)", symbolIndex, argOrder)
-		log.Fatalf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
+		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
 		return func(a []int) int { return 0.0 }
 	}
 	sym := g.Symbols[symbolIndex]

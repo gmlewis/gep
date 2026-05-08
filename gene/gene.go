@@ -60,7 +60,8 @@ func New(x string, funcType functions.FuncType) *Gene {
 		if sym[0:1] == "d" {
 			index, err := strconv.Atoi(sym[1:])
 			if err != nil {
-				log.Fatalf("unable to parse variable index %q: %v", sym, err)
+				log.Printf("unable to parse variable index %q: %v", sym, err)
+				continue
 			}
 			if index >= numTerminals {
 				numTerminals = index + 1
@@ -68,7 +69,8 @@ func New(x string, funcType functions.FuncType) *Gene {
 		} else if sym[0:1] == "c" {
 			index, err := strconv.Atoi(sym[1:])
 			if err != nil {
-				log.Fatalf("unable to parse constant index %q: %v", sym, err)
+				log.Printf("unable to parse constant index %q: %v", sym, err)
+				continue
 			}
 			if index >= numConstants {
 				numConstants = index + 1
@@ -133,7 +135,14 @@ func (g Gene) String() string {
 		if strings.HasPrefix(s, "c") {
 			i, err := strconv.Atoi(s[1:])
 			if err != nil {
-				log.Fatalf("bad constant name: %v", s)
+				log.Printf("bad constant name: %v", s)
+				syms = append(syms, s)
+				continue
+			}
+			if i < 0 || i >= len(g.Constants) {
+				log.Printf("constant index out of range: symbol=%q index=%v len(constants)=%v", s, i, len(g.Constants))
+				syms = append(syms, s)
+				continue
 			}
 			syms = append(syms, fmt.Sprintf("%v(%v)", s, g.Constants[i]))
 		} else {
@@ -166,7 +175,8 @@ func (g *Gene) SymbolCount(sym string) int {
 		case functions.VectorInts:
 			g.generateVectorIntFunc()
 		default:
-			log.Fatalf("unknown funcType: %v", g.funcType)
+			log.Printf("unknown funcType: %v", g.funcType)
+			return 0
 		}
 	}
 	return g.SymbolMap[sym]
@@ -288,7 +298,8 @@ func (g *Gene) getArgOrder() [][]int {
 	case functions.VectorInts:
 		lookup = vin.VectorIntFuncs
 	default:
-		log.Fatalf("unknown funcType: %v", g.funcType)
+		log.Printf("unknown funcType: %v", g.funcType)
+		return nil
 	}
 
 	argOrder := make([][]int, len(g.Symbols))

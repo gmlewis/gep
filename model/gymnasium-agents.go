@@ -230,11 +230,14 @@ func (ga *GymnasiumAgents) Evolve() error {
 	// gen.replication()  // This seems to eliminate all diversity - investigate
 	gen.mutation()
 	gen.crossover()
-	gen.Individuals[ga.numIndividuals-1] = bestInd // Overwrite lowest performer
+	if len(gen.Individuals) == 0 {
+		return fmt.Errorf("programming error: no individuals available after evolution operators")
+	}
+	gen.Individuals[len(gen.Individuals)-1] = bestInd // Overwrite lowest performer
 	ga.Individuals = gen.Individuals
 
 	if len(ga.Individuals) != ga.numIndividuals {
-		log.Fatalf("programming error: got %v individuals, want %v", len(ga.Individuals), ga.numIndividuals)
+		return fmt.Errorf("programming error: got %v individuals, want %v", len(ga.Individuals), ga.numIndividuals)
 	}
 	// Reset all scores to zero
 	for _, individual := range ga.Individuals {
