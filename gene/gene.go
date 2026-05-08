@@ -137,7 +137,6 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 		Constants:    constants,
 		funcType:     funcType,
 		HeadSize:     headSize,
-		choiceSlice:  choiceSlice,
 		numTerminals: numTerminals + numConstants,
 		rng:          rng,
 	}
