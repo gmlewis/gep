@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 // Node defines a typed function node in a Karva expression.
@@ -443,6 +444,51 @@ func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants 
 	}
 
 	return Gene[T]{Symbols: syms}, nil
+}
+
+// KarvaString returns the dot-separated Karva representation of the gene's symbols.
+// For example: "+.d0.d1" or "*.c0.d1".
+func (g Gene[T]) KarvaString() string {
+	names := make([]string, len(g.Symbols))
+	for i, sym := range g.Symbols {
+		names[i] = sym.Name
+	}
+	return strings.Join(names, ".")
+}
+
+// Dup returns a deep copy of the gene.
+func (g Gene[T]) Dup() Gene[T] {
+	syms := make([]Symbol[T], len(g.Symbols))
+	copy(syms, g.Symbols)
+	consts := make([]T, len(g.Constants))
+	copy(consts, g.Constants)
+	return Gene[T]{Symbols: syms, Constants: consts}
+}
+
+// KarvaString returns the multi-gene Karva representation of the genome.
+// Each gene is rendered with its own KarvaString and genes are joined by the
+// link operator symbol, e.g. "+.d0.d1|+|*.d0.d1".
+// Returns an empty string when the genome has no genes or a nil link operator.
+func (g Genome[T]) KarvaString() string {
+	if len(g.Genes) == 0 || g.Link == nil {
+		return ""
+	}
+	parts := make([]string, len(g.Genes))
+	for i, gene := range g.Genes {
+		parts[i] = gene.KarvaString()
+	}
+	sep := "|" + g.Link.Symbol() + "|"
+	return strings.Join(parts, sep)
+}
+
+// Dup returns a deep copy of the genome.  The link operator is shared (it is
+// assumed to be stateless and immutable).
+func (g Genome[T]) Dup() Genome[T] {
+	genes := make([]Gene[T], len(g.Genes))
+	for i := range g.Genes {
+		genes[i] = g.Genes[i].Dup()
+	}
+	return Genome[T]{Genes: genes, Link: g.Link}
 }
 
 // NewRandomGenome creates a random Genome[T] containing numGenes random genes.
