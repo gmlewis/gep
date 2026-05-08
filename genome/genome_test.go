@@ -557,7 +557,7 @@ func TestIrisPlants(t *testing.T) {
 	g3 := gene.New("AND2.Avg2.GOE2C.d3.AND1.GOE2A.3Rt.AND2.d0.c1.d3.d2.d0.c6.c3.c7.d0", functions.Float64)
 	g1.Constants = []float64{
 		-7.36991485335856,
-		3.02133243812372E-02,
+		3.02133243812372e-02,
 		3.90911587878048,
 		-3.37382122257149,
 		6.02038636432997,
