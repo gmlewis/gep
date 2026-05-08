@@ -12,8 +12,8 @@ type intNode struct {
 	fn     func([]int) int
 }
 
-func (n intNode) Symbol() string  { return n.symbol }
-func (n intNode) Arity() int      { return n.arity }
+func (n intNode) Symbol() string   { return n.symbol }
+func (n intNode) Arity() int       { return n.arity }
 func (n intNode) Eval(v []int) int { return n.fn(v) }
 
 func TestNewFunctionSymbol(t *testing.T) {
