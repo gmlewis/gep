@@ -29,7 +29,7 @@ func (g *Gene) EvalMath(in []float64) float64 {
 func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) float64 {
 	// count := make(map[string]int)
 	// log.Infof("buildMathTree(%v, %#v, ...)", symbolIndex, argOrder)
-	if symbolIndex > len(g.Symbols) {
+	if symbolIndex >= len(g.Symbols) {
 		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
 		return func(a []float64) float64 { return 0.0 }
 	}

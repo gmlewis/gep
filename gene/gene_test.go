@@ -300,6 +300,22 @@ func TestVectorInt(t *testing.T) {
 	}
 }
 
+func TestBuildMathTree_OutOfBoundsSymbolIndex(t *testing.T) {
+	g := New("d0", functions.Float64)
+	f := g.buildMathTree(len(g.Symbols), g.getArgOrder())
+	if got := f([]float64{42}); got != 0 {
+		t.Fatalf("buildMathTree out-of-bounds fallback = %v, want 0", got)
+	}
+}
+
+func TestBuildVectorIntTree_OutOfBoundsSymbolIndex(t *testing.T) {
+	g := New("d0", functions.VectorInts)
+	f := g.buildVectorIntTree(len(g.Symbols), g.getArgOrder())
+	if got := f([]VectorInt{{1, 2, 3}}); len(got) != 0 {
+		t.Fatalf("buildVectorIntTree out-of-bounds fallback = %v, want empty vector", got)
+	}
+}
+
 func TestGetBoolArgOrder(t *testing.T) {
 	nand := New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0", functions.Bool)
 	got := nand.getArgOrder()

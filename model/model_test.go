@@ -77,3 +77,28 @@ func TestReplication(t *testing.T) {
 		t.Errorf("replication = %v individuals, want %v", got, want)
 	}
 }
+
+func TestGetBestHandlesAllNegativeScores(t *testing.T) {
+	g1 := &genome.Genome{}
+	g2 := &genome.Genome{}
+	g3 := &genome.Genome{}
+	scores := map[*genome.Genome]float64{
+		g1: -100,
+		g2: -1,
+		g3: -50,
+	}
+	g := &Generation{
+		Individuals: []*genome.Genome{g1, g2, g3},
+		ScoringFunc: func(gn *genome.Genome) float64 {
+			return scores[gn]
+		},
+	}
+
+	got := g.getBest()
+	if got != g2 {
+		t.Fatalf("getBest() = %p (score=%v), want %p (score=%v)", got, got.Score, g2, g2.Score)
+	}
+	if got.Score != -1 {
+		t.Fatalf("getBest() score = %v, want -1", got.Score)
+	}
+}
