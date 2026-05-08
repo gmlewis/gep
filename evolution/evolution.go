@@ -38,9 +38,9 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"sync"
 
 	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/evolution/evaluation"
 )
 
 // ScoringFunc computes a fitness score for a genome.
@@ -181,25 +181,13 @@ func (g *Generation[T]) Evaluate() {
 	if g.ScoringFunc == nil {
 		return
 	}
-	type result struct {
-		idx   int
-		score float64
-	}
-	ch := make(chan result, len(g.Individuals))
-	var wg sync.WaitGroup
+	genomes := make([]core.Genome[T], len(g.Individuals))
 	for i, ind := range g.Individuals {
-		wg.Add(1)
-		go func(idx int, genome core.Genome[T]) {
-			defer wg.Done()
-			ch <- result{idx: idx, score: g.ScoringFunc(genome)}
-		}(i, ind.Genome)
+		genomes[i] = ind.Genome
 	}
-	go func() {
-		wg.Wait()
-		close(ch)
-	}()
-	for r := range ch {
-		g.Individuals[r.idx].Score = r.score
+	scores := evaluation.ScoreAll(genomes, evaluation.ScoringFunc[T](g.ScoringFunc), evaluation.Config{})
+	for i, score := range scores {
+		g.Individuals[i].Score = score
 	}
 }
 
