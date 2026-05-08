@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/evolution/mutation"
 )
 
 // --- helpers ---
@@ -441,4 +442,112 @@ func TestEvolve_MaxIterationsReturnsCurrentBest(t *testing.T) {
 		t.Fatal("Evolve did not evaluate genomes before returning")
 	}
 	_ = best
+}
+
+// --- Mutate tests ---
+
+func TestMutate_PreservesPopulationSize(t *testing.T) {
+	g := newTestGeneration(t, 5, nil)
+	before := len(g.Individuals)
+	g.Mutate()
+	if got := len(g.Individuals); got != before {
+		t.Fatalf("Mutate changed population size: got %d, want %d", got, before)
+	}
+}
+
+func TestMutate_ZeroRates_GenomesUnchanged(t *testing.T) {
+	// With all zero rates, Mutate must not alter any genome.
+	g := newTestGeneration(t, 6, nil)
+	origKarvas := make([]string, len(g.Individuals))
+	for i, ind := range g.Individuals {
+		origKarvas[i] = ind.Genome.KarvaString()
+	}
+	g.Mutate()
+	for i, ind := range g.Individuals {
+		if ind.Genome.KarvaString() != origKarvas[i] {
+			t.Errorf("individual[%d] changed with zero mutation rates", i)
+		}
+	}
+}
+
+func TestMutate_PointMutation_ChangesAtLeastOneGenome(t *testing.T) {
+	// With PointMutationRate=1.0 every gene is mutated; some genomes must differ.
+	g := newTestGeneration(t, 10, nil)
+	origKarvas := make([]string, len(g.Individuals))
+	for i, ind := range g.Individuals {
+		origKarvas[i] = ind.Genome.KarvaString()
+	}
+	g.MutationConfig = mutation.Config{PointMutationRate: 1.0}
+	g.Mutate()
+	changed := 0
+	for i, ind := range g.Individuals {
+		if ind.Genome.KarvaString() != origKarvas[i] {
+			changed++
+		}
+	}
+	if changed == 0 {
+		t.Fatal("PointMutationRate=1.0: no genomes were changed by Mutate")
+	}
+}
+
+func TestMutate_MutatedGenomesAreValid(t *testing.T) {
+	g := newTestGeneration(t, 10, nil)
+	g.MutationConfig = mutation.Config{
+		PointMutationRate:    1.0,
+		InversionRate:        1.0,
+		ISTranspositionRate:  1.0,
+		MaxISLen:             2,
+		RISTranspositionRate: 1.0,
+		MaxRISLen:            2,
+		GeneTranspositionRate: 1.0,
+	}
+	g.Mutate()
+	for i, ind := range g.Individuals {
+		if err := ind.Genome.Validate(); err != nil {
+			t.Errorf("individual[%d].Genome invalid after Mutate: %v", i, err)
+		}
+	}
+}
+
+func TestMutate_HeadSizeOverriddenFromGeneration(t *testing.T) {
+	// Mutate must use the headSize stored at construction time, not any value
+	// left in MutationConfig. We verify this by setting a deliberately wrong
+	// HeadSize in MutationConfig; the mutation should still produce valid genomes.
+	g := newTestGeneration(t, 8, nil)
+	g.MutationConfig = mutation.Config{
+		PointMutationRate: 1.0,
+		HeadSize:          9999, // will be overridden internally
+	}
+	g.Mutate()
+	for i, ind := range g.Individuals {
+		if err := ind.Genome.Validate(); err != nil {
+			t.Errorf("individual[%d].Genome invalid: %v", i, err)
+		}
+	}
+}
+
+func TestEvolve_WithMutation_StillConverges(t *testing.T) {
+	// Evolve must still converge when mutation operators are active.
+	var callCount atomic.Int64
+	sf := func(core.Genome[int]) float64 {
+		n := callCount.Add(1)
+		if n >= int64(5*10) {
+			return 1000.0
+		}
+		return 0.0
+	}
+	g := newTestGeneration(t, 13, sf)
+	g.MutationConfig = mutation.Config{
+		PointMutationRate:    0.1,
+		InversionRate:        0.1,
+		ISTranspositionRate:  0.1,
+		MaxISLen:             2,
+		RISTranspositionRate: 0.1,
+		MaxRISLen:            2,
+		GeneTranspositionRate: 0.1,
+	}
+	best := g.Evolve(200)
+	if best.Score < 1000.0 {
+		t.Fatalf("Evolve with mutation: best.Score=%v, want >= 1000", best.Score)
+	}
 }
