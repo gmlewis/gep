@@ -5,7 +5,7 @@
 // Package evolution provides a typed generic GEP evolution engine built on the
 // core package.
 //
-// This is Phase 3 of the GEP modernisation roadmap: the evolution engine is
+// This is Phase 3 of the GEP modernization roadmap: the evolution engine is
 // rebuilt as an explicit, configurable, and independently testable subsystem.
 // The package currently implements the foundation layer:
 //
@@ -89,7 +89,7 @@ func (g *Generation[T]) randFloat64() float64 {
 }
 
 // effectiveScore maps a raw score to an internal "higher is better" scale so
-// that both maximisation and minimisation can share the same selection logic.
+// that both maximization and minimization can share the same selection logic.
 func (g *Generation[T]) effectiveScore(score float64) float64 {
 	if g.MinimizeScore {
 		return -score
