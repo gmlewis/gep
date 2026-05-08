@@ -36,11 +36,11 @@ package evolution
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
 
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution/evaluation"
+	"github.com/gmlewis/gep/v2/evolution/selection"
 )
 
 // ScoringFunc computes a fitness score for a genome.
@@ -83,22 +83,6 @@ type Generation[T any] struct {
 	// When nil (as created by New), the global math/rand source is used.
 	// Use NewWithSeed to obtain a fully deterministic Generation.
 	rng *rand.Rand
-}
-
-// randIntn returns a random int in [0, n) using g.rng when non-nil.
-func (g *Generation[T]) randIntn(n int) int {
-	if g.rng != nil {
-		return g.rng.Intn(n)
-	}
-	return rand.Intn(n) //nolint:gosec
-}
-
-// randFloat64 returns a random float64 in [0.0, 1.0) using g.rng when non-nil.
-func (g *Generation[T]) randFloat64() float64 {
-	if g.rng != nil {
-		return g.rng.Float64()
-	}
-	return rand.Float64() //nolint:gosec
 }
 
 // effectiveScore maps a raw score to an internal "higher is better" scale so
@@ -217,41 +201,19 @@ func (g *Generation[T]) BestIndividual() Individual[T] {
 // The method is safe to call even when all individuals have equal scores
 // (every individual has an equal probability of being selected in that case).
 func (g *Generation[T]) Select() {
-	// Map effective scores into the [0.1, 1.0] range so all weights are
-	// strictly positive.  A weight of exactly 0 would stall the beta loop.
-	minEff := math.Inf(1)
-	maxEff := math.Inf(-1)
-	for _, ind := range g.Individuals {
-		e := g.effectiveScore(ind.Score)
-		if e < minEff {
-			minEff = e
-		}
-		if e > maxEff {
-			maxEff = e
-		}
-	}
-	scale := maxEff - minEff
-	if scale <= 0 {
-		scale = 1.0
-	}
-	scaledScore := func(score float64) float64 {
-		return 0.1 + (g.effectiveScore(score)-minEff)/scale
+	candidates := make([]selection.Candidate[T], len(g.Individuals))
+	for i, ind := range g.Individuals {
+		candidates[i] = selection.Candidate[T]{Genome: ind.Genome, Score: ind.Score}
 	}
 
-	result := make([]Individual[T], 0, len(g.Individuals))
-	idx := g.randIntn(len(g.Individuals))
-	beta := 0.0
-	for range g.Individuals {
-		beta += g.randFloat64() * 2.0
-		s := scaledScore(g.Individuals[idx].Score)
-		for beta > s {
-			beta -= s
-			idx = (idx + 1) % len(g.Individuals)
-			s = scaledScore(g.Individuals[idx].Score)
-		}
-		result = append(result, g.Individuals[idx].Dup())
+	selected := selection.Roulette(candidates, selection.Config{
+		MinimizeScore: g.MinimizeScore,
+	}, g.rng)
+
+	g.Individuals = make([]Individual[T], len(selected))
+	for i, ind := range selected {
+		g.Individuals[i] = Individual[T]{Genome: ind.Genome, Score: ind.Score}
 	}
-	g.Individuals = result
 }
 
 // Evolve runs the GEP algorithm for up to iterations generations.
