@@ -56,7 +56,7 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 		}
 
 		if n := g.numTerminals - len(g.Constants); index >= n {
-			return "", fmt.Errorf("programming error: terminal symbol name %q exceeds number of terminals (%v)", sym, n)
+			return "", fmt.Errorf("terminal symbol name %q exceeds number of terminals (%v)", sym, n)
 		}
 		return fmt.Sprintf("d[%v]", index), nil
 	}
@@ -68,7 +68,7 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 		}
 
 		if index >= len(g.Constants) {
-			return "", fmt.Errorf("programming error: constant symbol name %q exceeds length of constant slice (%v)", sym, len(g.Constants))
+			return "", fmt.Errorf("constant symbol name %q exceeds length of constant slice (%v)", sym, len(g.Constants))
 		}
 		return fmt.Sprintf("%v", g.Constants[index]), nil
 	}

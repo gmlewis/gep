@@ -98,7 +98,7 @@ func TestGetBestHandlesAllNegativeScores(t *testing.T) {
 	if got != g2 {
 		t.Fatalf("getBest() = %p (score=%v), want %p (score=%v)", got, got.Score, g2, g2.Score)
 	}
-	if got.Score != -1 {
-		t.Fatalf("getBest() score = %v, want -1", got.Score)
+	if scores[got] != -1 {
+		t.Fatalf("getBest() score = %v, want -1", scores[got])
 	}
 }
