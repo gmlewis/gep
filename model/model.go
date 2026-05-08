@@ -25,8 +25,33 @@ type Generation struct {
 	Individuals []*genome.Genome
 	Funcs       []gene.FuncWeight
 	ScoringFunc genome.ScoringFunc
+	// StopFunc is an optional callback that is called after each generation's
+	// best genome is evaluated. When StopFunc returns true, evolution halts
+	// early and the best genome is returned. When nil, the default stopping
+	// criterion of Score >= 1000 is used.
+	StopFunc func(*genome.Genome) bool
 
 	debug bool
+	// rng is an optional seeded random source for reproducible evolution.
+	// When nil (as produced by New), the global math/rand source is used.
+	// Use NewWithSeed to obtain a fully deterministic Generation.
+	rng *rand.Rand
+}
+
+// randIntn returns a random int in [0, n) using g.rng when set, else the global source.
+func (g *Generation) randIntn(n int) int {
+	if g.rng != nil {
+		return g.rng.Intn(n)
+	}
+	return rand.Intn(n)
+}
+
+// randFloat64 returns a random float64 in [0.0, 1.0) using g.rng when set, else the global source.
+func (g *Generation) randFloat64() float64 {
+	if g.rng != nil {
+		return g.rng.Float64()
+	}
+	return rand.Float64()
 }
 
 // New creates a new random generation of the model.
@@ -50,31 +75,75 @@ func New(
 	linkFunc string,
 	sf genome.ScoringFunc,
 	debug bool) *Generation {
+	return newGeneration(nil, fs, funcType, numIndividuals, headSize, numGenesPerGenome, numTerminals, numConstants, linkFunc, sf, debug)
+}
+
+// NewWithSeed creates a new random generation of the model seeded for deterministic
+// reproducibility. Two calls to NewWithSeed with the same seed and identical parameters
+// will produce identical populations and identical evolution trajectories.
+func NewWithSeed(
+	seed int64,
+	fs []gene.FuncWeight,
+	funcType functions.FuncType,
+	numIndividuals,
+	headSize,
+	numGenesPerGenome,
+	numTerminals,
+	numConstants int,
+	linkFunc string,
+	sf genome.ScoringFunc,
+	debug bool) *Generation {
+	rng := rand.New(rand.NewSource(seed))
+	return newGeneration(rng, fs, funcType, numIndividuals, headSize, numGenesPerGenome, numTerminals, numConstants, linkFunc, sf, debug)
+}
+
+// newGeneration is the shared internal constructor used by New and NewWithSeed.
+func newGeneration(
+	rng *rand.Rand,
+	fs []gene.FuncWeight,
+	funcType functions.FuncType,
+	numIndividuals,
+	headSize,
+	numGenesPerGenome,
+	numTerminals,
+	numConstants int,
+	linkFunc string,
+	sf genome.ScoringFunc,
+	debug bool) *Generation {
 	r := &Generation{
 		Individuals: make([]*genome.Genome, numIndividuals),
 		Funcs:       fs,
 		ScoringFunc: sf,
 		debug:       debug,
+		rng:         rng,
 	}
 	n := maxArity(fs, funcType)
 	tailSize := headSize*(n-1) + 1
 	for i := range r.Individuals {
 		genes := make([]*gene.Gene, numGenesPerGenome)
 		for j := range genes {
-			genes[j] = gene.RandomNew(headSize, tailSize, numTerminals, numConstants, fs, funcType)
+			genes[j] = gene.RandomNew(headSize, tailSize, numTerminals, numConstants, fs, funcType, rng)
 		}
-		r.Individuals[i] = genome.New(genes, linkFunc)
+		r.Individuals[i] = genome.New(genes, linkFunc, rng)
 	}
 	return r
 }
 
-// Evolve runs the GEP algorithm for the given number of iterations, or until a score of 1000 (or more) is reached.
+// Evolve runs the GEP algorithm for the given number of iterations.
+// Evolution stops early when StopFunc (if set) returns true for the current best
+// genome. When StopFunc is nil, the default criterion of Score >= 1000 is used.
 func (g *Generation) Evolve(iterations int) *genome.Genome {
 	// Algorithm flow diagram, figure 3.1, book page 56
 	for i := 0; i < iterations; i++ {
 		// fmt.Printf("Iteration #%v...\n", i)
 		bestGenome := g.getBest() // Preserve the best genome
-		if bestGenome.Score >= 1000.0 {
+		stop := false
+		if g.StopFunc != nil {
+			stop = g.StopFunc(bestGenome)
+		} else {
+			stop = bestGenome.Score >= 1000.0
+		}
+		if stop {
 			fmt.Printf("Stopping after generation #%v\n", i)
 			return bestGenome
 		}
@@ -124,10 +193,10 @@ func (g *Generation) replication() {
 	f := func(v float64) float64 { return 0.1 + (v-minWeight)/weightScale }
 
 	result := make([]*genome.Genome, 0, len(g.Individuals))
-	index := rand.Intn(len(g.Individuals))
+	index := g.randIntn(len(g.Individuals))
 	beta := 0.0
 	for i := 0; i < len(g.Individuals); i++ {
-		beta += rand.Float64() * 2.0
+		beta += g.randFloat64() * 2.0
 		scaledScore := f(g.Individuals[index].Score)
 		for beta > scaledScore {
 			beta -= scaledScore
@@ -141,7 +210,7 @@ func (g *Generation) replication() {
 func (g *Generation) singleMutation(index int) {
 	gen := g.Individuals[index]
 	// Determine the total number of mutations to perform within the genome
-	numMutations := 1 + rand.Intn(2)
+	numMutations := 1 + g.randIntn(2)
 	// fmt.Printf("\nMutating genome #%v %v times, before:\n%v\n", genomeNum, numMutations, genome)
 	gen.Mutate(numMutations)
 	// fmt.Printf("after:\n%v\n", gen)
@@ -149,10 +218,10 @@ func (g *Generation) singleMutation(index int) {
 
 func (g *Generation) mutation() {
 	// Determine the total number of individuals to mutate
-	numMutations := 1 + rand.Intn(len(g.Individuals)-1)
+	numMutations := 1 + g.randIntn(len(g.Individuals)-1)
 	for i := 0; i < numMutations; i++ {
 		// Pick a random genome
-		genomeNum := rand.Intn(len(g.Individuals))
+		genomeNum := g.randIntn(len(g.Individuals))
 		g.singleMutation(genomeNum)
 	}
 }
@@ -162,9 +231,9 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 	genome2 := g.Individuals[idx2]
 
 	// Pick a random gene from genome1 and genome2
-	geneIdx1 := rand.Intn(len(genome1.Genes))
+	geneIdx1 := g.randIntn(len(genome1.Genes))
 	gene1 := genome1.Genes[geneIdx1]
-	geneIdx2 := rand.Intn(len(genome2.Genes))
+	geneIdx2 := g.randIntn(len(genome2.Genes))
 	gene2 := genome2.Genes[geneIdx2]
 
 	if len(gene1.Symbols) != len(gene2.Symbols) || gene1.HeadSize != gene2.HeadSize {
@@ -174,7 +243,7 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 
 	// Pick a random location within the head of both gene's symbols to crossover.
 	// The length of both symbols slices will stay the same.
-	symbolIdx := rand.Intn(gene1.HeadSize)
+	symbolIdx := g.randIntn(gene1.HeadSize)
 	head1, tail1 := gene1.Symbols[:gene1.HeadSize], gene1.Symbols[gene1.HeadSize:]
 	head2, tail2 := gene2.Symbols[:gene2.HeadSize], gene2.Symbols[gene2.HeadSize:]
 	newSyms1 := append([]string{}, head2[symbolIdx:]...)
@@ -211,13 +280,13 @@ func (g *Generation) crossover() {
 	}
 
 	// Determine the total number of individuals pairs to crossover
-	numCrossovers := 1 + rand.Intn(len(g.Individuals)-1)
+	numCrossovers := 1 + g.randIntn(len(g.Individuals)-1)
 	for i := 0; i < numCrossovers; i++ {
 		// Pick two random genomes
-		genomeNum1 := rand.Intn(len(g.Individuals))
+		genomeNum1 := g.randIntn(len(g.Individuals))
 		var genomeNum2 int
 		for {
-			genomeNum2 = rand.Intn(len(g.Individuals))
+			genomeNum2 = g.randIntn(len(g.Individuals))
 			if genomeNum2 != genomeNum1 {
 				break
 			}

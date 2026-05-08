@@ -5,6 +5,7 @@
 package model
 
 import (
+	"sync/atomic"
 	"testing"
 
 	"github.com/gmlewis/gep/v2/functions"
@@ -153,5 +154,152 @@ func TestSingleCrossover_InvalidatesGeneCaches(t *testing.T) {
 	}
 	if got := gene2.EvalMath([]float64{10, 20}); got != 10 {
 		t.Fatalf("gene2.EvalMath(after) = %v, want 10", got)
+	}
+}
+
+// TestEvolve_StopFuncHaltsBeforeMaxIterations verifies that a custom StopFunc
+// terminates evolution as soon as it returns true, without requiring Score >= 1000.
+func TestEvolve_StopFuncHaltsBeforeMaxIterations(t *testing.T) {
+	funcs := []gene.FuncWeight{
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
+	}
+	stopAfter := 3
+	callCount := 0
+	g := New(funcs, functions.Float64, 10, 4, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
+		return 0.5 // never reaches 1000
+	}, false)
+	g.StopFunc = func(best *genome.Genome) bool {
+		callCount++
+		return callCount >= stopAfter
+	}
+	g.Evolve(1000)
+	if callCount != stopAfter {
+		t.Fatalf("StopFunc called %v times, want %v", callCount, stopAfter)
+	}
+}
+
+// TestEvolve_NilStopFuncUsesDefaultThreshold verifies that when StopFunc is nil,
+// evolution stops when the best genome's score reaches 1000.
+func TestEvolve_NilStopFuncUsesDefaultThreshold(t *testing.T) {
+	funcs := []gene.FuncWeight{
+		{Symbol: "+", Weight: 1},
+	}
+	var callCount atomic.Int64
+	g := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
+		n := callCount.Add(1)
+		if n >= 3 {
+			return 1000.0 // triggers default stop
+		}
+		return 0.0
+	}, false)
+	// StopFunc is nil — default threshold of 1000 applies
+	best := g.Evolve(100)
+	if best.Score < 1000.0 {
+		t.Fatalf("expected best.Score >= 1000, got %v", best.Score)
+	}
+}
+
+// TestNewWithSeed_DeterministicPopulation verifies that two calls to NewWithSeed
+// with identical parameters and the same seed produce identical initial populations.
+func TestNewWithSeed_DeterministicPopulation(t *testing.T) {
+	funcs := []gene.FuncWeight{
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
+	}
+	const seed = int64(42)
+	g1 := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	g2 := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+
+	if len(g1.Individuals) != len(g2.Individuals) {
+		t.Fatalf("population sizes differ: %v vs %v", len(g1.Individuals), len(g2.Individuals))
+	}
+	for i, ind1 := range g1.Individuals {
+		ind2 := g2.Individuals[i]
+		for j, g := range ind1.Genes {
+			g2g := ind2.Genes[j]
+			if len(g.Symbols) != len(g2g.Symbols) {
+				t.Fatalf("individual[%v].gene[%v]: symbol count %v != %v", i, j, len(g.Symbols), len(g2g.Symbols))
+			}
+			for k, sym := range g.Symbols {
+				if sym != g2g.Symbols[k] {
+					t.Fatalf("individual[%v].gene[%v].symbol[%v]: %q != %q", i, j, k, sym, g2g.Symbols[k])
+				}
+			}
+		}
+	}
+}
+
+// TestNewWithSeed_DifferentSeedsProduceDifferentPopulations verifies that different
+// seeds lead to different populations (with overwhelming probability).
+func TestNewWithSeed_DifferentSeedsProduceDifferentPopulations(t *testing.T) {
+	funcs := []gene.FuncWeight{
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
+	}
+	g1 := NewWithSeed(1, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	g2 := NewWithSeed(2, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+
+	different := false
+	for i, ind1 := range g1.Individuals {
+		ind2 := g2.Individuals[i]
+		for j, g := range ind1.Genes {
+			g2g := ind2.Genes[j]
+			for k, sym := range g.Symbols {
+				if sym != g2g.Symbols[k] {
+					different = true
+					break
+				}
+			}
+			if different {
+				break
+			}
+		}
+		if different {
+			break
+		}
+	}
+	if !different {
+		t.Fatal("populations from different seeds are identical; expected differences")
+	}
+}
+
+// TestNewWithSeed_DeterministicEvolution verifies that two identical seeded
+// generations produce the same evolution trajectory after one Evolve step.
+func TestNewWithSeed_DeterministicEvolution(t *testing.T) {
+	funcs := []gene.FuncWeight{
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
+	}
+	const seed = int64(77)
+	scorer := func(gn *genome.Genome) float64 { return 0.0 }
+
+	g1 := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
+	g2 := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
+
+	// Run one step of evolution on each
+	g1.getBest()
+	g1.replication()
+	g1.mutation()
+
+	g2.getBest()
+	g2.replication()
+	g2.mutation()
+
+	// Populations should be identical after deterministic operations
+	for i, ind1 := range g1.Individuals {
+		ind2 := g2.Individuals[i]
+		for j, g := range ind1.Genes {
+			g2g := ind2.Genes[j]
+			for k, sym := range g.Symbols {
+				if sym != g2g.Symbols[k] {
+					t.Fatalf("after evolution: individual[%v].gene[%v].symbol[%v]: %q != %q", i, j, k, sym, g2g.Symbols[k])
+				}
+			}
+		}
 	}
 }

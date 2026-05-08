@@ -6,6 +6,7 @@ package gene
 
 import (
 	"math"
+	"math/rand"
 	"reflect"
 	"testing"
 
@@ -439,4 +440,86 @@ func BenchmarkDup(b *testing.B) {
 		v = g.Dup()
 	}
 	result = v
+}
+
+// TestRandomNew_SeededIsDeterministic verifies that two calls to RandomNew with
+// the same seeded *rand.Rand produce identical genes.
+func TestRandomNew_SeededIsDeterministic(t *testing.T) {
+	headSize := 6
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 3
+	numConstants := 2
+	funcs := []FuncWeight{
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
+	}
+	rng1 := rand.New(rand.NewSource(42))
+	rng2 := rand.New(rand.NewSource(42))
+
+	g1 := RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64, rng1)
+	g2 := RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64, rng2)
+
+	if len(g1.Symbols) != len(g2.Symbols) {
+		t.Fatalf("symbol count mismatch: %v vs %v", len(g1.Symbols), len(g2.Symbols))
+	}
+	for i, sym := range g1.Symbols {
+		if sym != g2.Symbols[i] {
+			t.Fatalf("symbol[%v]: %q != %q", i, sym, g2.Symbols[i])
+		}
+	}
+}
+
+// TestRandomNew_DifferentSeedsProduceDifferentGenes verifies that different seeds
+// produce different genes (with overwhelming probability given a non-trivial gene size).
+func TestRandomNew_DifferentSeedsProduceDifferentGenes(t *testing.T) {
+	headSize := 6
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 3
+	numConstants := 0
+	funcs := []FuncWeight{
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+		{Symbol: "*", Weight: 1},
+	}
+	rng1 := rand.New(rand.NewSource(1))
+	rng2 := rand.New(rand.NewSource(2))
+
+	g1 := RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64, rng1)
+	g2 := RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64, rng2)
+
+	different := false
+	for i, sym := range g1.Symbols {
+		if i < len(g2.Symbols) && sym != g2.Symbols[i] {
+			different = true
+			break
+		}
+	}
+	if !different {
+		t.Fatal("genes from different seeds are identical; expected differences")
+	}
+}
+
+// TestRandomNew_GlobalRandUsedWhenNoRngProvided verifies that RandomNew works
+// correctly when no rng is provided (falls back to global math/rand source).
+func TestRandomNew_GlobalRandUsedWhenNoRngProvided(t *testing.T) {
+	headSize := 4
+	maxArity := 2
+	tailSize := headSize*(maxArity-1) + 1
+	numTerminals := 2
+	numConstants := 0
+	funcs := []FuncWeight{
+		{Symbol: "+", Weight: 1},
+		{Symbol: "-", Weight: 1},
+	}
+	g := RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
+	if g == nil {
+		t.Fatal("RandomNew() returned nil")
+	}
+	want := headSize + tailSize
+	if got := len(g.Symbols); got != want {
+		t.Fatalf("len(Symbols) = %v, want %v", got, want)
+	}
 }

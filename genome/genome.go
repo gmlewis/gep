@@ -31,11 +31,28 @@ type Genome struct {
 	Score    float64
 
 	SymbolMap map[string]int // do not use directly.  Use SymbolCount() instead.
+	// rng is an optional seeded random source for reproducible evolution.
+	// When nil, the global math/rand source is used.
+	rng *rand.Rand
 }
 
 // New creates a new genome from the given genes and linking function.
-func New(genes []*gene.Gene, linkFunc string) *Genome {
-	return &Genome{Genes: genes, LinkFunc: linkFunc}
+// An optional *rand.Rand may be passed as the last argument to enable
+// deterministic mutation; if omitted or nil, the global math/rand source is used.
+func New(genes []*gene.Gene, linkFunc string, rngs ...*rand.Rand) *Genome {
+	var rng *rand.Rand
+	if len(rngs) > 0 {
+		rng = rngs[0]
+	}
+	return &Genome{Genes: genes, LinkFunc: linkFunc, rng: rng}
+}
+
+// randIntn returns a random int in [0, n) using g.rng when set, else the global source.
+func (g *Genome) randIntn(n int) int {
+	if g.rng != nil {
+		return g.rng.Intn(n)
+	}
+	return rand.Intn(n)
 }
 
 func merge(dst *map[string]int, src map[string]int) {
@@ -97,7 +114,7 @@ func (g Genome) DotGraph() string {
 // Mutate mutates a genome by performing numMutations random symbol exchanges within the genome.
 func (g *Genome) Mutate(numMutations int) {
 	for i := 0; i < numMutations; i++ {
-		n := rand.Intn(len(g.Genes))
+		n := g.randIntn(len(g.Genes))
 		// fmt.Printf("\nMutating gene #%v, before:\n%v\n", n, g.Genes[n])
 		g.Genes[n].Mutate()
 		// fmt.Printf("after:\n%v\n", g.Genes[n])
@@ -115,6 +132,7 @@ func (g *Genome) Dup() *Genome {
 		Genes:    make([]*gene.Gene, len(g.Genes)),
 		LinkFunc: g.LinkFunc,
 		Score:    g.Score,
+		rng:      g.rng,
 	}
 	for i := range g.Genes {
 		dst.Genes[i] = g.Genes[i].Dup()

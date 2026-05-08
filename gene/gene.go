@@ -50,6 +50,33 @@ type Gene struct {
 	// are entirely inputs ("d*") and constants ("c*") whereas all
 	// choices following that are strictly function symbols.
 	numTerminals int
+	// rng is an optional seeded random source for reproducible evolution.
+	// When nil, the global math/rand source is used.
+	rng *rand.Rand
+}
+
+// randIntn returns a random int in [0, n) using g.rng when set, else the global source.
+func (g *Gene) randIntn(n int) int {
+	if g.rng != nil {
+		return g.rng.Intn(n)
+	}
+	return rand.Intn(n)
+}
+
+// randFloat64 returns a random float64 in [0.0, 1.0) using g.rng when set, else the global source.
+func (g *Gene) randFloat64() float64 {
+	if g.rng != nil {
+		return g.rng.Float64()
+	}
+	return rand.Float64()
+}
+
+// randPerm returns a random permutation of [0, n) using g.rng when set, else the global source.
+func (g *Gene) randPerm(n int) []int {
+	if g.rng != nil {
+		return g.rng.Perm(n)
+	}
+	return rand.Perm(n)
 }
 
 // New creates a new gene based on the Karva string representation.
@@ -89,7 +116,13 @@ func New(x string, funcType functions.FuncType) *Gene {
 // algorithm. The headSize, tailSize, numTerminals, and numConstants determine the respective
 // properties of the gene, and functions provide the available functions and
 // their respective weights to be used in the creation of the gene.
-func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []FuncWeight, funcType functions.FuncType) *Gene {
+// An optional *rand.Rand may be passed as the last argument to enable deterministic
+// gene generation; if omitted or nil, the global math/rand source is used.
+func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []FuncWeight, funcType functions.FuncType, rngs ...*rand.Rand) *Gene {
+	var rng *rand.Rand
+	if len(rngs) > 0 {
+		rng = rngs[0]
+	}
 	totalWeight := numTerminals + numConstants
 	for _, f := range functions {
 		totalWeight += f.Weight
@@ -99,16 +132,6 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 		choiceSlice = append(choiceSlice, fmt.Sprintf("d%v", i))
 	}
 	constants := make([]float64, 0, numConstants)
-	for i := 0; i < numConstants; i++ {
-		choiceSlice = append(choiceSlice, fmt.Sprintf("c%v", i))
-		constants = append(constants, math.Round(constRange*rand.Float64()))
-	}
-	for _, f := range functions {
-		for i := 0; i < f.Weight; i++ {
-			choiceSlice = append(choiceSlice, f.Symbol)
-		}
-	}
-	choices := rand.Perm(totalWeight)
 	r := &Gene{
 		Symbols:      make([]string, 0, headSize+tailSize),
 		Constants:    constants,
@@ -116,7 +139,19 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 		HeadSize:     headSize,
 		choiceSlice:  choiceSlice,
 		numTerminals: numTerminals + numConstants,
+		rng:          rng,
 	}
+	for i := 0; i < numConstants; i++ {
+		choiceSlice = append(choiceSlice, fmt.Sprintf("c%v", i))
+		r.Constants = append(r.Constants, math.Round(constRange*r.randFloat64()))
+	}
+	for _, f := range functions {
+		for i := 0; i < f.Weight; i++ {
+			choiceSlice = append(choiceSlice, f.Symbol)
+		}
+	}
+	r.choiceSlice = choiceSlice
+	choices := r.randPerm(totalWeight)
 	for i := 0; i < headSize; i++ { // head is made up of any symbol (function, input, or constant)
 		choice := choices[i%len(choices)]
 		r.Symbols = append(r.Symbols, choiceSlice[choice])
@@ -183,7 +218,7 @@ func (g *Gene) SymbolCount(sym string) int {
 
 // Mutate mutates a gene by performing a single random symbol exchange within the gene.
 func (g *Gene) Mutate() {
-	position := rand.Intn(len(g.Symbols))
+	position := g.randIntn(len(g.Symbols))
 	if g.numTerminals < 2 {
 		position %= g.HeadSize // Force choice to be within the head
 	}
@@ -194,7 +229,7 @@ func (g *Gene) Mutate() {
 		}
 		symbol := g.Symbols[position]
 		for symbol == g.Symbols[position] { // Force new symbol to be different from old one
-			n := rand.Intn(len(g.choiceSlice))
+			n := g.randIntn(len(g.choiceSlice))
 			symbol = g.choiceSlice[n]
 		}
 		// fmt.Printf("\nChanging symbol #%v from %q to %q\n", position, g.Symbols[position], symbol)
@@ -202,7 +237,7 @@ func (g *Gene) Mutate() {
 	} else { // Must choose strictly from terminals
 		terminal := g.Symbols[position]
 		for terminal == g.Symbols[position] { // Force new terminal to be different from old one
-			n := rand.Intn(g.numTerminals)
+			n := g.randIntn(g.numTerminals)
 			terminal = g.choiceSlice[n]
 		}
 		// fmt.Printf("\nChanging terminal #%v from %q to %q\n", position, g.Symbols[position], terminal)
@@ -224,6 +259,7 @@ func (g *Gene) Dup() *Gene {
 		HeadSize:     g.HeadSize,
 		choiceSlice:  make([]string, len(g.choiceSlice)),
 		numTerminals: g.numTerminals,
+		rng:          g.rng,
 	}
 	copy(r.Symbols, g.Symbols)
 	copy(r.Constants, g.Constants)
