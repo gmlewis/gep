@@ -17,10 +17,12 @@
 //   - BestIndividual – returns the best individual, respecting both maximization
 //     and minimization orientations.
 //   - Select – roulette-wheel (fitness-proportionate) selection.
+//   - Recombine – applies configurable crossover operators (one-point and
+//     two-point recombination) to the population.
 //   - Mutate – applies configurable genetic operators (point mutation, inversion,
 //     IS/RIS transposition, gene transposition) to the population.
 //   - Evolve – runs the complete evolution loop (evaluate → stop-check → select →
-//     mutate → elitism) for a given number of iterations.
+//     recombine → mutate → elitism) for a given number of iterations.
 //
 // Typical usage:
 //
@@ -49,6 +51,7 @@ import (
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution/evaluation"
 	"github.com/gmlewis/gep/v2/evolution/mutation"
+	"github.com/gmlewis/gep/v2/evolution/recombination"
 	"github.com/gmlewis/gep/v2/evolution/selection"
 )
 
@@ -92,6 +95,10 @@ type Generation[T any] struct {
 	// selection and at what rates. Zero values disable the corresponding
 	// operators. See evolution/mutation.Config for details.
 	MutationConfig mutation.Config
+
+	// RecombinationConfig controls one-point and two-point crossover rates
+	// applied after selection. Zero values disable recombination operators.
+	RecombinationConfig recombination.Config
 
 	// cat is the typed function catalog used for point mutation.
 	cat *core.Catalog[T]
@@ -247,6 +254,23 @@ func (g *Generation[T]) Select() {
 	}
 }
 
+// Recombine applies configured crossover operators to the current population
+// in place, replacing each individual with a (possibly recombined) offspring.
+//
+// When both rates are zero (the default), Recombine is effectively a no-op that
+// deep-copies the current population.
+func (g *Generation[T]) Recombine() {
+	genomes := make([]core.Genome[T], len(g.Individuals))
+	for i, ind := range g.Individuals {
+		genomes[i] = ind.Genome
+	}
+
+	recombined := recombination.Apply(genomes, g.RecombinationConfig, g.rng)
+	for i, genome := range recombined {
+		g.Individuals[i].Genome = genome
+	}
+}
+
 // Mutate applies the configured genetic operators to the current population
 // in place, replacing each individual with a (possibly mutated) offspring.
 //
@@ -285,8 +309,9 @@ func (g *Generation[T]) Mutate() {
 //     If met, returns the best individual immediately.
 //  4. Saves a deep copy of the best individual (elitism).
 //  5. Replaces the population via roulette-wheel selection (calls Select).
-//  6. Applies configured genetic operators to the population (calls Mutate).
-//  7. Restores the saved best individual to position 0 (elitism guarantee).
+//  6. Applies configured crossover operators to the population (calls Recombine).
+//  7. Applies configured genetic operators to the population (calls Mutate).
+//  8. Restores the saved best individual to position 0 (elitism guarantee).
 //
 // If the loop completes without triggering the stopping criterion, Evolve
 // performs a final Evaluate and returns BestIndividual.
@@ -307,6 +332,7 @@ func (g *Generation[T]) Evolve(iterations int) Individual[T] {
 
 		saveBest := best.Dup()
 		g.Select()
+		g.Recombine()
 		g.Mutate()
 		// Elitism: ensure the best individual survives to the next generation.
 		g.Individuals[0] = saveBest
