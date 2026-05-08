@@ -134,13 +134,12 @@ func (g Gene) String() string {
 	for _, s := range g.Symbols {
 		if strings.HasPrefix(s, "c") {
 			i, err := strconv.Atoi(s[1:])
-			if err != nil {
-				log.Printf("bad constant name: %v", s)
-				syms = append(syms, s)
-				continue
-			}
-			if i < 0 || i >= len(g.Constants) {
-				log.Printf("constant index out of range: symbol=%q index=%v len(constants)=%v", s, i, len(g.Constants))
+			if err != nil || i < 0 || i >= len(g.Constants) {
+				if err != nil {
+					log.Printf("bad constant name: %v", s)
+				} else {
+					log.Printf("constant index out of range: symbol=%q index=%v len(constants)=%v", s, i, len(g.Constants))
+				}
 				syms = append(syms, s)
 				continue
 			}
