@@ -123,12 +123,14 @@ func Inversion[T any](g Gene[T], headSize int, rng *rand.Rand) (Gene[T], error) 
 	return dst, nil
 }
 
-// ISTransposition performs IS element transposition on a copy of g.
+// ISTransposition performs IS (Insertion Sequence) element transposition on a
+// copy of g.
 //
-// A random subsequence of length in [1, maxISLen] is extracted from anywhere
-// in the gene.  It is inserted at a random position in [1, headSize), shifting
-// the existing head symbols to the right; symbols pushed past the head boundary
-// are discarded.  The tail is never modified.
+// In GEP, an IS element is an arbitrary subsequence of symbols taken from
+// anywhere in the gene.  The transposition operator extracts a random IS element
+// of length in [1, maxISLen] and inserts it at a random position in
+// [1, headSize), shifting the existing head symbols to the right; any symbols
+// pushed past the head boundary are discarded.  The tail is never modified.
 //
 // headSize must be >= 0.  maxISLen must be >= 1.  rng may be nil.
 // If the gene is too short for IS transposition (headSize <= 1 or no symbols),
@@ -145,7 +147,7 @@ func ISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) (
 		return dst, nil
 	}
 
-	// Pick IS element.
+	// Pick IS (Insertion Sequence) element.
 	start := randIntn(len(dst.Symbols), rng)
 	length := 1 + randIntn(maxISLen, rng)
 	if start+length > len(dst.Symbols) {
@@ -183,16 +185,21 @@ func ISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) (
 	return dst, nil
 }
 
-// RISTransposition performs RIS element transposition on a copy of g.
+// RISTransposition performs RIS (Root Insertion Sequence) element transposition
+// on a copy of g.
 //
-// An RIS element is a subsequence starting with a function symbol chosen
-// randomly from the head.  It is inserted at position 0 of the head, shifting
-// existing head symbols to the right; symbols pushed past the head boundary are
-// discarded.  The tail is never modified.
+// In GEP, an RIS element is a subsequence that must begin with a function
+// symbol.  Unlike IS transposition, the RIS element is always inserted at
+// position 0 — the root — of the gene head, which guarantees that the head
+// continues to start with a function.  Existing head symbols are shifted to the
+// right; symbols pushed past the head boundary are discarded.  The tail is
+// never modified.
+//
+// The operator scans the head for function symbols and picks one at random as
+// the starting point for the RIS element.  If no function symbol exists in the
+// head, or headSize == 0, the gene is returned unchanged (deep-copied).
 //
 // headSize must be >= 0.  maxISLen must be >= 1.  rng may be nil.
-// If no function symbol exists in the head, or headSize == 0, the gene is
-// returned unchanged (deep-copied).
 func RISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) (Gene[T], error) {
 	if headSize < 0 {
 		return Gene[T]{}, fmt.Errorf("core.RISTransposition: headSize must be >= 0")
