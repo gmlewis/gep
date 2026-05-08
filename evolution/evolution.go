@@ -17,8 +17,10 @@
 //   - BestIndividual – returns the best individual, respecting both maximization
 //     and minimization orientations.
 //   - Select – roulette-wheel (fitness-proportionate) selection.
+//   - Mutate – applies configurable genetic operators (point mutation, inversion,
+//     IS/RIS transposition, gene transposition) to the population.
 //   - Evolve – runs the complete evolution loop (evaluate → stop-check → select →
-//     elitism) for a given number of iterations.
+//     mutate → elitism) for a given number of iterations.
 //
 // Typical usage:
 //
@@ -31,6 +33,12 @@
 //	gen.StopFunc = func(best evolution.Individual[float64]) bool {
 //	    return best.Score >= 1000.0
 //	}
+//	gen.MutationConfig = mutation.Config{
+//	    HeadSize:          7,
+//	    NumTerminals:      2,
+//	    PointMutationRate: 0.044,
+//	    InversionRate:     0.1,
+//	}
 //	result := gen.Evolve(500)
 package evolution
 
@@ -40,6 +48,7 @@ import (
 
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution/evaluation"
+	"github.com/gmlewis/gep/v2/evolution/mutation"
 	"github.com/gmlewis/gep/v2/evolution/selection"
 )
 
@@ -78,6 +87,24 @@ type Generation[T any] struct {
 	// halts early and that individual is returned. When nil, the default
 	// stopping criterion of Score >= 1000 is used.
 	StopFunc func(Individual[T]) bool
+
+	// MutationConfig controls which genetic operators are applied after
+	// selection and at what rates. Zero values disable the corresponding
+	// operators. See evolution/mutation.Config for details.
+	MutationConfig mutation.Config
+
+	// cat is the typed function catalog used for point mutation.
+	cat *core.Catalog[T]
+
+	// headSize is the gene head size passed at construction time; forwarded to
+	// mutation operators.
+	headSize int
+
+	// numTerminals is forwarded to mutation operators.
+	numTerminals int
+
+	// numConstants is forwarded to mutation operators.
+	numConstants int
 
 	// rng is an optional seeded random source for deterministic evolution.
 	// When nil (as created by New), the global math/rand source is used.
@@ -153,9 +180,13 @@ func newGeneration[T any](
 	}
 
 	return &Generation[T]{
-		Individuals: individuals,
-		ScoringFunc: sf,
-		rng:         rng,
+		Individuals:  individuals,
+		ScoringFunc:  sf,
+		cat:          cat,
+		headSize:     headSize,
+		numTerminals: numTerminals,
+		numConstants: numConstants,
+		rng:          rng,
 	}, nil
 }
 
@@ -216,6 +247,35 @@ func (g *Generation[T]) Select() {
 	}
 }
 
+// Mutate applies the configured genetic operators to the current population
+// in place, replacing each individual with a (possibly mutated) offspring.
+//
+// The operators applied and their rates are governed by MutationConfig.
+// When all rates are zero (the default), Mutate is effectively a no-op that
+// deep-copies the current population.
+//
+// Mutate uses the catalog, head size, numTerminals, and numConstants stored at
+// construction time to drive point mutation. MutationConfig.HeadSize,
+// MutationConfig.NumTerminals, and MutationConfig.NumConstants are overridden
+// by the values stored at construction time so callers do not need to duplicate
+// those settings.
+func (g *Generation[T]) Mutate() {
+	cfg := g.MutationConfig
+	cfg.HeadSize = g.headSize
+	cfg.NumTerminals = g.numTerminals
+	cfg.NumConstants = g.numConstants
+
+	genomes := make([]core.Genome[T], len(g.Individuals))
+	for i, ind := range g.Individuals {
+		genomes[i] = ind.Genome
+	}
+
+	mutated := mutation.Apply(genomes, g.cat, cfg, g.rng)
+	for i, genome := range mutated {
+		g.Individuals[i].Genome = genome
+	}
+}
+
 // Evolve runs the GEP algorithm for up to iterations generations.
 //
 // Each iteration:
@@ -225,7 +285,8 @@ func (g *Generation[T]) Select() {
 //     If met, returns the best individual immediately.
 //  4. Saves a deep copy of the best individual (elitism).
 //  5. Replaces the population via roulette-wheel selection (calls Select).
-//  6. Restores the saved best individual to position 0 (elitism guarantee).
+//  6. Applies configured genetic operators to the population (calls Mutate).
+//  7. Restores the saved best individual to position 0 (elitism guarantee).
 //
 // If the loop completes without triggering the stopping criterion, Evolve
 // performs a final Evaluate and returns BestIndividual.
@@ -246,6 +307,7 @@ func (g *Generation[T]) Evolve(iterations int) Individual[T] {
 
 		saveBest := best.Dup()
 		g.Select()
+		g.Mutate()
 		// Elitism: ensure the best individual survives to the next generation.
 		g.Individuals[0] = saveBest
 	}
