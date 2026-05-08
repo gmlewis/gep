@@ -470,7 +470,7 @@ func TestRecombine_ZeroRates_GenomesUnchanged(t *testing.T) {
 	}
 }
 
-func TestRecombine_Operators_MutatedGenomesAreValid(t *testing.T) {
+func TestRecombine_Operators_RecombinedGenomesAreValid(t *testing.T) {
 	g := newTestGeneration(t, 10, nil)
 	g.RecombinationConfig = recombination.Config{
 		OnePointRate: 1.0,

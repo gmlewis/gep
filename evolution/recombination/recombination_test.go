@@ -131,7 +131,7 @@ func TestApply_OnePoint_ChangesSomeGenomes(t *testing.T) {
 	}
 }
 
-func TestApply_TwoPoint_MutatedGenomeValid(t *testing.T) {
+func TestApply_TwoPoint_RecombinedGenomeValid(t *testing.T) {
 	genomes := newGenomes(t, 10)
 	got := Apply(genomes, Config{TwoPointRate: 1.0}, rand.New(rand.NewSource(7)))
 	for i, g := range got {
