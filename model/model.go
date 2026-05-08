@@ -58,6 +58,9 @@ func (g *Generation) randFloat64() float64 {
 	return rand.Float64()
 }
 
+// effectiveScore maps raw scores to an internal "higher is better" scale used
+// only by selection logic so the same code can support both maximization and
+// minimization.
 func (g *Generation) effectiveScore(score float64) float64 {
 	if g.MinimizeScore {
 		return -score
@@ -309,7 +312,7 @@ func (g *Generation) crossover() {
 
 // getBest evaluates all individuals and returns a pointer to the best one.
 func (g *Generation) getBest() *genome.Genome {
-	bestScore := math.Inf(-1)
+	highestEffectiveScore := math.Inf(-1)
 	bestGenome := g.Individuals[0]
 	c := make(chan *genome.Genome)
 	for i := 0; i < len(g.Individuals); i++ { // Evaluate individuals concurrently
@@ -318,9 +321,9 @@ func (g *Generation) getBest() *genome.Genome {
 	for i := 0; i < len(g.Individuals); i++ { // Collect and return the highest scoring Genome
 		gn := <-c
 		effectiveScore := g.effectiveScore(gn.Score)
-		if effectiveScore > bestScore {
+		if effectiveScore > highestEffectiveScore {
 			bestGenome = gn
-			bestScore = effectiveScore
+			highestEffectiveScore = effectiveScore
 		}
 	}
 	return bestGenome
