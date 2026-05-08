@@ -71,7 +71,7 @@ func TestExpression_InvalidTerminalIndexReturnsError(t *testing.T) {
 	if err == nil {
 		t.Fatalf("g.Expression() error = nil, want non-nil")
 	}
-	if !strings.Contains(err.Error(), `terminal symbol name "d1"`) {
+	if !strings.Contains(err.Error(), `terminal symbol name "d1"`) || !strings.Contains(err.Error(), "exceeds number of terminals") {
 		t.Fatalf("g.Expression() error = %q, want terminal index error", err)
 	}
 }
@@ -88,7 +88,7 @@ func TestExpression_InvalidConstantIndexReturnsError(t *testing.T) {
 	if err == nil {
 		t.Fatalf("g.Expression() error = nil, want non-nil")
 	}
-	if !strings.Contains(err.Error(), `constant symbol name "c1"`) {
+	if !strings.Contains(err.Error(), `constant symbol name "c1"`) || !strings.Contains(err.Error(), "exceeds length of constant slice") {
 		t.Fatalf("g.Expression() error = %q, want constant index error", err)
 	}
 }
