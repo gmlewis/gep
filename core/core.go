@@ -7,6 +7,8 @@ package core
 
 import (
 	"fmt"
+	"math/rand"
+	"sort"
 	"strconv"
 )
 
@@ -201,6 +203,28 @@ func (c *Catalog[T]) Lookup(name string) (Node[T], bool) {
 	return n, ok
 }
 
+// Symbols returns a sorted slice of all function symbol names registered in the catalog.
+func (c *Catalog[T]) Symbols() []string {
+	syms := make([]string, 0, len(c.nodes))
+	for sym := range c.nodes {
+		syms = append(syms, sym)
+	}
+	sort.Strings(syms)
+	return syms
+}
+
+// MaxArity returns the maximum arity of any node registered in the catalog,
+// or 0 if the catalog is empty.
+func (c *Catalog[T]) MaxArity() int {
+	max := 0
+	for _, n := range c.nodes {
+		if a := n.Arity(); a > max {
+			max = a
+		}
+	}
+	return max
+}
+
 // ParseSymbols converts a Karva symbol string slice into a typed []Symbol[T].
 // Terminal symbols (d0, d1, ...) and constant symbols (c0, c1, ...) are
 // recognised by their conventional prefixes. All other symbols are looked up in
@@ -339,4 +363,108 @@ func (g Genome[T]) Eval(terminals []T) (T, error) {
 		geneOutputs[i] = v
 	}
 	return g.Link.Eval(geneOutputs), nil
+}
+
+// NewRandomGene creates a random Gene[T] from the given catalog.
+//
+// headSize is the number of positions in the gene head. The tail size is derived
+// automatically as max(1, (maxArity-1)*headSize+1) where maxArity is the maximum
+// arity of any node in cat; this guarantees a syntactically valid Karva expression.
+//
+// numTerminals is the count of available d-prefixed input variables (d0..d(n-1)).
+// numConstants is the count of available c-prefixed constants (c0..c(n-1)).
+// rng is the random source; if nil the global math/rand source is used.
+//
+// Returns an error if cat is nil, headSize < 0, numTerminals < 0, numConstants < 0,
+// or numTerminals+numConstants == 0.
+func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants int, rng *rand.Rand) (Gene[T], error) {
+	if cat == nil {
+		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: catalog cannot be nil")
+	}
+	if headSize < 0 {
+		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: headSize must be >= 0")
+	}
+	if numTerminals < 0 {
+		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: numTerminals must be >= 0")
+	}
+	if numConstants < 0 {
+		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: numConstants must be >= 0")
+	}
+	if numTerminals+numConstants == 0 {
+		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: numTerminals+numConstants must be > 0")
+	}
+
+	intn := func(n int) int {
+		if rng != nil {
+			return rng.Intn(n)
+		}
+		return rand.Intn(n) //nolint:gosec
+	}
+
+	// Calculate tail size from max arity so that any parse tree within the head
+	// can always be completed by terminals in the tail.
+	maxA := cat.MaxArity()
+	tailSize := 1
+	if maxA > 1 && headSize > 0 {
+		tailSize = (maxA-1)*headSize + 1
+	}
+
+	// Build terminal choice slice: d0..d(numTerminals-1), c0..c(numConstants-1).
+	termChoices := make([]Symbol[T], 0, numTerminals+numConstants)
+	for i := 0; i < numTerminals; i++ {
+		sym, _ := NewTerminalSymbol[T](i)
+		termChoices = append(termChoices, sym)
+	}
+	for i := 0; i < numConstants; i++ {
+		sym, _ := NewConstantSymbol[T](i)
+		termChoices = append(termChoices, sym)
+	}
+
+	// Build function choice slice from catalog (sorted for determinism).
+	funcNames := cat.Symbols()
+
+	// Head: any function or terminal.
+	headChoiceCount := len(funcNames) + len(termChoices)
+	syms := make([]Symbol[T], 0, headSize+tailSize)
+	for i := 0; i < headSize; i++ {
+		choice := intn(headChoiceCount)
+		if choice < len(funcNames) {
+			node, _ := cat.Lookup(funcNames[choice])
+			sym, _ := NewFunctionSymbol[T](node)
+			syms = append(syms, sym)
+		} else {
+			syms = append(syms, termChoices[choice-len(funcNames)])
+		}
+	}
+
+	// Tail: terminals only.
+	for i := 0; i < tailSize; i++ {
+		syms = append(syms, termChoices[intn(len(termChoices))])
+	}
+
+	return Gene[T]{Symbols: syms}, nil
+}
+
+// NewRandomGenome creates a random Genome[T] containing numGenes random genes.
+// Each gene is created with NewRandomGene using the provided parameters.
+// link is the typed link operator used to combine gene outputs.
+// rng is the random source; if nil the global math/rand source is used.
+//
+// Returns an error if numGenes <= 0, link is nil, or any gene creation fails.
+func NewRandomGenome[T any](cat *Catalog[T], numGenes, headSize, numTerminals, numConstants int, link LinkOperator[T], rng *rand.Rand) (Genome[T], error) {
+	if numGenes <= 0 {
+		return Genome[T]{}, fmt.Errorf("core.NewRandomGenome: numGenes must be > 0")
+	}
+	if link == nil {
+		return Genome[T]{}, fmt.Errorf("core.NewRandomGenome: link cannot be nil")
+	}
+	genes := make([]Gene[T], numGenes)
+	for i := range genes {
+		g, err := NewRandomGene(cat, headSize, numTerminals, numConstants, rng)
+		if err != nil {
+			return Genome[T]{}, fmt.Errorf("core.NewRandomGenome: gene[%d]: %w", i, err)
+		}
+		genes[i] = g
+	}
+	return Genome[T]{Genes: genes, Link: link}, nil
 }

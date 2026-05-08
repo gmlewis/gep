@@ -5,6 +5,7 @@
 package core
 
 import (
+	"math/rand"
 	"strings"
 	"testing"
 )
@@ -467,5 +468,203 @@ func TestGenomeEval_InvalidGenomeErrors(t *testing.T) {
 	genome := Genome[int]{} // empty genes → invalid
 	if _, err := genome.Eval(nil); err == nil {
 		t.Fatal("Eval on invalid genome: got nil error, want non-nil")
+	}
+}
+
+// --- Catalog.Symbols and Catalog.MaxArity tests ---
+
+func TestCatalog_Symbols_Empty(t *testing.T) {
+	cat := NewCatalog[int]()
+	if syms := cat.Symbols(); len(syms) != 0 {
+		t.Fatalf("Symbols() on empty catalog: got %v, want []", syms)
+	}
+}
+
+func TestCatalog_Symbols_Sorted(t *testing.T) {
+	cat := newIntCatalog(t) // registers "+", "-", "*"
+	syms := cat.Symbols()
+	want := []string{"*", "+", "-"}
+	if len(syms) != len(want) {
+		t.Fatalf("Symbols() len=%d, want %d", len(syms), len(want))
+	}
+	for i, s := range want {
+		if syms[i] != s {
+			t.Errorf("Symbols()[%d]=%q, want %q", i, syms[i], s)
+		}
+	}
+}
+
+func TestCatalog_MaxArity_Empty(t *testing.T) {
+	cat := NewCatalog[int]()
+	if got := cat.MaxArity(); got != 0 {
+		t.Fatalf("MaxArity() on empty catalog=%d, want 0", got)
+	}
+}
+
+func TestCatalog_MaxArity_Mixed(t *testing.T) {
+	cat := NewCatalog[int]()
+	// arity 1 node
+	if err := cat.Register(intNode{symbol: "neg", arity: 1, fn: func(v []int) int { return -v[0] }}); err != nil {
+		t.Fatalf("Register: %v", err)
+	}
+	// arity 3 node
+	if err := cat.Register(intNode{symbol: "fma", arity: 3, fn: func(v []int) int { return v[0]*v[1] + v[2] }}); err != nil {
+		t.Fatalf("Register: %v", err)
+	}
+	if got := cat.MaxArity(); got != 3 {
+		t.Fatalf("MaxArity()=%d, want 3", got)
+	}
+}
+
+// --- NewRandomGene tests ---
+
+func TestNewRandomGene_ValidGene(t *testing.T) {
+	cat := newIntCatalog(t)
+	g, err := NewRandomGene(cat, 5, 2, 0, nil)
+	if err != nil {
+		t.Fatalf("NewRandomGene: %v", err)
+	}
+	if err := g.Validate(); err != nil {
+		t.Fatalf("gene.Validate: %v", err)
+	}
+	// gene must have at least headSize+tailSize symbols; headSize=5, maxArity=2 → tailSize=6
+	wantMin := 5 + (2-1)*5 + 1 // head + tail
+	if len(g.Symbols) != wantMin {
+		t.Fatalf("len(g.Symbols)=%d, want %d", len(g.Symbols), wantMin)
+	}
+}
+
+func TestNewRandomGene_TailSymbolsAreTerminals(t *testing.T) {
+	cat := newIntCatalog(t) // maxArity=2
+	headSize := 4
+	tailSize := (2-1)*headSize + 1 // 5
+	rng := rand.New(rand.NewSource(42))
+	g, err := NewRandomGene(cat, headSize, 3, 0, rng)
+	if err != nil {
+		t.Fatalf("NewRandomGene: %v", err)
+	}
+	// The last tailSize symbols must be terminals (not functions).
+	total := len(g.Symbols)
+	for i := headSize; i < total; i++ {
+		sym := g.Symbols[i]
+		if sym.Kind == SymbolKindFunction {
+			t.Errorf("tail symbol[%d] is a function, want terminal or constant", i)
+		}
+	}
+	_ = tailSize
+}
+
+func TestNewRandomGene_WithConstants(t *testing.T) {
+	cat := newIntCatalog(t)
+	rng := rand.New(rand.NewSource(7))
+	g, err := NewRandomGene(cat, 4, 1, 2, rng)
+	if err != nil {
+		t.Fatalf("NewRandomGene: %v", err)
+	}
+	if err := g.Validate(); err != nil {
+		t.Fatalf("gene.Validate: %v", err)
+	}
+}
+
+func TestNewRandomGene_HeadSizeZero(t *testing.T) {
+	cat := newIntCatalog(t)
+	g, err := NewRandomGene(cat, 0, 2, 0, nil)
+	if err != nil {
+		t.Fatalf("NewRandomGene(headSize=0): %v", err)
+	}
+	// With headSize=0, tailSize=1, so we get exactly 1 terminal symbol.
+	if len(g.Symbols) != 1 {
+		t.Fatalf("len(g.Symbols)=%d, want 1", len(g.Symbols))
+	}
+	if g.Symbols[0].Kind == SymbolKindFunction {
+		t.Error("headSize=0 gene head position is a function, want terminal")
+	}
+}
+
+func TestNewRandomGene_DeterministicWithSeed(t *testing.T) {
+	cat := newIntCatalog(t)
+	g1, err := NewRandomGene(cat, 4, 2, 0, rand.New(rand.NewSource(99)))
+	if err != nil {
+		t.Fatalf("NewRandomGene (first): %v", err)
+	}
+	g2, err := NewRandomGene(cat, 4, 2, 0, rand.New(rand.NewSource(99)))
+	if err != nil {
+		t.Fatalf("NewRandomGene (second): %v", err)
+	}
+	if len(g1.Symbols) != len(g2.Symbols) {
+		t.Fatalf("symbol length mismatch: %d vs %d", len(g1.Symbols), len(g2.Symbols))
+	}
+	for i := range g1.Symbols {
+		if g1.Symbols[i].Name != g2.Symbols[i].Name {
+			t.Errorf("symbol[%d] name: %q vs %q", i, g1.Symbols[i].Name, g2.Symbols[i].Name)
+		}
+		if g1.Symbols[i].Kind != g2.Symbols[i].Kind {
+			t.Errorf("symbol[%d] kind: %v vs %v", i, g1.Symbols[i].Kind, g2.Symbols[i].Kind)
+		}
+	}
+}
+
+func TestNewRandomGene_Errors(t *testing.T) {
+	cat := newIntCatalog(t)
+
+	if _, err := NewRandomGene[int](nil, 4, 2, 0, nil); err == nil {
+		t.Fatal("NewRandomGene(nil cat): got nil error, want non-nil")
+	}
+	if _, err := NewRandomGene(cat, -1, 2, 0, nil); err == nil {
+		t.Fatal("NewRandomGene(headSize=-1): got nil error, want non-nil")
+	}
+	if _, err := NewRandomGene(cat, 4, -1, 0, nil); err == nil {
+		t.Fatal("NewRandomGene(numTerminals=-1): got nil error, want non-nil")
+	}
+	if _, err := NewRandomGene(cat, 4, 0, -1, nil); err == nil {
+		t.Fatal("NewRandomGene(numConstants=-1): got nil error, want non-nil")
+	}
+	if _, err := NewRandomGene(cat, 4, 0, 0, nil); err == nil {
+		t.Fatal("NewRandomGene(numTerminals+numConstants=0): got nil error, want non-nil")
+	}
+}
+
+// --- NewRandomGenome tests ---
+
+func TestNewRandomGenome_Valid(t *testing.T) {
+	cat := newIntCatalog(t)
+	link, err := NewLinkFunc[int]("+", func(v []int) int {
+		sum := 0
+		for _, x := range v {
+			sum += x
+		}
+		return sum
+	})
+	if err != nil {
+		t.Fatalf("NewLinkFunc: %v", err)
+	}
+	genome, err := NewRandomGenome(cat, 3, 4, 2, 0, link, rand.New(rand.NewSource(1)))
+	if err != nil {
+		t.Fatalf("NewRandomGenome: %v", err)
+	}
+	if err := genome.Validate(); err != nil {
+		t.Fatalf("genome.Validate: %v", err)
+	}
+	if len(genome.Genes) != 3 {
+		t.Fatalf("len(genome.Genes)=%d, want 3", len(genome.Genes))
+	}
+}
+
+func TestNewRandomGenome_Errors(t *testing.T) {
+	cat := newIntCatalog(t)
+	link, err := NewLinkFunc[int]("id", func(v []int) int { return v[0] })
+	if err != nil {
+		t.Fatalf("NewLinkFunc: %v", err)
+	}
+
+	if _, err := NewRandomGenome(cat, 0, 4, 2, 0, link, nil); err == nil {
+		t.Fatal("NewRandomGenome(numGenes=0): got nil error, want non-nil")
+	}
+	if _, err := NewRandomGenome(cat, 1, 4, 2, 0, nil, nil); err == nil {
+		t.Fatal("NewRandomGenome(nil link): got nil error, want non-nil")
+	}
+	// Error propagated from NewRandomGene (nil catalog)
+	if _, err := NewRandomGenome[int](nil, 1, 4, 2, 0, link, nil); err == nil {
+		t.Fatal("NewRandomGenome(nil cat): got nil error, want non-nil")
 	}
 }
