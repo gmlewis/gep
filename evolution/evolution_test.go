@@ -493,12 +493,12 @@ func TestMutate_PointMutation_ChangesAtLeastOneGenome(t *testing.T) {
 func TestMutate_MutatedGenomesAreValid(t *testing.T) {
 	g := newTestGeneration(t, 10, nil)
 	g.MutationConfig = mutation.Config{
-		PointMutationRate:    1.0,
-		InversionRate:        1.0,
-		ISTranspositionRate:  1.0,
-		MaxISLen:             2,
-		RISTranspositionRate: 1.0,
-		MaxRISLen:            2,
+		PointMutationRate:     1.0,
+		InversionRate:         1.0,
+		ISTranspositionRate:   1.0,
+		MaxISLen:              2,
+		RISTranspositionRate:  1.0,
+		MaxRISLen:             2,
 		GeneTranspositionRate: 1.0,
 	}
 	g.Mutate()
@@ -538,12 +538,12 @@ func TestEvolve_WithMutation_StillConverges(t *testing.T) {
 	}
 	g := newTestGeneration(t, 13, sf)
 	g.MutationConfig = mutation.Config{
-		PointMutationRate:    0.1,
-		InversionRate:        0.1,
-		ISTranspositionRate:  0.1,
-		MaxISLen:             2,
-		RISTranspositionRate: 0.1,
-		MaxRISLen:            2,
+		PointMutationRate:     0.1,
+		InversionRate:         0.1,
+		ISTranspositionRate:   0.1,
+		MaxISLen:              2,
+		RISTranspositionRate:  0.1,
+		MaxRISLen:             2,
 		GeneTranspositionRate: 0.1,
 	}
 	best := g.Evolve(200)

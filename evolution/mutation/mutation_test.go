@@ -112,14 +112,14 @@ func TestApply_PreservesPopulationSize(t *testing.T) {
 	cat := newIntCatalog(t)
 	genomes := newGenomes(t, 8)
 	cfg := Config{
-		HeadSize:             4,
-		NumTerminals:         2,
-		PointMutationRate:    0.5,
-		InversionRate:        0.5,
-		ISTranspositionRate:  0.5,
-		MaxISLen:             2,
-		RISTranspositionRate: 0.5,
-		MaxRISLen:            2,
+		HeadSize:              4,
+		NumTerminals:          2,
+		PointMutationRate:     0.5,
+		InversionRate:         0.5,
+		ISTranspositionRate:   0.5,
+		MaxISLen:              2,
+		RISTranspositionRate:  0.5,
+		MaxRISLen:             2,
 		GeneTranspositionRate: 0.5,
 	}
 	got := Apply(genomes, cat, cfg, rand.New(rand.NewSource(42)))
@@ -225,14 +225,14 @@ func TestApply_Deterministic(t *testing.T) {
 	cat := newIntCatalog(t)
 	genomes := newGenomes(t, 6)
 	cfg := Config{
-		HeadSize:             4,
-		NumTerminals:         2,
-		PointMutationRate:    0.5,
-		InversionRate:        0.3,
-		ISTranspositionRate:  0.2,
-		MaxISLen:             2,
-		RISTranspositionRate: 0.2,
-		MaxRISLen:            2,
+		HeadSize:              4,
+		NumTerminals:          2,
+		PointMutationRate:     0.5,
+		InversionRate:         0.3,
+		ISTranspositionRate:   0.2,
+		MaxISLen:              2,
+		RISTranspositionRate:  0.2,
+		MaxRISLen:             2,
 		GeneTranspositionRate: 0.1,
 	}
 	got1 := Apply(genomes, cat, cfg, rand.New(rand.NewSource(42)))
@@ -250,14 +250,14 @@ func TestApply_AllOperators_NoAliasing(t *testing.T) {
 	cat := newIntCatalog(t)
 	genomes := newGenomes(t, 5)
 	cfg := Config{
-		HeadSize:             4,
-		NumTerminals:         2,
-		PointMutationRate:    1.0,
-		InversionRate:        1.0,
-		ISTranspositionRate:  1.0,
-		MaxISLen:             2,
-		RISTranspositionRate: 1.0,
-		MaxRISLen:            2,
+		HeadSize:              4,
+		NumTerminals:          2,
+		PointMutationRate:     1.0,
+		InversionRate:         1.0,
+		ISTranspositionRate:   1.0,
+		MaxISLen:              2,
+		RISTranspositionRate:  1.0,
+		MaxRISLen:             2,
 		GeneTranspositionRate: 1.0,
 	}
 	got := Apply(genomes, cat, cfg, rand.New(rand.NewSource(37)))
