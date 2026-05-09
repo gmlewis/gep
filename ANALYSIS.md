@@ -589,6 +589,240 @@ Once the architecture is modernized:
 - provide "import this library" examples
 - add modern CI and benchmark automation
 
+## Phase 1-4 implementation audit (2026-05-09)
+
+`ANALYSIS.md` is the source of truth for the intended meaning of Phases 1-4.
+The notes below evaluate the current repository against that original intent
+without reinterpreting the phases.
+
+### Phase 1 status: partially faithful
+
+What appears complete:
+
+- deterministic seeding exists in both the typed and legacy evolution paths
+- score orientation and stopping behavior are configurable
+- cache invalidation / duplication semantics were materially improved
+
+Remaining deviation from the original Phase 1 intent:
+
+- the legacy library path is still not fully stabilized because several
+  library APIs log or print on invalid state instead of surfacing errors
+  explicitly
+- examples include CLI exits as expected, but library packages still contain
+  "log-and-continue" / "print-and-continue" behavior that makes correctness
+  issues harder to detect and fix
+
+Representative locations:
+
+- `gene/gene.go`
+- `genome/genome.go`
+- `genome/write.go`
+- `model/model.go`
+
+### Phase 2 status: mostly faithful, but not yet dominant
+
+What appears complete:
+
+- a typed generic `core` package exists
+- typed nodes, terminals/constants, genomes, and link operators exist
+- bridge adapters exist between the typed and legacy representations
+
+Remaining deviation from the original Phase 2 intent:
+
+- the typed core is not yet the default execution path for the repository
+- major entrypoints and examples still run through legacy `model` /
+  `gene` / `genome`
+- the old `FuncType` architecture is still the primary surface for several
+  real workflows, which is broader than the intended "compatibility/reference
+  layer"
+
+Representative locations:
+
+- `core/core.go`
+- `gene/core_bridge.go`
+- `genome/core_bridge.go`
+- `model/model.go`
+- `experiments/*`
+- `examples/gymnasium/*`
+
+### Phase 3 status: mostly faithful, but not fully decomposed
+
+What appears complete:
+
+- explicit subsystems exist for selection, mutation, recombination,
+  termination, evaluation, and statistics
+- those subsystems are integrated into the typed `evolution` engine
+
+Remaining deviation from the original Phase 3 intent:
+
+- transposition is not a first-class subsystem; it is still bundled into
+  `evolution/mutation`
+
+Representative locations:
+
+- `evolution/evolution.go`
+- `evolution/mutation/mutation.go`
+
+### Phase 4 status: not faithful
+
+The current repository does **not** yet satisfy the original Phase 4 intent.
+The work completed under "Phase 4" mostly enforced package import boundaries,
+but the original Phase 4 was about **actual subsystem separation**.
+
+What is still missing relative to the original plan:
+
+- no dedicated `codegen` subsystem; code generation remains split across
+  `grammars`, `gene/write.go`, and `genome/write.go`
+- no dedicated `env` / RL subsystem; Gymnasium agent orchestration still lives
+  in legacy `model`
+- no dedicated `problems` / `domains` subsystem; reusable problem definitions
+  remain scattered between `fitness` helpers and experiment-specific code
+- experiments and examples still depend primarily on legacy representation and
+  legacy model packages rather than the typed `core` + `evolution` stack
+- legacy packages are still active workflow packages, not merely
+  compatibility/reference layers
+
+Representative locations:
+
+- `grammars/`
+- `gene/write.go`
+- `genome/write.go`
+- `gymnasium/`
+- `model/gymnasium-agents.go`
+- `experiments/*`
+- `examples/gymnasium/*`
+- `evolution/package_map_test.go`
+
+## Corrective milestone backlog for Phase 1-4 deviations
+
+These milestones are intended to correct the current deviations from the
+original plan. They are deliberately written so each milestone can be used as
+the source prompt for a separate `/delegate` PR.
+
+### P1-A: Finish legacy stabilization and explicit error surfaces
+
+Goal:
+
+- complete the remaining stabilization work on the legacy path
+
+Required outcome:
+
+- replace library `log.Printf` / `fmt.Printf` error handling in legacy
+  `gene`, `genome`, `model`, and legacy codegen paths with explicit error
+  returns or narrow compatibility wrappers
+- eliminate direct stdout/stderr emission from library packages
+- preserve existing behavior only where it is intentionally CLI/example-facing
+
+This milestone corrects the remaining Phase 1 deviation.
+
+### P2-A: Make typed core/evolution the default execution surface
+
+Goal:
+
+- make `core` + `evolution` the primary public execution path and reduce the
+  legacy stack to compatibility/reference status
+
+Required outcome:
+
+- add typed entrypoints where the repo still depends on legacy `model`
+- move compatibility conversion code behind clearly named adapter surfaces
+- stop adding new workflow code that depends directly on `functions.FuncType`,
+  legacy `gene`, legacy `genome`, or legacy `model`
+
+This milestone corrects the remaining Phase 2 deviation.
+
+### P3-A: Extract transposition into a first-class evolution subsystem
+
+Goal:
+
+- create an explicit `evolution/transposition` subsystem
+
+Required outcome:
+
+- move IS, RIS, and gene transposition orchestration out of
+  `evolution/mutation`
+- give `evolution.Generation` a distinct transposition configuration/invocation
+  stage
+- keep operator tests focused on behavior and validity of genomes
+
+This milestone corrects the remaining Phase 3 deviation.
+
+### P4-A: Create a dedicated codegen subsystem
+
+Goal:
+
+- separate code generation from representation packages
+
+Required outcome:
+
+- move code generation orchestration out of `gene/write.go`,
+  `genome/write.go`, and ad hoc grammar coupling into a dedicated `codegen`
+  package (or small `codegen/*` package tree)
+- keep legacy `gene` / `genome` write methods as thin adapters only, if they
+  remain at all
+
+### P4-B: Create a dedicated env / RL subsystem
+
+Goal:
+
+- separate environment definitions from agent/training orchestration
+
+Required outcome:
+
+- keep `gymnasium` focused on environments and environment metadata
+- move Gymnasium agent evolution/training logic out of
+  `model/gymnasium-agents.go` into a dedicated `env` / RL package
+- ensure RL flows no longer depend on legacy `model` as their primary engine
+
+### P4-C: Create a dedicated problems / domains subsystem
+
+Goal:
+
+- separate reusable problem definitions from ad hoc experiments
+
+Required outcome:
+
+- promote reusable fitness/problem definitions into a dedicated `problems`
+  or `domains` package tree
+- keep `fitness` only as a narrow helper layer, or fold it into the new
+  subsystem where appropriate
+- define typed problem-facing seams over `core` + `evolution`
+
+### P4-D: Rewire experiments and examples to the separated subsystems
+
+Goal:
+
+- make experiments/examples consume the intended architecture rather than the
+  legacy prototype architecture
+
+Required outcome:
+
+- migrate experiments/examples to import `core`, `evolution`, `codegen`,
+  `env`, and/or `problems`
+- stop using legacy `model`, `gene`, and `genome` as the default workflow
+  path for new or migrated examples
+
+Dependencies:
+
+- depends on `P2-A`, `P3-A`, `P4-A`, `P4-B`, and `P4-C`
+
+### P4-E: Retire Phase 4 import-boundary enforcement as the definition of success
+
+Goal:
+
+- stop treating import-boundary tests as the implementation of Phase 4
+
+Required outcome:
+
+- remove or greatly reduce `evolution/package_map_test.go` assertions that do
+  not prove user-visible architectural behavior
+- replace them with integration tests that exercise the real separated seams:
+  typed evolution, codegen, env/RL, and problem/domain wiring
+
+Dependencies:
+
+- depends on `P4-A`, `P4-B`, `P4-C`, and `P4-D`
+
 ## Final assessment
 
 This repo contains **real intellectual value** and should not be dismissed. The core ideas, the problem experiments, and the codegen direction are all worth preserving.
