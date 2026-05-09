@@ -13,6 +13,7 @@ import (
 	"github.com/gmlewis/gep/v2/evolution/mutation"
 	"github.com/gmlewis/gep/v2/evolution/recombination"
 	"github.com/gmlewis/gep/v2/evolution/statistics"
+	"github.com/gmlewis/gep/v2/evolution/termination"
 )
 
 // --- helpers ---
@@ -719,5 +720,113 @@ func TestEvolve_Statistics_EarlyStop_HistoryStopsAtStop(t *testing.T) {
 	// stopGen entries (one per iteration until stop).
 	if len(col.History) != stopGen {
 		t.Fatalf("Statistics.History len=%d, want %d (stopGen)", len(col.History), stopGen)
+	}
+}
+
+// --- TerminationCriteria integration tests ---
+
+func TestEvolve_TerminationCriteria_ScoreThresholdStops(t *testing.T) {
+	// When TerminationCriteria includes a ScoreThreshold that is met, Evolve
+	// must stop and return a best individual whose score satisfies the threshold.
+	var callCount atomic.Int64
+	sf := func(core.Genome[int]) float64 {
+		n := callCount.Add(1)
+		if n >= int64(3*10) {
+			return 500.0
+		}
+		return 0.0
+	}
+	g := newTestGeneration(t, 31, sf)
+	g.TerminationCriteria = []termination.Criterion{
+		termination.ScoreThreshold(500.0, false),
+	}
+	best := g.Evolve(500)
+	if best.Score < 500.0 {
+		t.Fatalf("Evolve with ScoreThreshold(500): best.Score=%v, want >= 500", best.Score)
+	}
+}
+
+func TestEvolve_TerminationCriteria_EmptyCriteriaUsesDefault(t *testing.T) {
+	// When TerminationCriteria is empty (nil) and StopFunc is nil, the default
+	// stopping criterion (score >= 1000) must apply.
+	var callCount atomic.Int64
+	sf := func(core.Genome[int]) float64 {
+		n := callCount.Add(1)
+		if n >= int64(3*10) {
+			return 1000.0
+		}
+		return 0.0
+	}
+	g := newTestGeneration(t, 33, sf)
+	// Explicitly ensure criteria are empty.
+	g.TerminationCriteria = nil
+	best := g.Evolve(500)
+	if best.Score < 1000.0 {
+		t.Fatalf("default stop criterion: best.Score=%v, want >= 1000", best.Score)
+	}
+}
+
+func TestEvolve_TerminationCriteria_StopFuncTakesPrecedence(t *testing.T) {
+	// When both StopFunc and TerminationCriteria are set, StopFunc is checked
+	// first and Evolve must stop when StopFunc fires, even if the criteria
+	// haven't fired yet.
+	stopFuncFired := false
+	sf := func(core.Genome[int]) float64 { return 0.5 }
+	g := newTestGeneration(t, 35, sf)
+	g.StopFunc = func(Individual[int]) bool {
+		stopFuncFired = true
+		return true // fires immediately
+	}
+	// This criterion would never fire (threshold unreachably high).
+	g.TerminationCriteria = []termination.Criterion{
+		termination.ScoreThreshold(1e9, false),
+	}
+	g.Evolve(100)
+	if !stopFuncFired {
+		t.Fatal("StopFunc must be called and take precedence over TerminationCriteria")
+	}
+}
+
+func TestEvolve_TerminationCriteria_NoImprovement(t *testing.T) {
+	// NoImprovement criterion must cause Evolve to stop after patience
+	// consecutive non-improving generations.
+	sf := func(core.Genome[int]) float64 { return 0.5 } // constant score, no improvement
+	g := newTestGeneration(t, 37, sf)
+	const patience = 5
+	g.TerminationCriteria = []termination.Criterion{
+		termination.NoImprovement(patience, false),
+	}
+	col := &statistics.Collector{}
+	g.Statistics = col
+	g.Evolve(500) // high iteration cap so termination must come from criterion
+	// The criterion initializes on gen 0, then stops after patience stagnant
+	// gens. With constant score the stop fires at generation patience.
+	// History length must be <= patience+1 (init gen + patience stagnant gens).
+	if len(col.History) > patience+1 {
+		t.Fatalf("NoImprovement(patience=%d): History len=%d, want <= %d",
+			patience, len(col.History), patience+1)
+	}
+}
+
+func TestEvolve_TerminationCriteria_AnyComposite(t *testing.T) {
+	// Any([never fires, fires at 500]) must stop when the second criterion fires.
+	var callCount atomic.Int64
+	sf := func(core.Genome[int]) float64 {
+		n := callCount.Add(1)
+		if n >= int64(3*10) {
+			return 500.0
+		}
+		return 0.0
+	}
+	g := newTestGeneration(t, 39, sf)
+	g.TerminationCriteria = []termination.Criterion{
+		termination.Any(
+			termination.ScoreThreshold(1e9, false),  // never fires
+			termination.ScoreThreshold(500.0, false), // fires at 500
+		),
+	}
+	best := g.Evolve(500)
+	if best.Score < 500.0 {
+		t.Fatalf("Any composite: best.Score=%v, want >= 500", best.Score)
 	}
 }
