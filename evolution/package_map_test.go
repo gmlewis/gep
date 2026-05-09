@@ -179,6 +179,39 @@ func TestPhase4Milestone5_FunctionPackageBoundaries(t *testing.T) {
 	}
 }
 
+func TestPhase4Milestone6_LegacyRepresentationPackageBoundaries(t *testing.T) {
+	metas := mustListPackages(t,
+		modulePath+"/grammars",
+		modulePath+"/gene",
+		modulePath+"/gene/...",
+		modulePath+"/genome",
+		modulePath+"/genome/...",
+	)
+
+	foundAny := false
+	for _, meta := range metas {
+		allowedPrefixes := allowedImportPrefixes(meta.ImportPath)
+		if len(allowedPrefixes) == 0 {
+			continue
+		}
+		foundAny = true
+
+		for _, imported := range meta.Imports {
+			if !strings.HasPrefix(imported, modulePath+"/") {
+				continue // standard library or external dependency
+			}
+			if hasAllowedPrefix(imported, allowedPrefixes) {
+				continue
+			}
+			t.Errorf("%s imports %s; allowed internal prefixes are %v", meta.ImportPath, imported, allowedPrefixes)
+		}
+	}
+
+	if !foundAny {
+		t.Fatalf("expected to inspect packages under %s/gene, %s/genome, and %s/grammars", modulePath, modulePath, modulePath)
+	}
+}
+
 func allowedImportPrefixes(importPath string) []string {
 	switch {
 	case importPath == modulePath+"/core":
@@ -199,6 +232,23 @@ func allowedImportPrefixes(importPath string) []string {
 		return []string{modulePath + "/fitness"}
 	case strings.HasPrefix(importPath, modulePath+"/functions"):
 		return []string{modulePath + "/core", modulePath + "/functions"}
+	case strings.HasPrefix(importPath, modulePath+"/grammars"):
+		return []string{modulePath + "/functions", modulePath + "/grammars"}
+	case strings.HasPrefix(importPath, modulePath+"/gene"):
+		return []string{
+			modulePath + "/core",
+			modulePath + "/functions",
+			modulePath + "/gene",
+			modulePath + "/grammars",
+		}
+	case strings.HasPrefix(importPath, modulePath+"/genome"):
+		return []string{
+			modulePath + "/core",
+			modulePath + "/functions",
+			modulePath + "/gene",
+			modulePath + "/genome",
+			modulePath + "/grammars",
+		}
 	default:
 		return nil
 	}
