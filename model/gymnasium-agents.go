@@ -28,6 +28,10 @@ const (
 // As more individuals are run and rewarded (at the end of their episode),
 // new individuals are created by mixing the genetic makeup of the other
 // top-performing individuals.
+//
+// Deprecated: use package env (github.com/gmlewis/gep/v2/env) instead.
+// The env package provides the same API as a first-class RL subsystem that
+// does not depend on the legacy model package as its execution engine.
 type GymnasiumAgents struct {
 	ActionSpace *common.Space
 	ObsSpace    *common.Space

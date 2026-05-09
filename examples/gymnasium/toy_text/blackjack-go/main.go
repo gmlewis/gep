@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/gmlewis/gep/v2/common"
+	"github.com/gmlewis/gep/v2/env"
 	"github.com/gmlewis/gep/v2/grammars"
 	gym "github.com/gmlewis/gep/v2/gymnasium"
-	"github.com/gmlewis/gep/v2/model"
 )
 
 const (
@@ -78,15 +78,15 @@ func main() {
 		log.Printf("Observation subspace[%v]: %+v", i, *subspace)
 	}
 
-	opts := []model.GymnasiumAgentsOption{
-		model.WithHeadSize(*headSize),
-		model.WithNumConstants(*numConsts),
-		model.WithNumIndividuals(*numIndividuals),
+	opts := []env.GymnasiumAgentsOption{
+		env.WithHeadSize(*headSize),
+		env.WithNumConstants(*numConsts),
+		env.WithNumIndividuals(*numIndividuals),
 	}
 	if *debug {
-		opts = append(opts, model.WithDebug())
+		opts = append(opts, env.WithDebug())
 	}
-	agents, err := model.NewGymnasiumAgents(actionSpace, obsSpace, opts...)
+	agents, err := env.NewGymnasiumAgents(actionSpace, obsSpace, opts...)
 	check("NewAgents: %v", err)
 
 	if *debug {
