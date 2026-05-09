@@ -516,6 +516,17 @@ func (g Genome[T]) SymbolNamesPerGene() [][]string {
 	return result
 }
 
+// ConstsPerGene returns the constants slice for each gene in the genome.
+// The outer slice has the same length as g.Genes; each inner slice is a
+// shallow copy of Gene[T].Constants for that gene.
+func (g Genome[T]) ConstsPerGene() [][]T {
+	result := make([][]T, len(g.Genes))
+	for i, gene := range g.Genes {
+		result[i] = gene.Constants
+	}
+	return result
+}
+
 // Dup returns a deep copy of the genome.  The link operator is shared (it is
 // assumed to be stateless and immutable).
 func (g Genome[T]) Dup() Genome[T] {

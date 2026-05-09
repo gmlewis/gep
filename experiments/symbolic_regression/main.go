@@ -95,11 +95,7 @@ func main() {
 		log.Printf("unable to load grammar: %v", err)
 	}
 
-	constsPerGene := make([][]float64, len(solution.Genome.Genes))
-	for i, g := range solution.Genome.Genes {
-		constsPerGene[i] = g.Constants
-	}
-	prog := codegen.ProgramFromSymbols(solution.Genome.SymbolNamesPerGene(), constsPerGene, solution.Genome.Link.Symbol())
+	prog := codegen.ProgramFromSymbols(solution.Genome.SymbolNamesPerGene(), solution.Genome.ConstsPerGene(), solution.Genome.Link.Symbol())
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
 	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %v\n", solution.Genome.KarvaString())
