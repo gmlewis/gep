@@ -5,8 +5,6 @@
 package genome
 
 import (
-	"log"
-
 	intN "github.com/gmlewis/gep/v2/functions/int_nodes"
 )
 
@@ -15,7 +13,6 @@ import (
 func (g *Genome) EvalInt(in []int) int {
 	lf, ok := intN.Int[g.LinkFunc]
 	if !ok {
-		log.Printf("Unable to find linking function: %v", g.LinkFunc)
 		return 0.0
 	}
 	result := g.Genes[0].EvalInt(in)

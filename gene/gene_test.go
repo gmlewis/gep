@@ -5,8 +5,10 @@
 package gene
 
 import (
+	"io"
 	"math"
 	"math/rand"
+	"os"
 	"reflect"
 	"testing"
 
@@ -20,6 +22,29 @@ func TestNew_InvalidSymbolIndexesDoNotExit(t *testing.T) {
 	}
 	if got := len(g.Constants); got != 0 {
 		t.Fatalf("len(g.Constants) = %v, want 0", got)
+	}
+}
+
+func TestNew_InvalidSymbolIndexesDoNotWriteStderr(t *testing.T) {
+	orig := os.Stderr
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("os.Pipe() error: %v", err)
+	}
+	os.Stderr = w
+	defer func() { os.Stderr = orig }()
+
+	_ = New("dX.cY", functions.Float64)
+
+	if err := w.Close(); err != nil {
+		t.Fatalf("stderr close error: %v", err)
+	}
+	out, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatalf("stderr read error: %v", err)
+	}
+	if len(out) != 0 {
+		t.Fatalf("New wrote to stderr: %q", string(out))
 	}
 }
 

@@ -6,11 +6,8 @@
 package model
 
 import (
-	"fmt"
-	"log"
 	"math"
 	"math/rand"
-	"strings"
 
 	"github.com/gmlewis/gep/v2/functions"
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
@@ -158,7 +155,6 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 			stop = bestGenome.Score >= 1000.0
 		}
 		if stop {
-			fmt.Printf("Stopping after generation #%v\n", i)
 			return bestGenome
 		}
 		// fmt.Printf("Best genome (score %v): %v\n", bestGenome.Score, *bestGenome)
@@ -174,7 +170,6 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 		// Now that replication is done, restore the best genome (aka "elitism")
 		g.Individuals[0] = saveCopy
 	}
-	fmt.Printf("Stopping after generation #%v\n", iterations)
 	return g.getBest()
 }
 
@@ -252,7 +247,6 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 	gene2 := genome2.Genes[geneIdx2]
 
 	if len(gene1.Symbols) != len(gene2.Symbols) || gene1.HeadSize != gene2.HeadSize {
-		log.Printf("programming error: gene1: %v symbols (headSize=%v), gene2: %v symbols (headSize=%v)", len(gene1.Symbols), gene1.HeadSize, len(gene2.Symbols), gene2.HeadSize)
 		return
 	}
 
@@ -269,16 +263,7 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 	newSyms2 = append(newSyms2, tail2...)
 
 	if len(newSyms1) != len(newSyms2) || len(newSyms1) != len(gene1.Symbols) {
-		log.Printf("programming error: newSyms1: %v symbols, newSyms2: %v symbols, gene1: %v symbols", len(newSyms1), len(newSyms2), len(gene1.Symbols))
 		return
-	}
-
-	if g.debug {
-		log.Printf("singleCrossover:\nbefore genome[%v].gene[%v]=%v\nbefore genome[%v].gene[%v]=%v\nafter genome[%v].gene[%v]=%v\nafter genome[%v].gene[%v]=%v",
-			idx1, geneIdx1, strings.Join(gene1.Symbols, "."),
-			idx2, geneIdx2, strings.Join(gene2.Symbols, "."),
-			idx1, geneIdx1, strings.Join(newSyms1, "."),
-			idx2, geneIdx2, strings.Join(newSyms2, "."))
 	}
 
 	gene1.Symbols = newSyms1
@@ -340,7 +325,6 @@ func maxArity(fs []gene.FuncWeight, funcType functions.FuncType) int {
 	case functions.Float64:
 		lookup = mn.Math
 	default:
-		log.Printf("unknown funcType: %v", funcType)
 		return 0
 	}
 
@@ -351,7 +335,6 @@ func maxArity(fs []gene.FuncWeight, funcType functions.FuncType) int {
 				r = fn.Terminals()
 			}
 		} else {
-			log.Printf("unable to find symbol %v in function map", f.Symbol)
 		}
 	}
 	return r

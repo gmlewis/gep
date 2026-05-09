@@ -5,7 +5,6 @@
 package gene
 
 import (
-	"log"
 	"strconv"
 
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
@@ -30,7 +29,6 @@ func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int) func([]bool) boo
 	// count := make(map[string]int)
 	// log.Infof("buildBoolTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex >= len(g.Symbols) {
-		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
 		return func(a []bool) bool { return false }
 	}
 	sym := g.Symbols[symbolIndex]
@@ -52,11 +50,9 @@ func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int) func([]bool) boo
 	} else { // No named symbol found - look for d0, d1, ...
 		if sym[0:1] == "d" {
 			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse variable index: sym=%q", sym)
 			} else {
 				return func(in []bool) bool {
 					if index >= len(in) {
-						log.Printf("error evaluating gene symbol %q: index %v >= d length (%v)", sym, index, len(in))
 						return false
 					}
 					return in[index]
@@ -65,6 +61,5 @@ func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int) func([]bool) boo
 		}
 		// Note that constants c0, c1, ... don't make sense for bool expressions
 	}
-	log.Printf("unable to return function: unknown gene symbol %q", sym)
 	return func(in []bool) bool { return false }
 }

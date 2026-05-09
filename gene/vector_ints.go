@@ -5,7 +5,6 @@
 package gene
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/gmlewis/gep/v2/functions"
@@ -33,7 +32,6 @@ func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) func([]Vect
 	// count := make(map[string]int)
 	// log.Infof("buildVectorIntTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex >= len(g.Symbols) {
-		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
 		return func(a []VectorInt) VectorInt { return VectorInt{} }
 	}
 	sym := g.Symbols[symbolIndex]
@@ -55,11 +53,9 @@ func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) func([]Vect
 	} else { // No named symbol found - look for d0, d1, ...
 		if sym[0:1] == "d" {
 			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse variable index: sym=%q", sym)
 			} else {
 				return func(in []VectorInt) VectorInt {
 					if index >= len(in) {
-						log.Printf("error evaluating gene %q: index %v >= d length (%v)", sym, index, len(in))
 						return VectorInt{}
 					}
 					return in[index]
@@ -67,11 +63,9 @@ func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) func([]Vect
 			}
 		} else if sym[0:1] == "c" {
 			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse constant index: sym=%v", sym)
 			} else {
 				return func(in []VectorInt) VectorInt {
 					if index >= len(g.Constants) {
-						log.Printf("error evaluating gene %q: index %v >= c length (%v)", sym, index, len(g.Constants))
 						return VectorInt{}
 					}
 					op := func(in []int) int {
@@ -82,6 +76,5 @@ func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) func([]Vect
 			}
 		}
 	}
-	log.Printf("unable to return function: unknown gene symbol %q", sym)
 	return func(in []VectorInt) VectorInt { return VectorInt{} }
 }

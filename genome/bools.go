@@ -5,8 +5,6 @@
 package genome
 
 import (
-	"log"
-
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
 
@@ -16,7 +14,6 @@ import (
 func (g *Genome) EvalBool(in []bool) bool {
 	lf, ok := bn.BoolAllGates[g.LinkFunc]
 	if !ok {
-		log.Printf("Unable to find linking function: %v", g.LinkFunc)
 		return false
 	}
 	result := g.Genes[0].EvalBool(in)

@@ -7,7 +7,6 @@ package model
 import (
 	"cmp"
 	"fmt"
-	"log"
 	"sort"
 
 	"github.com/gmlewis/gep/v2/common"
@@ -192,11 +191,7 @@ func (ga *GymnasiumAgents) EvaluateAgent(agentIdx, episodeSteps int, obs common.
 			(*v)[i] = clamp(val, 0, ga.ActionSpace.Subspaces[i].N-1)
 		}
 	case *int:
-		before := *v
 		*v = clamp(*v, 0, ga.ActionSpace.N-1)
-		if ga.debug {
-			log.Printf("EvaluateAgent(agentIdx=%v, obs=%+v)=%v => clamp(0,%v) => %v", agentIdx, observations, before, ga.ActionSpace.N-1, *v)
-		}
 	default:
 		return fmt.Errorf("agent.Evaluate: action type '%T' not yet supported", v)
 	}

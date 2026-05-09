@@ -13,7 +13,6 @@ package genome
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"math/rand"
 	"strings"
@@ -125,7 +124,6 @@ func (g *Genome) Mutate(numMutations int) {
 // Dup duplicates the genome into the provided destination genome.
 func (g *Genome) Dup() *Genome {
 	if g == nil {
-		log.Printf("denome.Dup error: src and dst must be non-nil")
 		return nil
 	}
 	dst := &Genome{
@@ -148,7 +146,6 @@ type ScoringFunc func(g *Genome) float64
 // EvaluateWithScore scores a genome and sends the result to a channel.
 func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
 	if sf == nil {
-		log.Printf("genome.EvaluateWithScore: ScoringFunc must not be nil")
 		g.Score = math.Inf(-1)
 		c <- g
 		return

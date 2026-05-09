@@ -7,7 +7,6 @@ package gene
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"math/rand"
 	"strconv"
@@ -87,7 +86,6 @@ func New(x string, funcType functions.FuncType) *Gene {
 		if sym[0:1] == "d" {
 			index, err := strconv.Atoi(sym[1:])
 			if err != nil {
-				log.Printf("unable to parse variable index %q: %v", sym, err)
 				continue
 			}
 			if index >= numTerminals {
@@ -96,7 +94,6 @@ func New(x string, funcType functions.FuncType) *Gene {
 		} else if sym[0:1] == "c" {
 			index, err := strconv.Atoi(sym[1:])
 			if err != nil {
-				log.Printf("unable to parse constant index %q: %v", sym, err)
 				continue
 			}
 			if index >= numConstants {
@@ -170,9 +167,7 @@ func (g Gene) String() string {
 			i, err := strconv.Atoi(s[1:])
 			if err != nil || i < 0 || i >= len(g.Constants) {
 				if err != nil {
-					log.Printf("bad constant name: %v", s)
 				} else {
-					log.Printf("constant index out of range: symbol=%q index=%v len(constants)=%v", s, i, len(g.Constants))
 				}
 				syms = append(syms, s)
 				continue
@@ -208,7 +203,6 @@ func (g *Gene) SymbolCount(sym string) int {
 		case functions.VectorInts:
 			g.generateVectorIntFunc()
 		default:
-			log.Printf("unknown funcType: %v", g.funcType)
 			return 0
 		}
 	}
@@ -223,7 +217,6 @@ func (g *Gene) Mutate() {
 	}
 	if position < g.HeadSize {
 		if len(g.choiceSlice) < 2 {
-			log.Printf("error: must have choice of more than one function")
 			return
 		}
 		symbol := g.Symbols[position]
@@ -248,7 +241,6 @@ func (g *Gene) Mutate() {
 // Dup duplicates the gene into the provided destination gene.
 func (g *Gene) Dup() *Gene {
 	if g == nil {
-		log.Printf("gene.Dup error: src and dst must be non-nil")
 		return nil
 	}
 	r := &Gene{
@@ -334,7 +326,6 @@ func (g *Gene) getArgOrder() [][]int {
 	case functions.VectorInts:
 		lookup = vin.VectorIntFuncs
 	default:
-		log.Printf("unknown funcType: %v", g.funcType)
 		return nil
 	}
 

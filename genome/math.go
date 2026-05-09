@@ -5,8 +5,6 @@
 package genome
 
 import (
-	"log"
-
 	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
 )
 
@@ -15,7 +13,6 @@ import (
 func (g *Genome) EvalMath(in []float64) float64 {
 	lf, ok := mn.Math[g.LinkFunc]
 	if !ok {
-		log.Printf("Unable to find linking function: %v", g.LinkFunc)
 		return 0.0
 	}
 	result := g.Genes[0].EvalMath(in)

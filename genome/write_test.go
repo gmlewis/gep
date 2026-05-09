@@ -6,6 +6,8 @@ package genome
 
 import (
 	"bytes"
+	"io"
+	"os"
 	"strings"
 	"testing"
 
@@ -137,5 +139,50 @@ func TestGenerateCode_MissingLinkFunctionReturnsError(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "MissingLink") {
 		t.Fatalf("generateCode() error = %q, want mention of missing link function", err)
+	}
+}
+
+func TestWriteWithError_MissingLinkFunctionReturnsError(t *testing.T) {
+	g1 := gene.New("d0", functions.Bool)
+	gn := New([]*gene.Gene{g1}, "MissingLink")
+	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
+	if err != nil {
+		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
+	}
+
+	var b bytes.Buffer
+	if err := gn.WriteWithError(&b, grammar); err == nil {
+		t.Fatalf("WriteWithError() error = nil, want non-nil")
+	}
+}
+
+func TestWrite_MissingLinkFunctionDoesNotWriteStdout(t *testing.T) {
+	g1 := gene.New("d0", functions.Bool)
+	gn := New([]*gene.Gene{g1}, "MissingLink")
+	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
+	if err != nil {
+		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
+	}
+
+	orig := os.Stdout
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("os.Pipe() error: %v", err)
+	}
+	os.Stdout = w
+	defer func() { os.Stdout = orig }()
+
+	var b bytes.Buffer
+	gn.Write(&b, grammar)
+
+	if err := w.Close(); err != nil {
+		t.Fatalf("stdout close error: %v", err)
+	}
+	out, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatalf("stdout read error: %v", err)
+	}
+	if len(out) != 0 {
+		t.Fatalf("Write() wrote to stdout: %q", string(out))
 	}
 }

@@ -595,7 +595,7 @@ Once the architecture is modernized:
 The notes below evaluate the current repository against that original intent
 without reinterpreting the phases.
 
-### Phase 1 status: partially faithful
+### Phase 1 status: complete (after P1-A)
 
 What appears complete:
 
@@ -603,21 +603,19 @@ What appears complete:
 - score orientation and stopping behavior are configurable
 - cache invalidation / duplication semantics were materially improved
 
-Remaining deviation from the original Phase 1 intent:
+P1-A completion evidence:
 
-- the legacy library path is still not fully stabilized because several
-  library APIs log or print on invalid state instead of surfacing errors
-  explicitly
-- examples include CLI exits as expected, but library packages still contain
-  "log-and-continue" / "print-and-continue" behavior that makes correctness
-  issues harder to detect and fix
-
-Representative locations:
-
-- `gene/gene.go`
-- `genome/genome.go`
-- `genome/write.go`
-- `model/model.go`
+- direct library `log.Printf` / `fmt.Printf` emissions were removed from legacy
+  `gene`, `genome`, and `model` packages
+- legacy codegen now has an explicit error-return surface:
+  `(*genome.Genome).WriteWithError(...) error`, while `Write(...)` remains as a
+  narrow compatibility wrapper
+- focused tests now prove no direct stdout/stderr emission on representative
+  legacy error/stop paths:
+  - `gene.TestNew_InvalidSymbolIndexesDoNotWriteStderr`
+  - `genome.TestWrite_MissingLinkFunctionDoesNotWriteStdout`
+  - `model.TestEvolve_DoesNotWriteStdoutOnStop`
+- full repo validation passed via `scripts/test-all.sh`
 
 ### Phase 2 status: mostly faithful, but not yet dominant
 
@@ -713,7 +711,26 @@ Required outcome:
 - eliminate direct stdout/stderr emission from library packages
 - preserve existing behavior only where it is intentionally CLI/example-facing
 
-This milestone corrects the remaining Phase 1 deviation.
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- no direct runtime `log.Printf` / `fmt.Printf` emissions remain in legacy
+  library code for:
+  - `gene/*.go`
+  - `genome/*.go`
+  - `model/*.go`
+- `genome/write.go` now exposes `WriteWithError(...) error` as the explicit
+  codegen error surface, with `Write(...)` retained as compatibility wrapper
+- added regression tests:
+  - `gene/gene_test.go`: `TestNew_InvalidSymbolIndexesDoNotWriteStderr`
+  - `genome/write_test.go`:
+    `TestWriteWithError_MissingLinkFunctionReturnsError`,
+    `TestWrite_MissingLinkFunctionDoesNotWriteStdout`
+  - `model/model_test.go`: `TestEvolve_DoesNotWriteStdoutOnStop`
+- verification commands passed:
+  - `go test ./gene ./genome ./model`
+  - `./scripts/test-all.sh`
 
 ### P2-A: Make typed core/evolution the default execution surface
 

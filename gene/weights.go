@@ -1,8 +1,6 @@
 package gene
 
 import (
-	"log"
-
 	"github.com/gmlewis/gep/v2/functions"
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
 	in "github.com/gmlewis/gep/v2/functions/int_nodes"
@@ -32,7 +30,6 @@ func AllSymbolsEqualWeights(funcType functions.FuncType) []FuncWeight {
 	case functions.VectorInts:
 		lookup = vin.VectorIntFuncs
 	default:
-		log.Printf("unknown funcType: %v", funcType)
 		return nil
 	}
 

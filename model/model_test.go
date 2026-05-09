@@ -5,6 +5,8 @@
 package model
 
 import (
+	"io"
+	"os"
 	"sync/atomic"
 	"testing"
 
@@ -222,6 +224,36 @@ func TestEvolve_NilStopFuncUsesDefaultThreshold(t *testing.T) {
 	best := g.Evolve(100)
 	if best.Score < 1000.0 {
 		t.Fatalf("expected best.Score >= 1000, got %v", best.Score)
+	}
+}
+
+func TestEvolve_DoesNotWriteStdoutOnStop(t *testing.T) {
+	funcs := []gene.FuncWeight{
+		{Symbol: "+", Weight: 1},
+	}
+	g := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(*genome.Genome) float64 {
+		return 1000.0
+	}, false)
+
+	orig := os.Stdout
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("os.Pipe() error: %v", err)
+	}
+	os.Stdout = w
+	defer func() { os.Stdout = orig }()
+
+	_ = g.Evolve(10)
+
+	if err := w.Close(); err != nil {
+		t.Fatalf("stdout close error: %v", err)
+	}
+	out, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatalf("stdout read error: %v", err)
+	}
+	if len(out) != 0 {
+		t.Fatalf("Evolve() wrote to stdout: %q", string(out))
 	}
 }
 
