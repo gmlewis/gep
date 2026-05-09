@@ -13,12 +13,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/gmlewis/gep/v2/codegen"
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution"
 	evolutionMutation "github.com/gmlewis/gep/v2/evolution/mutation"
 	"github.com/gmlewis/gep/v2/functions"
 	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
-	"github.com/gmlewis/gep/v2/genome"
 	"github.com/gmlewis/gep/v2/grammars"
 )
 
@@ -146,10 +146,6 @@ func main() {
 		InversionRate:     0.1,
 	}
 	solution := population.Evolve(20000)
-	legacySolution, err := genome.NewFromCoreBool(solution.Genome)
-	if err != nil {
-		log.Fatalf("NewFromCoreBool failed: %v", err)
-	}
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()
@@ -157,9 +153,19 @@ func main() {
 		log.Printf("unable to load Boolean grammar: %v", err)
 	}
 
+	genes := make([]codegen.Expressor, len(solution.Genome.Genes))
+	for i, g := range solution.Genome.Genes {
+		syms := make([]string, len(g.Symbols))
+		for j, sym := range g.Symbols {
+			syms[j] = sym.Name
+		}
+		genes[i] = codegen.KarvaExpressor{Symbols: syms}
+	}
+	prog := codegen.Program{Genes: genes, LinkFunc: solution.Genome.Link.Symbol()}
+
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// 6-multiplexer solution karva expression:\n// %v\n", legacySolution)
-	if err := legacySolution.Write(os.Stdout, gr); err != nil {
+	fmt.Printf("// 6-multiplexer solution karva expression:\n// %v\n", solution.Genome.KarvaString())
+	if err := codegen.Write(os.Stdout, prog, gr); err != nil {
 		log.Fatalf("Write failed: %v", err)
 	}
 }

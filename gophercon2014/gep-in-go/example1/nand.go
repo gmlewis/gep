@@ -6,11 +6,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 
+	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/evolution"
 	"github.com/gmlewis/gep/v2/functions"
-	"github.com/gmlewis/gep/v2/gene"
-	"github.com/gmlewis/gep/v2/genome"
-	"github.com/gmlewis/gep/v2/model"
+	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
 
 var nandTests = []struct {
@@ -23,10 +24,10 @@ var nandTests = []struct {
 	{[]bool{true, true}, false},
 }
 
-func validateNand(g *genome.Genome) float64 {
+func validateNand(g core.Genome[bool]) float64 {
 	correct := 0
 	for _, n := range nandTests {
-		r, err := g.EvalBool(n.in)
+		r, err := g.Eval(n.in)
 		if err != nil {
 			return 0
 		}
@@ -38,18 +39,33 @@ func validateNand(g *genome.Genome) float64 {
 }
 
 func main() {
-	funcs := []gene.FuncWeight{
-		{Symbol: "Not", Weight: 1},
-		{Symbol: "And", Weight: 5},
-		{Symbol: "Or", Weight: 5},
+	funcs := []string{"Not", "And", "Or"}
+	fm := make(functions.FuncMap, len(funcs))
+	for _, sym := range funcs {
+		fn, ok := boolNodes.BoolAllGates[sym]
+		if !ok {
+			log.Fatalf("unsupported boolean function %q", sym)
+		}
+		fm[sym] = fn
 	}
-	e, err := model.New(funcs, functions.Bool, 30, 7, 1, 2, 0, "Or", validateNand, false)
+	cat, err := boolNodes.CatalogFrom(fm)
 	if err != nil {
-		panic(err)
+		log.Fatalf("CatalogFrom failed: %v", err)
 	}
-	s, err := e.Evolve(1000)
+
+	linkNode, ok := boolNodes.BoolAllGates["Or"]
+	if !ok {
+		log.Fatal(`link function "Or" not found`)
+	}
+	link, err := core.NewLinkFunc[bool]("Or", linkNode.BoolFunction)
 	if err != nil {
-		panic(err)
+		log.Fatalf("NewLinkFunc failed: %v", err)
 	}
-	fmt.Printf("nand solution: %v, score=%v\n", s, validateNand(s))
+
+	population, err := evolution.New(cat, 30, 7, 1, 2, 0, link, validateNand)
+	if err != nil {
+		log.Fatalf("New failed: %v", err)
+	}
+	solution := population.Evolve(1000)
+	fmt.Printf("nand solution: %v, score=%v\n", solution.Genome.KarvaString(), solution.Score)
 }

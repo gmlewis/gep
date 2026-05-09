@@ -16,6 +16,71 @@ import (
 	"github.com/gmlewis/gep/v2/grammars"
 )
 
+// KarvaExpressor implements Expressor from pre-extracted Karva symbol names
+// and numeric constants. It computes the argument-order tree from the grammar
+// at render time so no typed node-arity information from the original genome
+// is required. This allows experiment and example code to call codegen directly
+// from a core.Genome[T] without importing the legacy gene or genome packages.
+type KarvaExpressor struct {
+	// Symbols contains the individual Karva symbol names (e.g. "And", "d0", "c0").
+	Symbols []string
+	// Float64Constants contains the constant values referenced by "c0", "c1", …
+	// symbols. For boolean or integer genes with no constants this may be nil.
+	Float64Constants []float64
+}
+
+// Expression builds the expression tree for this gene using the grammar and
+// records any required helper functions into helpers.
+func (e KarvaExpressor) Expression(grammar *grammars.Grammar, helpers grammars.HelperMap) (string, error) {
+	argOrder := buildArgOrderFromGrammar(e.Symbols, grammar)
+	numTerminals := computeNumTerminals(e.Symbols, e.Float64Constants)
+	return Expression(e.Symbols, e.Float64Constants, numTerminals, argOrder, grammar, helpers)
+}
+
+// buildArgOrderFromGrammar computes the child-symbol index map by looking up
+// function arities in the grammar's function map. This mirrors the logic in
+// core.buildArgOrder but uses the grammar instead of typed node objects, keeping
+// codegen free of any dependency on the core or gene packages.
+func buildArgOrderFromGrammar(symbols []string, grammar *grammars.Grammar) [][]int {
+	argOrder := make([][]int, len(symbols))
+	argCount := 0
+	for i, sym := range symbols {
+		s, ok := grammar.Functions.FuncMap[sym]
+		if !ok {
+			continue
+		}
+		f, ok := s.(*grammars.Function)
+		if !ok {
+			continue
+		}
+		n := f.Terminals()
+		if n <= 0 {
+			continue
+		}
+		args := make([]int, n)
+		for j := range n {
+			argCount++
+			args[j] = argCount
+		}
+		argOrder[i] = args
+	}
+	return argOrder
+}
+
+// computeNumTerminals returns the numTerminals value expected by Expression: the
+// count of distinct input variables ("d0", "d1", …) plus the number of constants.
+func computeNumTerminals(symbols []string, constants []float64) int {
+	maxIdx := -1
+	for _, sym := range symbols {
+		if len(sym) > 1 && sym[0] == 'd' {
+			if idx, err := strconv.Atoi(sym[1:]); err == nil && idx > maxIdx {
+				maxIdx = idx
+			}
+		}
+	}
+	return (maxIdx + 1) + len(constants)
+}
+
 // Expressor renders a single gene expression for a grammar while collecting any
 // helper functions required by that expression.
 type Expressor interface {
