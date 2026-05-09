@@ -13,7 +13,7 @@ import (
 func (g *Genome) EvalInt(in []int) int {
 	lf, ok := intN.Int[g.LinkFunc]
 	if !ok {
-		return 0.0
+		return 0
 	}
 	result := g.Genes[0].EvalInt(in)
 	for i := 1; i < len(g.Genes); i++ {
