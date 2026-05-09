@@ -147,7 +147,6 @@ func newGeneration(
 // genome. When StopFunc is nil, the default criterion of Score >= 1000 is used.
 func (g *Generation) Evolve(iterations int) (*genome.Genome, error) {
 	// Algorithm flow diagram, figure 3.1, book page 56
-	// Algorithm flow diagram, figure 3.1, book page 56
 	for i := 0; i < iterations; i++ {
 		// fmt.Printf("Iteration #%v...\n", i)
 		bestGenome, err := g.getBest() // Preserve the best genome
