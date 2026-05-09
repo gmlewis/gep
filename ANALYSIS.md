@@ -645,23 +645,19 @@ Representative locations:
 - `experiments/*`
 - `examples/gymnasium/*`
 
-### Phase 3 status: mostly faithful, but not fully decomposed
+### Phase 3 status: complete (after P3-A)
 
 What appears complete:
 
 - explicit subsystems exist for selection, mutation, recombination,
-  termination, evaluation, and statistics
+  transposition, termination, evaluation, and statistics
 - those subsystems are integrated into the typed `evolution` engine
-
-Remaining deviation from the original Phase 3 intent:
-
-- transposition is not a first-class subsystem; it is still bundled into
-  `evolution/mutation`
 
 Representative locations:
 
 - `evolution/evolution.go`
 - `evolution/mutation/mutation.go`
+- `evolution/transposition/transposition.go`
 
 ### Phase 4 status: not faithful
 
@@ -851,6 +847,32 @@ Required outcome:
 - continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
 This milestone corrects the remaining Phase 3 deviation.
+
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- extracted typed transposition orchestration into a dedicated
+  `evolution/transposition` subsystem with package-level godoc and exported
+  `Config` / `Apply` API:
+  - `evolution/transposition/transposition.go`
+- removed IS, RIS, and gene transposition orchestration from
+  `evolution/mutation`, leaving that package focused on point mutation and
+  inversion:
+  - `evolution/mutation/mutation.go`
+- gave `evolution.Generation` a distinct transposition configuration and
+  invocation stage via `TranspositionConfig` and `Transpose`, and updated the
+  typed evolution loop to run `select -> recombine -> mutate -> transpose`:
+  - `evolution/evolution.go`
+- kept operator tests focused on behavior and genome validity by moving
+  transposition-specific operator coverage into the new subsystem tests and
+  leaving `evolution` tests focused on stage wiring/integration:
+  - `evolution/transposition/transposition_test.go`
+  - `evolution/mutation/mutation_test.go`
+  - `evolution/evolution_test.go`
+- verification commands passed:
+  - `go test ./evolution/...`
+  - `./scripts/test-all.sh`
 
 ### P4-A: Create a dedicated codegen subsystem
 

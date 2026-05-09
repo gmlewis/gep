@@ -6,11 +6,9 @@
 // typed evolution engine.
 //
 // Each operator is applied probabilistically according to the rates in Config.
-// Gene-level operators (point mutation, inversion, IS transposition, RIS
-// transposition) are applied independently to every gene in every genome.
-// Genome-level operators (gene transposition) are applied to the genome as a
-// whole.  All operators produce deep copies; the input genomes are never
-// modified in place.
+// Gene-level operators (point mutation and inversion) are applied
+// independently to every gene in every genome. All operators produce deep
+// copies; the input genomes are never modified in place.
 package mutation
 
 import (
@@ -23,8 +21,8 @@ import (
 // Zero values disable the corresponding operators.
 type Config struct {
 	// HeadSize is the length of each gene's head region. This is required by
-	// operators that need the head/tail boundary (inversion, IS transposition,
-	// RIS transposition, point mutation).
+	// operators that need the head/tail boundary (inversion and point
+	// mutation).
 	HeadSize int
 
 	// NumTerminals is the number of terminal symbols available. Required by
@@ -42,26 +40,6 @@ type Config struct {
 	// InversionRate is the probability [0, 1] that each gene undergoes head
 	// inversion. Zero disables the operator.
 	InversionRate float64
-
-	// ISTranspositionRate is the probability [0, 1] that each gene undergoes
-	// IS-element transposition. Zero disables the operator.
-	ISTranspositionRate float64
-
-	// MaxISLen is the maximum IS element length used by IS transposition.
-	// Defaults to 1 when zero.
-	MaxISLen int
-
-	// RISTranspositionRate is the probability [0, 1] that each gene undergoes
-	// RIS-element transposition. Zero disables the operator.
-	RISTranspositionRate float64
-
-	// MaxRISLen is the maximum RIS element length used by RIS transposition.
-	// Defaults to 1 when zero.
-	MaxRISLen int
-
-	// GeneTranspositionRate is the probability [0, 1] that each genome
-	// undergoes gene transposition. Zero disables the operator.
-	GeneTranspositionRate float64
 }
 
 // Apply applies the configured mutation operators to each genome and returns a
@@ -71,24 +49,12 @@ type Config struct {
 // Operators are applied in the following order per genome:
 //  1. Point mutation  (per gene)
 //  2. Inversion       (per gene)
-//  3. IS transposition (per gene)
-//  4. RIS transposition (per gene)
-//  5. Gene transposition (per genome)
 //
 // cat must be non-nil when cfg.PointMutationRate > 0.
 // rng may be nil; when nil the global math/rand source is used.
 func Apply[T any](genomes []core.Genome[T], cat *core.Catalog[T], cfg Config, rng *rand.Rand) []core.Genome[T] {
 	if len(genomes) == 0 {
 		return nil
-	}
-
-	maxISLen := cfg.MaxISLen
-	if maxISLen < 1 {
-		maxISLen = 1
-	}
-	maxRISLen := cfg.MaxRISLen
-	if maxRISLen < 1 {
-		maxRISLen = 1
 	}
 
 	randFloat64 := func() float64 {
@@ -120,28 +86,7 @@ func Apply[T any](genomes []core.Genome[T], cat *core.Catalog[T], cfg Config, rn
 				}
 			}
 
-			// 3. IS transposition
-			if cfg.ISTranspositionRate > 0 && randFloat64() < cfg.ISTranspositionRate {
-				if t, err := core.ISTransposition(gene, cfg.HeadSize, maxISLen, rng); err == nil {
-					gene = t
-				}
-			}
-
-			// 4. RIS transposition
-			if cfg.RISTranspositionRate > 0 && randFloat64() < cfg.RISTranspositionRate {
-				if t, err := core.RISTransposition(gene, cfg.HeadSize, maxRISLen, rng); err == nil {
-					gene = t
-				}
-			}
-
 			current.Genes[j] = gene
-		}
-
-		// 5. Gene transposition (genome-level)
-		if cfg.GeneTranspositionRate > 0 && randFloat64() < cfg.GeneTranspositionRate {
-			if t, err := core.GeneTranspose(current, rng); err == nil {
-				current = t
-			}
 		}
 
 		result[i] = current

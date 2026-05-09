@@ -19,10 +19,13 @@
 //   - Select – roulette-wheel (fitness-proportionate) selection.
 //   - Recombine – applies configurable crossover operators (one-point and
 //     two-point recombination) to the population.
-//   - Mutate – applies configurable genetic operators (point mutation, inversion,
-//     IS/RIS transposition, gene transposition) to the population.
+//   - Mutate – applies configurable mutation operators (point mutation and
+//     inversion) to the population.
+//   - Transpose – applies configurable transposition operators (IS/RIS
+//     transposition and gene transposition) to the population.
 //   - Evolve – runs the complete evolution loop (evaluate → stop-check → select →
-//     recombine → mutate → elitism) for a given number of iterations.
+//     recombine → mutate → transpose → elitism) for a given number of
+//     iterations.
 //   - Statistics – optional per-generation statistics collection via a
 //     *statistics.Collector stored on Generation.
 //   - TerminationCriteria – optional list of termination.Criterion values that
@@ -46,6 +49,12 @@
 //	    PointMutationRate: 0.044,
 //	    InversionRate:     0.1,
 //	}
+//	gen.TranspositionConfig = transposition.Config{
+//	    HeadSize:              7,
+//	    ISTranspositionRate:   0.1,
+//	    RISTranspositionRate:  0.1,
+//	    GeneTranspositionRate: 0.1,
+//	}
 //	result := gen.Evolve(500)
 package evolution
 
@@ -61,6 +70,7 @@ import (
 	"github.com/gmlewis/gep/v2/evolution/selection"
 	"github.com/gmlewis/gep/v2/evolution/statistics"
 	"github.com/gmlewis/gep/v2/evolution/termination"
+	"github.com/gmlewis/gep/v2/evolution/transposition"
 )
 
 // ScoringFunc computes a fitness score for a genome.
@@ -103,6 +113,11 @@ type Generation[T any] struct {
 	// selection and at what rates. Zero values disable the corresponding
 	// operators. See evolution/mutation.Config for details.
 	MutationConfig mutation.Config
+
+	// TranspositionConfig controls which transposition operators are applied
+	// after mutation and at what rates. Zero values disable the corresponding
+	// operators. See evolution/transposition.Config for details.
+	TranspositionConfig transposition.Config
 
 	// RecombinationConfig controls one-point and two-point crossover rates
 	// applied after selection. Zero values disable recombination operators.
@@ -324,6 +339,32 @@ func (g *Generation[T]) Mutate() {
 	}
 }
 
+// Transpose applies the configured transposition operators to the current
+// population in place, replacing each individual with a (possibly transposed)
+// offspring.
+//
+// The operators applied and their rates are governed by TranspositionConfig.
+// When all rates are zero (the default), Transpose is effectively a no-op that
+// deep-copies the current population.
+//
+// Transpose uses the headSize stored at construction time to drive IS and RIS
+// transposition. TranspositionConfig.HeadSize is overridden by the value stored
+// at construction time so callers do not need to duplicate that setting.
+func (g *Generation[T]) Transpose() {
+	cfg := g.TranspositionConfig
+	cfg.HeadSize = g.headSize
+
+	genomes := make([]core.Genome[T], len(g.Individuals))
+	for i, ind := range g.Individuals {
+		genomes[i] = ind.Genome
+	}
+
+	transposed := transposition.Apply(genomes, cfg, g.rng)
+	for i, genome := range transposed {
+		g.Individuals[i].Genome = genome
+	}
+}
+
 // Evolve runs the GEP algorithm for up to iterations generations.
 //
 // Each iteration:
@@ -340,8 +381,9 @@ func (g *Generation[T]) Mutate() {
 //  5. Saves a deep copy of the best individual (elitism).
 //  6. Replaces the population via roulette-wheel selection (calls Select).
 //  7. Applies configured crossover operators to the population (calls Recombine).
-//  8. Applies configured genetic operators to the population (calls Mutate).
-//  9. Restores the saved best individual to position 0 (elitism guarantee).
+//  8. Applies configured mutation operators to the population (calls Mutate).
+//  9. Applies configured transposition operators to the population (calls Transpose).
+//  10. Restores the saved best individual to position 0 (elitism guarantee).
 //
 // If the loop completes without triggering the stopping criterion, Evolve
 // performs a final Evaluate (and a final statistics record) and returns
@@ -373,6 +415,7 @@ func (g *Generation[T]) Evolve(iterations int) Individual[T] {
 		g.Select()
 		g.Recombine()
 		g.Mutate()
+		g.Transpose()
 		// Elitism: ensure the best individual survives to the next generation.
 		g.Individuals[0] = saveBest
 	}
