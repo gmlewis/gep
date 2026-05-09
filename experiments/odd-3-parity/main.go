@@ -82,11 +82,7 @@ func main() {
 		log.Printf("unable to load Boolean grammar: %v", err)
 	}
 
-	symsPerGene := make([][]string, len(solution.Genome.Genes))
-	for i, g := range solution.Genome.Genes {
-		symsPerGene[i] = g.SymbolNames()
-	}
-	prog := codegen.ProgramFromSymbols(symsPerGene, nil, solution.Genome.Link.Symbol())
+	prog := codegen.ProgramFromSymbols(solution.Genome.SymbolNamesPerGene(), nil, solution.Genome.Link.Symbol())
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
 	fmt.Printf("// odd-3-parity solution karva expression:\n// %v\n", solution.Genome.KarvaString())

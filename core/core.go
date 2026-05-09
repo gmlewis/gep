@@ -505,6 +505,17 @@ func (g Genome[T]) KarvaString() string {
 	return strings.Join(parts, sep)
 }
 
+// SymbolNamesPerGene returns the Karva symbol names for each gene in the genome.
+// The outer slice has the same length as g.Genes; each inner slice is produced
+// by Gene[T].SymbolNames().
+func (g Genome[T]) SymbolNamesPerGene() [][]string {
+	result := make([][]string, len(g.Genes))
+	for i, gene := range g.Genes {
+		result[i] = gene.SymbolNames()
+	}
+	return result
+}
+
 // Dup returns a deep copy of the genome.  The link operator is shared (it is
 // assumed to be stateless and immutable).
 func (g Genome[T]) Dup() Genome[T] {
