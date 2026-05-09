@@ -754,6 +754,22 @@ Completion proof:
   - `go test ./gene ./genome ./model`
   - `./scripts/test-all.sh`
 
+### P1-B: Modernize legacy-style `for` loops to `range` where equivalent
+
+Goal:
+
+- improve readability by replacing legacy index-based loop forms with modern Go
+  `range` loops where behavior remains equivalent
+
+Required outcome:
+
+- audit repository packages for legacy-style `for` loops that can be safely
+  rewritten as `range` loops without changing semantics
+- convert those loops to `range` syntax in a behavior-preserving way
+- keep explicit index/counter loops only where they are required for semantics
+  (for example, custom stepping, reverse traversal, or mutation during index
+  iteration)
+
 ### P2-A: Make typed core/evolution the default execution surface
 
 Goal:
