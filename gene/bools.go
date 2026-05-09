@@ -5,7 +5,7 @@
 package gene
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
@@ -33,7 +33,7 @@ func (g *Gene) EvalBool(in []bool) (bool, error) {
 		}
 	}
 	if g.bf == nil {
-		return false, fmt.Errorf("unable to generate bool evaluator")
+		return false, errors.New("unable to generate bool evaluator")
 	}
 	return g.bf(in), nil
 }

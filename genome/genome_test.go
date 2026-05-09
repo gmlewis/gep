@@ -5,6 +5,7 @@
 package genome
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -896,7 +897,7 @@ func TestFuelConsumption(t *testing.T) {
 
 func checkEqual(g1 *Genome, g2 *Genome) error {
 	if g1 == nil || g2 == nil {
-		return fmt.Errorf("genome.checkEqual error: g1 and g2 must be non-nil")
+		return errors.New("genome.checkEqual error: g1 and g2 must be non-nil")
 	}
 	if len(g1.Genes) != len(g2.Genes) {
 		return fmt.Errorf("len(g1.Genes)=%v != len(g2.Genes)=%v", len(g1.Genes), len(g2.Genes))

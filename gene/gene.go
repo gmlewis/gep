@@ -87,7 +87,7 @@ func New(x string, funcType functions.FuncType) (*Gene, error) {
 	var errs []error
 	for _, sym := range parts {
 		if len(sym) == 0 {
-			errs = append(errs, fmt.Errorf("empty symbol"))
+			errs = append(errs, errors.New("empty symbol"))
 			continue
 		}
 		if sym[0:1] == "d" {
@@ -239,7 +239,7 @@ func (g *Gene) Mutate() error {
 	}
 	if position < g.HeadSize {
 		if len(g.choiceSlice) < 2 {
-			return fmt.Errorf("must have choice of more than one function")
+			return errors.New("must have choice of more than one function")
 		}
 		symbol := g.Symbols[position]
 		for symbol == g.Symbols[position] { // Force new symbol to be different from old one
@@ -264,7 +264,7 @@ func (g *Gene) Mutate() error {
 // Dup duplicates the gene into the provided destination gene.
 func (g *Gene) Dup() (*Gene, error) {
 	if g == nil {
-		return nil, fmt.Errorf("gene.Dup error: src and dst must be non-nil")
+		return nil, errors.New("gene.Dup error: src and dst must be non-nil")
 	}
 	r := &Gene{
 		Symbols:      make([]string, len(g.Symbols)),
@@ -293,7 +293,7 @@ func (g *Gene) InvalidateCache() {
 // CheckEqual is used for testing purposes only (exported to use in genome_test.go).
 func CheckEqual(g1 *Gene, g2 *Gene) error {
 	if g1 == nil || g2 == nil {
-		return fmt.Errorf("gene.CheckEqual error: g1 and g2 must be non-nil")
+		return errors.New("gene.CheckEqual error: g1 and g2 must be non-nil")
 	}
 	if len(g1.Symbols) != len(g2.Symbols) {
 		return fmt.Errorf("len(g1.Symbols)=%v != len(g2.Symbols)=%v", len(g1.Symbols), len(g2.Symbols))

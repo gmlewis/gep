@@ -6,6 +6,7 @@ package model
 
 import (
 	"cmp"
+	"errors"
 	"fmt"
 	"sort"
 
@@ -245,7 +246,7 @@ func (ga *GymnasiumAgents) Evolve() error {
 		return err
 	}
 	if len(gen.Individuals) == 0 {
-		return fmt.Errorf("programming error: no individuals available after evolution operators")
+		return errors.New("programming error: no individuals available after evolution operators")
 	}
 	gen.Individuals[len(gen.Individuals)-1] = bestInd // Overwrite lowest performer
 	ga.Individuals = gen.Individuals

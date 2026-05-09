@@ -5,6 +5,7 @@
 package genome
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gmlewis/gep/v2/core"
@@ -17,7 +18,7 @@ import (
 // CoreBool converts a legacy boolean genome into the typed core representation.
 func (g *Genome) CoreBool() (core.Genome[bool], error) {
 	if g == nil {
-		return core.Genome[bool]{}, fmt.Errorf("genome.CoreBool: genome cannot be nil")
+		return core.Genome[bool]{}, errors.New("genome.CoreBool: genome cannot be nil")
 	}
 	linkNode, ok := bn.BoolAllGates[g.LinkFunc]
 	if !ok {
@@ -41,7 +42,7 @@ func (g *Genome) CoreBool() (core.Genome[bool], error) {
 // CoreInt converts a legacy integer genome into the typed core representation.
 func (g *Genome) CoreInt() (core.Genome[int], error) {
 	if g == nil {
-		return core.Genome[int]{}, fmt.Errorf("genome.CoreInt: genome cannot be nil")
+		return core.Genome[int]{}, errors.New("genome.CoreInt: genome cannot be nil")
 	}
 	linkNode, ok := in.Int[g.LinkFunc]
 	if !ok {
@@ -65,7 +66,7 @@ func (g *Genome) CoreInt() (core.Genome[int], error) {
 // CoreFloat64 converts a legacy floating-point genome into the typed core representation.
 func (g *Genome) CoreFloat64() (core.Genome[float64], error) {
 	if g == nil {
-		return core.Genome[float64]{}, fmt.Errorf("genome.CoreFloat64: genome cannot be nil")
+		return core.Genome[float64]{}, errors.New("genome.CoreFloat64: genome cannot be nil")
 	}
 	linkNode, ok := mn.Math[g.LinkFunc]
 	if !ok {
@@ -97,7 +98,7 @@ func NewFromCoreBool(g core.Genome[bool]) (*Genome, error) {
 		genes[i] = lg
 	}
 	if g.Link == nil {
-		return nil, fmt.Errorf("genome.NewFromCoreBool: link operator cannot be nil")
+		return nil, errors.New("genome.NewFromCoreBool: link operator cannot be nil")
 	}
 	return New(genes, g.Link.Symbol()), nil
 }
@@ -113,7 +114,7 @@ func NewFromCoreInt(g core.Genome[int]) (*Genome, error) {
 		genes[i] = lg
 	}
 	if g.Link == nil {
-		return nil, fmt.Errorf("genome.NewFromCoreInt: link operator cannot be nil")
+		return nil, errors.New("genome.NewFromCoreInt: link operator cannot be nil")
 	}
 	return New(genes, g.Link.Symbol()), nil
 }
@@ -129,7 +130,7 @@ func NewFromCoreFloat64(g core.Genome[float64]) (*Genome, error) {
 		genes[i] = lg
 	}
 	if g.Link == nil {
-		return nil, fmt.Errorf("genome.NewFromCoreFloat64: link operator cannot be nil")
+		return nil, errors.New("genome.NewFromCoreFloat64: link operator cannot be nil")
 	}
 	return New(genes, g.Link.Symbol()), nil
 }

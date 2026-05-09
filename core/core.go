@@ -6,6 +6,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"sort"
@@ -59,14 +60,14 @@ type Symbol[T any] struct {
 // NewFunctionSymbol creates a typed function symbol.
 func NewFunctionSymbol[T any](node Node[T]) (Symbol[T], error) {
 	if node == nil {
-		return Symbol[T]{}, fmt.Errorf("core.NewFunctionSymbol: node cannot be nil")
+		return Symbol[T]{}, errors.New("core.NewFunctionSymbol: node cannot be nil")
 	}
 	name := node.Symbol()
 	if name == "" {
-		return Symbol[T]{}, fmt.Errorf("core.NewFunctionSymbol: node symbol cannot be empty")
+		return Symbol[T]{}, errors.New("core.NewFunctionSymbol: node symbol cannot be empty")
 	}
 	if node.Arity() < 0 {
-		return Symbol[T]{}, fmt.Errorf("core.NewFunctionSymbol: node arity must be >= 0")
+		return Symbol[T]{}, errors.New("core.NewFunctionSymbol: node arity must be >= 0")
 	}
 	return Symbol[T]{
 		Kind: SymbolKindFunction,
@@ -78,7 +79,7 @@ func NewFunctionSymbol[T any](node Node[T]) (Symbol[T], error) {
 // NewTerminalSymbol creates a typed terminal symbol.
 func NewTerminalSymbol[T any](index int) (Symbol[T], error) {
 	if index < 0 {
-		return Symbol[T]{}, fmt.Errorf("core.NewTerminalSymbol: index must be >= 0")
+		return Symbol[T]{}, errors.New("core.NewTerminalSymbol: index must be >= 0")
 	}
 	return Symbol[T]{
 		Kind:          SymbolKindTerminal,
@@ -90,7 +91,7 @@ func NewTerminalSymbol[T any](index int) (Symbol[T], error) {
 // NewConstantSymbol creates a typed constant symbol.
 func NewConstantSymbol[T any](index int) (Symbol[T], error) {
 	if index < 0 {
-		return Symbol[T]{}, fmt.Errorf("core.NewConstantSymbol: index must be >= 0")
+		return Symbol[T]{}, errors.New("core.NewConstantSymbol: index must be >= 0")
 	}
 	return Symbol[T]{
 		Kind:          SymbolKindConstant,
@@ -108,7 +109,7 @@ type Gene[T any] struct {
 // Validate validates a typed gene.
 func (g Gene[T]) Validate() error {
 	if len(g.Symbols) == 0 {
-		return fmt.Errorf("core.Gene.Validate: gene must contain at least one symbol")
+		return errors.New("core.Gene.Validate: gene must contain at least one symbol")
 	}
 	for i, sym := range g.Symbols {
 		switch sym.Kind {
@@ -134,10 +135,10 @@ type Genome[T any] struct {
 // Validate validates a typed genome.
 func (g Genome[T]) Validate() error {
 	if len(g.Genes) == 0 {
-		return fmt.Errorf("core.Genome.Validate: genome must contain at least one gene")
+		return errors.New("core.Genome.Validate: genome must contain at least one gene")
 	}
 	if g.Link == nil {
-		return fmt.Errorf("core.Genome.Validate: link operator cannot be nil")
+		return errors.New("core.Genome.Validate: link operator cannot be nil")
 	}
 	for i := range g.Genes {
 		if err := g.Genes[i].Validate(); err != nil {
@@ -156,10 +157,10 @@ type LinkFunc[T any] struct {
 // NewLinkFunc creates a LinkFunc adapter.
 func NewLinkFunc[T any](name string, fn func([]T) T) (LinkFunc[T], error) {
 	if name == "" {
-		return LinkFunc[T]{}, fmt.Errorf("core.NewLinkFunc: name cannot be empty")
+		return LinkFunc[T]{}, errors.New("core.NewLinkFunc: name cannot be empty")
 	}
 	if fn == nil {
-		return LinkFunc[T]{}, fmt.Errorf("core.NewLinkFunc: fn cannot be nil")
+		return LinkFunc[T]{}, errors.New("core.NewLinkFunc: fn cannot be nil")
 	}
 	return LinkFunc[T]{name: name, fn: fn}, nil
 }
@@ -185,11 +186,11 @@ func NewCatalog[T any]() *Catalog[T] {
 // node with the same symbol is already registered.
 func (c *Catalog[T]) Register(node Node[T]) error {
 	if node == nil {
-		return fmt.Errorf("core.Catalog.Register: node cannot be nil")
+		return errors.New("core.Catalog.Register: node cannot be nil")
 	}
 	sym := node.Symbol()
 	if sym == "" {
-		return fmt.Errorf("core.Catalog.Register: node symbol cannot be empty")
+		return errors.New("core.Catalog.Register: node symbol cannot be empty")
 	}
 	if _, ok := c.nodes[sym]; ok {
 		return fmt.Errorf("core.Catalog.Register: symbol %q already registered", sym)
@@ -232,7 +233,7 @@ func (c *Catalog[T]) MaxArity() int {
 // catalog; an error is returned for any symbol that is not found.
 func ParseSymbols[T any](symbols []string, catalog *Catalog[T]) ([]Symbol[T], error) {
 	if catalog == nil {
-		return nil, fmt.Errorf("core.ParseSymbols: catalog cannot be nil")
+		return nil, errors.New("core.ParseSymbols: catalog cannot be nil")
 	}
 	result := make([]Symbol[T], 0, len(symbols))
 	for i, s := range symbols {
@@ -380,19 +381,19 @@ func (g Genome[T]) Eval(terminals []T) (T, error) {
 // or numTerminals+numConstants == 0.
 func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants int, rng *rand.Rand) (Gene[T], error) {
 	if cat == nil {
-		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: catalog cannot be nil")
+		return Gene[T]{}, errors.New("core.NewRandomGene: catalog cannot be nil")
 	}
 	if headSize < 0 {
-		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: headSize must be >= 0")
+		return Gene[T]{}, errors.New("core.NewRandomGene: headSize must be >= 0")
 	}
 	if numTerminals < 0 {
-		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: numTerminals must be >= 0")
+		return Gene[T]{}, errors.New("core.NewRandomGene: numTerminals must be >= 0")
 	}
 	if numConstants < 0 {
-		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: numConstants must be >= 0")
+		return Gene[T]{}, errors.New("core.NewRandomGene: numConstants must be >= 0")
 	}
 	if numTerminals+numConstants == 0 {
-		return Gene[T]{}, fmt.Errorf("core.NewRandomGene: numTerminals+numConstants must be > 0")
+		return Gene[T]{}, errors.New("core.NewRandomGene: numTerminals+numConstants must be > 0")
 	}
 
 	intn := func(n int) int {
@@ -512,10 +513,10 @@ func (g Genome[T]) Dup() Genome[T] {
 // Returns an error if numGenes <= 0, link is nil, or any gene creation fails.
 func NewRandomGenome[T any](cat *Catalog[T], numGenes, headSize, numTerminals, numConstants int, link LinkOperator[T], rng *rand.Rand) (Genome[T], error) {
 	if numGenes <= 0 {
-		return Genome[T]{}, fmt.Errorf("core.NewRandomGenome: numGenes must be > 0")
+		return Genome[T]{}, errors.New("core.NewRandomGenome: numGenes must be > 0")
 	}
 	if link == nil {
-		return Genome[T]{}, fmt.Errorf("core.NewRandomGenome: link cannot be nil")
+		return Genome[T]{}, errors.New("core.NewRandomGenome: link cannot be nil")
 	}
 	genes := make([]Gene[T], numGenes)
 	for i := range genes {

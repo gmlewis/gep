@@ -16,7 +16,7 @@ func validateSymbols(symbols []string, lookup functions.FuncMap, inputLen, const
 	var errs []error
 	for _, sym := range symbols {
 		if sym == "" {
-			errs = append(errs, fmt.Errorf("empty symbol"))
+			errs = append(errs, errors.New("empty symbol"))
 			continue
 		}
 		if _, ok := lookup[sym]; ok {

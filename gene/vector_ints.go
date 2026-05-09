@@ -5,7 +5,7 @@
 package gene
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 
 	"github.com/gmlewis/gep/v2/functions"
@@ -36,7 +36,7 @@ func (g *Gene) EvalVectorInt(in []VectorInt) (VectorInt, error) {
 		}
 	}
 	if g.vif == nil {
-		return VectorInt{}, fmt.Errorf("unable to generate vector-int evaluator")
+		return VectorInt{}, errors.New("unable to generate vector-int evaluator")
 	}
 	return g.vif(in), nil
 }

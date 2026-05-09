@@ -135,7 +135,7 @@ func (g *Genome) Mutate(numMutations int) error {
 // Dup duplicates the genome into the provided destination genome.
 func (g *Genome) Dup() (*Genome, error) {
 	if g == nil {
-		return nil, fmt.Errorf("genome.Dup error: src and dst must be non-nil")
+		return nil, errors.New("genome.Dup error: src and dst must be non-nil")
 	}
 	dst := &Genome{
 		Genes:    make([]*gene.Gene, len(g.Genes)),
@@ -161,7 +161,7 @@ type ScoringFunc func(g *Genome) float64
 // EvaluateWithScore scores a genome and surfaces a nil scoring function.
 func (g *Genome) EvaluateWithScore(sf ScoringFunc) error {
 	if sf == nil {
-		return fmt.Errorf("genome.EvaluateWithScore: ScoringFunc must not be nil")
+		return errors.New("genome.EvaluateWithScore: ScoringFunc must not be nil")
 	}
 	g.Score = sf(g)
 	return nil

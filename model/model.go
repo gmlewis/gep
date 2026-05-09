@@ -328,7 +328,7 @@ func (g *Generation) crossover() error {
 // getBest evaluates all individuals and returns a pointer to the best one.
 func (g *Generation) getBest() (*genome.Genome, error) {
 	if len(g.Individuals) == 0 {
-		return nil, fmt.Errorf("no individuals in generation")
+		return nil, errors.New("no individuals in generation")
 	}
 	highestEffectiveScore := math.Inf(-1)
 	bestGenome := g.Individuals[0]

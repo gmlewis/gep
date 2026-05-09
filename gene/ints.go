@@ -5,7 +5,7 @@
 package gene
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 
 	in "github.com/gmlewis/gep/v2/functions/int_nodes"
@@ -33,7 +33,7 @@ func (g *Gene) EvalInt(in []int) (int, error) {
 		}
 	}
 	if g.intF == nil {
-		return 0, fmt.Errorf("unable to generate int evaluator")
+		return 0, errors.New("unable to generate int evaluator")
 	}
 	return g.intF(in), nil
 }

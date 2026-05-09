@@ -5,7 +5,7 @@
 package gene
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 
 	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
@@ -33,7 +33,7 @@ func (g *Gene) EvalMath(in []float64) (float64, error) {
 		}
 	}
 	if g.mf == nil {
-		return 0.0, fmt.Errorf("unable to generate math evaluator")
+		return 0.0, errors.New("unable to generate math evaluator")
 	}
 	return g.mf(in), nil
 }
