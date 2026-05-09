@@ -25,6 +25,9 @@
 //     recombine → mutate → elitism) for a given number of iterations.
 //   - Statistics – optional per-generation statistics collection via a
 //     *statistics.Collector stored on Generation.
+//   - TerminationCriteria – optional list of termination.Criterion values that
+//     provide composable, configurable stopping rules (ScoreThreshold,
+//     NoImprovement, Any, All) as an alternative or supplement to StopFunc.
 //
 // Typical usage:
 //
@@ -56,6 +59,7 @@ import (
 	"github.com/gmlewis/gep/v2/evolution/recombination"
 	"github.com/gmlewis/gep/v2/evolution/selection"
 	"github.com/gmlewis/gep/v2/evolution/statistics"
+	"github.com/gmlewis/gep/v2/evolution/termination"
 )
 
 // ScoringFunc computes a fitness score for a genome.
@@ -108,6 +112,16 @@ type Generation[T any] struct {
 	// generation immediately after evaluation and before the stop-check.
 	// Set this field before calling Evolve to enable statistics collection.
 	Statistics *statistics.Collector
+
+	// TerminationCriteria is an optional list of stopping conditions evaluated
+	// after each generation. Evolution halts when any criterion returns true
+	// from ShouldStop. When empty, the default stopping criterion (Score >= 1000
+	// or StopFunc if set) is used.
+	//
+	// TerminationCriteria is evaluated after StopFunc: if StopFunc is set and
+	// returns true, Evolve stops immediately without consulting
+	// TerminationCriteria.
+	TerminationCriteria []termination.Criterion
 
 	// cat is the typed function catalog used for point mutation.
 	cat *core.Catalog[T]
@@ -315,8 +329,13 @@ func (g *Generation[T]) Mutate() {
 //  1. Evaluates all individuals (calls Evaluate).
 //  2. Records per-generation statistics (if Statistics is non-nil).
 //  3. Identifies the best individual (calls BestIndividual).
-//  4. Checks the stopping criterion (StopFunc or default Score >= 1000).
-//     If met, returns the best individual immediately.
+//  4. Checks the stopping criterion in order:
+//     a. StopFunc (if set) – if it returns true, Evolve halts immediately.
+//     b. TerminationCriteria (if non-empty) – if any criterion returns true,
+//     Evolve halts immediately.
+//     c. Default criterion (Score >= 1000) – used only when both StopFunc
+//     and TerminationCriteria are unset/empty.
+//     If the active criterion signals a stop, Evolve returns the best individual.
 //  5. Saves a deep copy of the best individual (elitism).
 //  6. Replaces the population via roulette-wheel selection (calls Select).
 //  7. Applies configured crossover operators to the population (calls Recombine).
@@ -335,6 +354,13 @@ func (g *Generation[T]) Evolve(iterations int) Individual[T] {
 		stop := false
 		if g.StopFunc != nil {
 			stop = g.StopFunc(best)
+		} else if len(g.TerminationCriteria) > 0 {
+			for _, c := range g.TerminationCriteria {
+				if c.ShouldStop(i, best.Score) {
+					stop = true
+					break
+				}
+			}
 		} else {
 			stop = best.Score >= 1000.0
 		}
