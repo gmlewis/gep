@@ -10,7 +10,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -69,7 +68,7 @@ func main() {
 
 	linkNode, ok := boolNodes.BoolAllGates["Or"]
 	if !ok {
-		log.Fatal(errors.New(`link function "Or" not found`))
+		log.Fatal(`link function "Or" not found`)
 	}
 	link, err := core.NewLinkFunc[bool]("Or", linkNode.BoolFunction)
 	if err != nil {

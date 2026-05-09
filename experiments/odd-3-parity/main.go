@@ -9,7 +9,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -72,7 +71,7 @@ func main() {
 
 	linkNode, ok := boolNodes.BoolAllGates["And"]
 	if !ok {
-		log.Fatal(errors.New(`link function "And" not found`))
+		log.Fatal(`link function "And" not found`)
 	}
 	link, err := core.NewLinkFunc[bool]("And", linkNode.BoolFunction)
 	if err != nil {

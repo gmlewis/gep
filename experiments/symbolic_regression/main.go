@@ -10,7 +10,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -85,7 +84,7 @@ func main() {
 
 	linkNode, ok := mathNodes.Math["+"]
 	if !ok {
-		log.Fatal(errors.New(`link function "+" not found`))
+		log.Fatal(`link function "+" not found`)
 	}
 	link, err := core.NewLinkFunc[float64]("+", linkNode.Float64Function)
 	if err != nil {
