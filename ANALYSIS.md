@@ -848,6 +848,7 @@ Required outcome:
 - give `evolution.Generation` a distinct transposition configuration/invocation
   stage
 - keep operator tests focused on behavior and validity of genomes
+- continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
 This milestone corrects the remaining Phase 3 deviation.
 
