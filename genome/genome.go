@@ -69,11 +69,11 @@ func (g *Genome) SymbolCount(sym string) (int, error) {
 	if g.SymbolMap == nil {
 		g.SymbolMap = make(map[string]int)
 		g.SymbolMap[g.LinkFunc] = len(g.Genes) - 1
-		for i := 0; i < len(g.Genes); i++ {
-			if _, err := g.Genes[i].SymbolCount(sym); err != nil {
+		for _, gene := range g.Genes {
+			if _, err := gene.SymbolCount(sym); err != nil {
 				return 0, err
 			}
-			m := g.Genes[i].SymbolMap
+			m := gene.SymbolMap
 			merge(&(g.SymbolMap), m)
 		}
 	}
@@ -120,7 +120,7 @@ func (g Genome) DotGraph() string {
 // Mutate mutates a genome by performing numMutations random symbol exchanges within the genome.
 func (g *Genome) Mutate(numMutations int) error {
 	var errs []error
-	for i := 0; i < numMutations; i++ {
+	for range numMutations {
 		n := g.randIntn(len(g.Genes))
 		// fmt.Printf("\nMutating gene #%v, before:\n%v\n", n, g.Genes[n])
 		if err := g.Genes[n].Mutate(); err != nil {
@@ -143,8 +143,8 @@ func (g *Genome) Dup() (*Genome, error) {
 		Score:    g.Score,
 		rng:      g.rng,
 	}
-	for i := range g.Genes {
-		dup, err := g.Genes[i].Dup()
+	for i, gene := range g.Genes {
+		dup, err := gene.Dup()
 		if err != nil {
 			return nil, err
 		}

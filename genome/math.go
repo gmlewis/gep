@@ -21,8 +21,8 @@ func (g *Genome) EvalMath(in []float64) (float64, error) {
 	if err != nil {
 		return 0.0, err
 	}
-	for i := 1; i < len(g.Genes); i++ {
-		next, err := g.Genes[i].EvalMath(in)
+	for _, gene := range g.Genes[1:] {
+		next, err := gene.EvalMath(in)
 		if err != nil {
 			return 0.0, err
 		}
