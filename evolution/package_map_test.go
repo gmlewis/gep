@@ -214,6 +214,42 @@ func TestPhase4Milestone5_FunctionPackageBoundaries(t *testing.T) {
 	}
 }
 
+// TestPhase4MilestoneC_ProblemsPackageBoundaries verifies that the dedicated
+// problems subsystem does not import legacy representation or model packages.
+// The problems package may only import core, fitness, and problems-internal
+// prefixes.
+func TestPhase4MilestoneC_ProblemsPackageBoundaries(t *testing.T) {
+	metas := mustListPackages(t,
+		modulePath+"/problems",
+		modulePath+"/problems/...",
+	)
+
+	foundProblems := false
+	for _, meta := range metas {
+		allowedPrefixes := allowedImportPrefixes(meta.ImportPath)
+		if len(allowedPrefixes) == 0 {
+			continue
+		}
+		if meta.ImportPath == modulePath+"/problems" {
+			foundProblems = true
+		}
+
+		for _, imported := range meta.Imports {
+			if !strings.HasPrefix(imported, modulePath+"/") {
+				continue // standard library or external dependency
+			}
+			if hasAllowedPrefix(imported, allowedPrefixes) {
+				continue
+			}
+			t.Errorf("%s imports %s; allowed internal prefixes are %v", meta.ImportPath, imported, allowedPrefixes)
+		}
+	}
+
+	if !foundProblems {
+		t.Fatalf("expected to inspect %s/problems", modulePath)
+	}
+}
+
 func TestPhase4Milestone6_LegacyRepresentationPackageBoundaries(t *testing.T) {
 	metas := mustListPackages(t,
 		modulePath+"/codegen",
@@ -275,6 +311,12 @@ func allowedImportPrefixes(importPath string) []string {
 		}
 	case strings.HasPrefix(importPath, modulePath+"/fitness"):
 		return []string{modulePath + "/fitness"}
+	case strings.HasPrefix(importPath, modulePath+"/problems"):
+		return []string{
+			modulePath + "/core",
+			modulePath + "/fitness",
+			modulePath + "/problems",
+		}
 	case strings.HasPrefix(importPath, modulePath+"/functions"):
 		return []string{modulePath + "/core", modulePath + "/functions"}
 	case strings.HasPrefix(importPath, modulePath+"/codegen"):
