@@ -6,6 +6,7 @@ package gene
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/gmlewis/gep/v2/functions"
@@ -20,7 +21,10 @@ func (g *Gene) generateVectorIntFunc() error {
 		return err
 	}
 	g.SymbolMap = make(map[string]int)
-	g.vif = g.buildVectorIntTree(0, argOrder)
+	g.vif, err = g.buildVectorIntTree(0, argOrder)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -41,11 +45,11 @@ func (g *Gene) EvalVectorInt(in []VectorInt) (VectorInt, error) {
 	return g.vif(in), nil
 }
 
-func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) func([]VectorInt) VectorInt {
+func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) (func([]VectorInt) VectorInt, error) {
 	// count := make(map[string]int)
 	// log.Infof("buildVectorIntTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex >= len(g.Symbols) {
-		return func(a []VectorInt) VectorInt { return VectorInt{} }
+		return nil, fmt.Errorf("gene.buildVectorIntTree error: symbolIndex %d out of bounds [0,%d)", symbolIndex, len(g.Symbols))
 	}
 	sym := g.Symbols[symbolIndex]
 	g.SymbolMap[sym]++
@@ -53,7 +57,10 @@ func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) func([]Vect
 		args := argOrder[symbolIndex]
 		var funcs []func([]VectorInt) VectorInt
 		for _, arg := range args {
-			f := g.buildVectorIntTree(arg, argOrder)
+			f, err := g.buildVectorIntTree(arg, argOrder)
+			if err != nil {
+				return nil, err
+			}
 			funcs = append(funcs, f)
 		}
 		return func(in []VectorInt) VectorInt {
@@ -62,32 +69,37 @@ func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) func([]Vect
 				values = append(values, f(in))
 			}
 			return s.VectorIntFunction(values)
-		}
-	} else { // No named symbol found - look for d0, d1, ...
-		if sym[0:1] == "d" {
-			if index, err := strconv.Atoi(sym[1:]); err != nil {
-			} else {
-				return func(in []VectorInt) VectorInt {
-					if index >= len(in) {
-						return VectorInt{}
-					}
-					return in[index]
-				}
-			}
-		} else if sym[0:1] == "c" {
-			if index, err := strconv.Atoi(sym[1:]); err != nil {
-			} else {
-				return func(in []VectorInt) VectorInt {
-					if index >= len(g.Constants) {
-						return VectorInt{}
-					}
-					op := func(in []int) int {
-						return int(g.Constants[index])
-					}
-					return vin.ProcessVector(in, op)
-				}
-			}
-		}
+		}, nil
 	}
-	return func(in []VectorInt) VectorInt { return VectorInt{} }
+	if sym == "" {
+		return nil, errors.New("gene.buildVectorIntTree error: empty symbol")
+	}
+	if sym[0:1] == "d" { // No named symbol found - look for d0, d1, ...
+		index, err := strconv.Atoi(sym[1:])
+		if err != nil {
+			return nil, fmt.Errorf("gene.buildVectorIntTree error: unable to parse terminal index for symbol %q: %w", sym, err)
+		}
+		return func(in []VectorInt) VectorInt {
+			if index >= len(in) {
+				return VectorInt{}
+			}
+			return in[index]
+		}, nil
+	}
+	if sym[0:1] == "c" {
+		index, err := strconv.Atoi(sym[1:])
+		if err != nil {
+			return nil, fmt.Errorf("gene.buildVectorIntTree error: unable to parse constant index for symbol %q: %w", sym, err)
+		}
+		return func(in []VectorInt) VectorInt {
+			if index >= len(g.Constants) {
+				return VectorInt{}
+			}
+			op := func(in []int) int {
+				return int(g.Constants[index])
+			}
+			return vin.ProcessVector(in, op)
+		}, nil
+	}
+	return nil, fmt.Errorf("gene.buildVectorIntTree error: unknown symbol %q", sym)
 }

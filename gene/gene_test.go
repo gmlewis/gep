@@ -459,17 +459,15 @@ func TestVectorInt(t *testing.T) {
 
 func TestBuildMathTree_OutOfBoundsSymbolIndex(t *testing.T) {
 	g := mustNew(t, "d0", functions.Float64)
-	f := g.buildMathTree(len(g.Symbols), mustArgOrder(t, g))
-	if got := f([]float64{42}); got != 0 {
-		t.Fatalf("buildMathTree out-of-bounds fallback = %v, want 0", got)
+	if _, err := g.buildMathTree(len(g.Symbols), mustArgOrder(t, g)); err == nil {
+		t.Fatal("buildMathTree out-of-bounds error = nil, want non-nil")
 	}
 }
 
 func TestBuildVectorIntTree_OutOfBoundsSymbolIndex(t *testing.T) {
 	g := mustNew(t, "d0", functions.VectorInts)
-	f := g.buildVectorIntTree(len(g.Symbols), mustArgOrder(t, g))
-	if got := f([]VectorInt{{1, 2, 3}}); len(got) != 0 {
-		t.Fatalf("buildVectorIntTree out-of-bounds fallback = %v, want empty vector", got)
+	if _, err := g.buildVectorIntTree(len(g.Symbols), mustArgOrder(t, g)); err == nil {
+		t.Fatal("buildVectorIntTree out-of-bounds error = nil, want non-nil")
 	}
 }
 
