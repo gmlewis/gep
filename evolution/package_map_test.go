@@ -125,6 +125,33 @@ func TestPhase4Milestone3_LegacyModelPackageBoundaries(t *testing.T) {
 	}
 }
 
+func TestPhase4Milestone4_FitnessPackageBoundaries(t *testing.T) {
+	metas := mustListPackages(t, modulePath+"/fitness/...")
+
+	foundFitness := false
+	for _, meta := range metas {
+		allowedPrefixes := allowedImportPrefixes(meta.ImportPath)
+		if len(allowedPrefixes) == 0 {
+			continue
+		}
+		foundFitness = true
+
+		for _, imported := range meta.Imports {
+			if !strings.HasPrefix(imported, modulePath+"/") {
+				continue // standard library or external dependency
+			}
+			if hasAllowedPrefix(imported, allowedPrefixes) {
+				continue
+			}
+			t.Errorf("%s imports %s; allowed internal prefixes are %v", meta.ImportPath, imported, allowedPrefixes)
+		}
+	}
+
+	if !foundFitness {
+		t.Fatalf("expected to inspect packages under %s/fitness", modulePath)
+	}
+}
+
 func allowedImportPrefixes(importPath string) []string {
 	switch {
 	case importPath == modulePath+"/core":
@@ -141,6 +168,8 @@ func allowedImportPrefixes(importPath string) []string {
 			modulePath + "/genome",
 			modulePath + "/model",
 		}
+	case strings.HasPrefix(importPath, modulePath+"/fitness"):
+		return []string{modulePath + "/fitness"}
 	default:
 		return nil
 	}
