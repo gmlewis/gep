@@ -21,8 +21,8 @@ func (g *Genome) EvalInt(in []int) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	for i := 1; i < len(g.Genes); i++ {
-		next, err := g.Genes[i].EvalInt(in)
+	for _, gene := range g.Genes[1:] {
+		next, err := gene.EvalInt(in)
 		if err != nil {
 			return 0, err
 		}
@@ -38,10 +38,10 @@ func (g *Genome) EvalIntTuple(in []int) ([]int, error) {
 	result := make([]int, len(g.Genes))
 
 	// var wg sync.WaitGroup
-	for i := 0; i < len(g.Genes); i++ {
+	for i, gene := range g.Genes {
 		// wg.Add(1)
 		// go func(i int) {
-		v, err := g.Genes[i].EvalInt(in)
+		v, err := gene.EvalInt(in)
 		if err != nil {
 			return nil, err
 		}

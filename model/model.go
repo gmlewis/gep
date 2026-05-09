@@ -150,7 +150,7 @@ func newGeneration(
 // genome. When StopFunc is nil, the default criterion of Score >= 1000 is used.
 func (g *Generation) Evolve(iterations int) (*genome.Genome, error) {
 	// Algorithm flow diagram, figure 3.1, book page 56
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		// fmt.Printf("Iteration #%v...\n", i)
 		bestGenome, err := g.getBest() // Preserve the best genome
 		if err != nil {
@@ -220,7 +220,7 @@ func (g *Generation) replication() error {
 	result := make([]*genome.Genome, 0, len(g.Individuals))
 	index := g.randIntn(len(g.Individuals))
 	beta := 0.0
-	for i := 0; i < len(g.Individuals); i++ {
+	for range g.Individuals {
 		beta += g.randFloat64() * 2.0
 		scaledScore := f(g.effectiveScore(g.Individuals[index].Score))
 		for beta > scaledScore {
@@ -252,7 +252,7 @@ func (g *Generation) singleMutation(index int) error {
 func (g *Generation) mutation() error {
 	// Determine the total number of individuals to mutate
 	numMutations := 1 + g.randIntn(len(g.Individuals)-1)
-	for i := 0; i < numMutations; i++ {
+	for range numMutations {
 		// Pick a random genome
 		genomeNum := g.randIntn(len(g.Individuals))
 		if err := g.singleMutation(genomeNum); err != nil {
@@ -308,7 +308,7 @@ func (g *Generation) crossover() error {
 
 	// Determine the total number of individuals pairs to crossover
 	numCrossovers := 1 + g.randIntn(len(g.Individuals)-1)
-	for i := 0; i < numCrossovers; i++ {
+	for range numCrossovers {
 		// Pick two random genomes
 		genomeNum1 := g.randIntn(len(g.Individuals))
 		var genomeNum2 int

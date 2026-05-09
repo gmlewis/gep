@@ -36,7 +36,7 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 			return "", fmt.Errorf("programming error: symbol %q args length mismatch: len(args)=%v, want %v; check FuncType", sym, len(args), f.Terminals())
 		}
 
-		for i := 0; i < f.Terminals(); i++ {
+		for i := range f.Terminals() {
 			e, err := g.buildExp(args[i], argOrder, grammar, helpers)
 			if err != nil {
 				return "", err

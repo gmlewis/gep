@@ -595,7 +595,7 @@ Once the architecture is modernized:
 The notes below evaluate the current repository against that original intent
 without reinterpreting the phases.
 
-### Phase 1 status: complete (after P1-A)
+### Phase 1 status: complete (after P1-A and P1-B)
 
 What appears complete:
 
@@ -620,6 +620,8 @@ P1-A completion evidence:
   - `gene.TestNew_InvalidSymbolIndexesDoNotWriteStderr`
   - `genome.TestWrite_MissingLinkFunctionDoesNotWriteStdout`
   - `model.TestEvolve_DoesNotWriteStdoutOnStop`
+- legacy index-based `for` loops were modernized to `range` where semantics are
+  equivalent across the legacy packages (`gene`, `genome`, `model`)
 - full repo validation passed via `scripts/test-all.sh`
 
 ### Phase 2 status: mostly faithful, but not yet dominant
@@ -769,6 +771,26 @@ Required outcome:
 - keep explicit index/counter loops only where they are required for semantics
   (for example, custom stepping, reverse traversal, or mutation during index
   iteration)
+
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- completed a legacy package sweep (`gene`, `genome`, `model`) and converted
+  equivalent index-based loops to idiomatic `range` loops in:
+  - `gene/gene.go`
+  - `gene/write.go`
+  - `genome/bools.go`
+  - `genome/genome.go`
+  - `genome/ints.go`
+  - `genome/math.go`
+  - `model/model.go`
+- retained explicit index/counter loops only where semantics are intentionally
+  index-driven (for example benchmark counters and random/index-position
+  mutation/crossover logic)
+- verification commands passed:
+  - `go test ./gene ./genome ./model`
+  - `./scripts/test-all.sh`
 
 ### P2-A: Make typed core/evolution the default execution surface
 

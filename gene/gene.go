@@ -134,7 +134,7 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 		totalWeight += f.Weight
 	}
 	choiceSlice := make([]string, 0, totalWeight)
-	for i := 0; i < numTerminals; i++ {
+	for i := range numTerminals {
 		choiceSlice = append(choiceSlice, fmt.Sprintf("d%v", i))
 	}
 	constants := make([]float64, 0, numConstants)
@@ -146,22 +146,22 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 		numTerminals: numTerminals + numConstants,
 		rng:          rng,
 	}
-	for i := 0; i < numConstants; i++ {
+	for i := range numConstants {
 		choiceSlice = append(choiceSlice, fmt.Sprintf("c%v", i))
 		r.Constants = append(r.Constants, math.Round(constRange*r.randFloat64()))
 	}
 	for _, f := range functions {
-		for i := 0; i < f.Weight; i++ {
+		for range f.Weight {
 			choiceSlice = append(choiceSlice, f.Symbol)
 		}
 	}
 	r.choiceSlice = choiceSlice
 	choices := r.randPerm(totalWeight)
-	for i := 0; i < headSize; i++ { // head is made up of any symbol (function, input, or constant)
+	for i := range headSize { // head is made up of any symbol (function, input, or constant)
 		choice := choices[i%len(choices)]
 		r.Symbols = append(r.Symbols, choiceSlice[choice])
 	}
-	for i := 0; i < tailSize; i++ { // tail is strictly made up of terminals (input or constant)
+	for i := range tailSize { // tail is strictly made up of terminals (input or constant)
 		choice := choices[i%len(choices)]
 		r.Symbols = append(r.Symbols, choiceSlice[choice%r.numTerminals])
 	}
@@ -354,8 +354,7 @@ func (g *Gene) getArgOrder() ([][]int, error) {
 
 	argOrder := make([][]int, len(g.Symbols))
 	argCount := 0
-	for i := 0; i < len(g.Symbols); i++ {
-		sym := g.Symbols[i]
+	for i, sym := range g.Symbols {
 		s, ok := lookup[sym]
 		if !ok {
 			continue
@@ -365,7 +364,7 @@ func (g *Gene) getArgOrder() ([][]int, error) {
 			continue
 		}
 		args := make([]int, n)
-		for j := 0; j < n; j++ {
+		for j := range n {
 			argCount++
 			args[j] = argCount
 		}

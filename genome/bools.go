@@ -22,8 +22,8 @@ func (g *Genome) EvalBool(in []bool) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	for i := 1; i < len(g.Genes); i++ {
-		next, err := g.Genes[i].EvalBool(in)
+	for _, gene := range g.Genes[1:] {
+		next, err := gene.EvalBool(in)
 		if err != nil {
 			return false, err
 		}
