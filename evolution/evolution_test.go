@@ -14,6 +14,7 @@ import (
 	"github.com/gmlewis/gep/v2/evolution/recombination"
 	"github.com/gmlewis/gep/v2/evolution/statistics"
 	"github.com/gmlewis/gep/v2/evolution/termination"
+	"github.com/gmlewis/gep/v2/evolution/transposition"
 )
 
 // --- helpers ---
@@ -533,13 +534,8 @@ func TestMutate_PointMutation_ChangesAtLeastOneGenome(t *testing.T) {
 func TestMutate_MutatedGenomesAreValid(t *testing.T) {
 	g := newTestGeneration(t, 10, nil)
 	g.MutationConfig = mutation.Config{
-		PointMutationRate:     1.0,
-		InversionRate:         1.0,
-		ISTranspositionRate:   1.0,
-		MaxISLen:              2,
-		RISTranspositionRate:  1.0,
-		MaxRISLen:             2,
-		GeneTranspositionRate: 1.0,
+		PointMutationRate: 1.0,
+		InversionRate:     1.0,
 	}
 	g.Mutate()
 	for i, ind := range g.Individuals {
@@ -578,8 +574,83 @@ func TestEvolve_WithMutation_StillConverges(t *testing.T) {
 	}
 	g := newTestGeneration(t, 13, sf)
 	g.MutationConfig = mutation.Config{
-		PointMutationRate:     0.1,
-		InversionRate:         0.1,
+		PointMutationRate: 0.1,
+		InversionRate:     0.1,
+	}
+	best := g.Evolve(200)
+	if best.Score < 1000.0 {
+		t.Fatalf("Evolve with mutation: best.Score=%v, want >= 1000", best.Score)
+	}
+}
+
+func TestTranspose_PreservesPopulationSize(t *testing.T) {
+	g := newTestGeneration(t, 5, nil)
+	before := len(g.Individuals)
+	g.Transpose()
+	if got := len(g.Individuals); got != before {
+		t.Fatalf("Transpose changed population size: got %d, want %d", got, before)
+	}
+}
+
+func TestTranspose_ZeroRates_GenomesUnchanged(t *testing.T) {
+	g := newTestGeneration(t, 6, nil)
+	origKarvas := make([]string, len(g.Individuals))
+	for i, ind := range g.Individuals {
+		origKarvas[i] = ind.Genome.KarvaString()
+	}
+	g.Transpose()
+	for i, ind := range g.Individuals {
+		if ind.Genome.KarvaString() != origKarvas[i] {
+			t.Errorf("individual[%d] changed with zero transposition rates", i)
+		}
+	}
+}
+
+func TestTranspose_TransposedGenomesAreValid(t *testing.T) {
+	g := newTestGeneration(t, 10, nil)
+	g.TranspositionConfig = transposition.Config{
+		ISTranspositionRate:   1.0,
+		MaxISLen:              2,
+		RISTranspositionRate:  1.0,
+		MaxRISLen:             2,
+		GeneTranspositionRate: 1.0,
+	}
+	g.Transpose()
+	for i, ind := range g.Individuals {
+		if err := ind.Genome.Validate(); err != nil {
+			t.Errorf("individual[%d].Genome invalid after Transpose: %v", i, err)
+		}
+	}
+}
+
+func TestTranspose_HeadSizeOverriddenFromGeneration(t *testing.T) {
+	g := newTestGeneration(t, 8, nil)
+	g.TranspositionConfig = transposition.Config{
+		HeadSize:             9999,
+		ISTranspositionRate:  1.0,
+		MaxISLen:             2,
+		RISTranspositionRate: 1.0,
+		MaxRISLen:            2,
+	}
+	g.Transpose()
+	for i, ind := range g.Individuals {
+		if err := ind.Genome.Validate(); err != nil {
+			t.Errorf("individual[%d].Genome invalid: %v", i, err)
+		}
+	}
+}
+
+func TestEvolve_WithTransposition_StillConverges(t *testing.T) {
+	var callCount atomic.Int64
+	sf := func(core.Genome[int]) float64 {
+		n := callCount.Add(1)
+		if n >= int64(5*10) {
+			return 1000.0
+		}
+		return 0.0
+	}
+	g := newTestGeneration(t, 13, sf)
+	g.TranspositionConfig = transposition.Config{
 		ISTranspositionRate:   0.1,
 		MaxISLen:              2,
 		RISTranspositionRate:  0.1,
@@ -588,7 +659,7 @@ func TestEvolve_WithMutation_StillConverges(t *testing.T) {
 	}
 	best := g.Evolve(200)
 	if best.Score < 1000.0 {
-		t.Fatalf("Evolve with mutation: best.Score=%v, want >= 1000", best.Score)
+		t.Fatalf("Evolve with transposition: best.Score=%v, want >= 1000", best.Score)
 	}
 }
 
