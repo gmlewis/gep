@@ -927,6 +927,41 @@ Required outcome:
 - ensure RL flows no longer depend on legacy `model` as their primary engine
 - continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- added a dedicated `env` subsystem with package-level godoc and exported
+  `GymnasiumAgents`, `GymnasiumAgentsOption`, `NewGymnasiumAgents`,
+  `WithAppendEpisodeSteps`, `WithDebug`, `WithHeadSize`, `WithNumConstants`,
+  and `WithNumIndividuals` APIs:
+  - `env/doc.go`
+  - `env/env.go`
+- moved all Gymnasium agent evolution/training orchestration out of
+  `model/gymnasium-agents.go` into `env/env.go`; the `env` package imports
+  only `common`, `functions`, `gene`, `genome`, and standard library —
+  **it does not import `model`**
+- added `env/env_test.go` with full coverage of `NewGymnasiumAgents`,
+  `EvaluateAgent`, `RewardAgent`, `Evolve`, and `processObservations`
+- added deprecation notice to `model.GymnasiumAgents` directing consumers to
+  the new `env` package
+- migrated `examples/gymnasium/toy_text/blackjack-go/main.go` from
+  `model.GymnasiumAgents` to `env.GymnasiumAgents`
+- added `TestPhase4MilestoneB_EnvPackageBoundaries` to
+  `evolution/package_map_test.go` that enforces the env package boundary
+  (no `model` import allowed)
+- `gymnasium` package remains unchanged and focused solely on environment
+  definitions and metadata
+
+Verification commands:
+
+  ```
+  go test ./env/...
+  go test ./evolution/...   # TestPhase4MilestoneB_EnvPackageBoundaries passes
+  go build ./examples/gymnasium/toy_text/blackjack-go/...
+  ./scripts/test-all.sh
+  ```
+
 ### P4-C: Create a dedicated problems / domains subsystem
 
 Goal:

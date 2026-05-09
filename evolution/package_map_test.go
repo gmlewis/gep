@@ -93,6 +93,41 @@ func TestPhase4Milestone2_EnvironmentPackageBoundaries(t *testing.T) {
 	}
 }
 
+// TestPhase4MilestoneB_EnvPackageBoundaries verifies that the dedicated env /
+// RL subsystem does not import the legacy model package.  The env package may
+// only import common, functions, gene, genome, and env-internal prefixes.
+func TestPhase4MilestoneB_EnvPackageBoundaries(t *testing.T) {
+	metas := mustListPackages(t,
+		modulePath+"/env",
+		modulePath+"/env/...",
+	)
+
+	foundEnv := false
+	for _, meta := range metas {
+		allowedPrefixes := allowedImportPrefixes(meta.ImportPath)
+		if len(allowedPrefixes) == 0 {
+			continue
+		}
+		if meta.ImportPath == modulePath+"/env" {
+			foundEnv = true
+		}
+
+		for _, imported := range meta.Imports {
+			if !strings.HasPrefix(imported, modulePath+"/") {
+				continue // standard library or external dependency
+			}
+			if hasAllowedPrefix(imported, allowedPrefixes) {
+				continue
+			}
+			t.Errorf("%s imports %s; allowed internal prefixes are %v", meta.ImportPath, imported, allowedPrefixes)
+		}
+	}
+
+	if !foundEnv {
+		t.Fatalf("expected to inspect %s/env", modulePath)
+	}
+}
+
 func TestPhase4Milestone3_LegacyModelPackageBoundaries(t *testing.T) {
 	metas := mustListPackages(t,
 		modulePath+"/model",
@@ -220,6 +255,14 @@ func allowedImportPrefixes(importPath string) []string {
 		return []string{modulePath + "/core"}
 	case strings.HasPrefix(importPath, modulePath+"/evolution"):
 		return []string{modulePath + "/core", modulePath + "/evolution"}
+	case strings.HasPrefix(importPath, modulePath+"/env"):
+		return []string{
+			modulePath + "/common",
+			modulePath + "/env",
+			modulePath + "/functions",
+			modulePath + "/gene",
+			modulePath + "/genome",
+		}
 	case strings.HasPrefix(importPath, modulePath+"/gymnasium"):
 		return []string{modulePath + "/common", modulePath + "/gymnasium"}
 	case strings.HasPrefix(importPath, modulePath+"/model"):
