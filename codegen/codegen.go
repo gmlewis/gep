@@ -171,9 +171,9 @@ func (g *generator) generate() ([]byte, error) {
 			merge = strings.Replace(merge, "{member}", exp, -1)
 			merge = strings.Replace(merge, "{symbol}", glf.SymbolName, -1)
 			exps = append(exps, merge)
-			continue
+		} else {
+			exps = append(exps, g.subs["tempvarname"]+" = "+exp)
 		}
-		exps = append(exps, g.subs["tempvarname"]+" = "+exp)
 	}
 
 	exps = append(exps, "")
