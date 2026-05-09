@@ -659,18 +659,23 @@ Representative locations:
 - `evolution/mutation/mutation.go`
 - `evolution/transposition/transposition.go`
 
-### Phase 4 status: still not faithful (after P4-A)
+### Phase 4 status: partially complete (after P4-A, P4-B, P4-C)
 
-The current repository does **not** yet satisfy the original Phase 4 intent.
-The work completed under "Phase 4" mostly enforced package import boundaries,
-but the original Phase 4 was about **actual subsystem separation**.
+The current repository partially satisfies the original Phase 4 intent.
+The work completed under "Phase 4" has progressed from pure import-boundary
+enforcement to actual subsystem separation.
+
+What has been completed:
+
+- dedicated `codegen` subsystem separates code generation from representation
+  (P4-A)
+- dedicated `env` / RL subsystem separates Gymnasium agent orchestration from
+  legacy `model` (P4-B)
+- dedicated `problems` subsystem promotes reusable fitness/problem definitions
+  into typed seams over `core` + `evolution` (P4-C)
 
 What is still missing relative to the original plan:
 
-- no dedicated `env` / RL subsystem; Gymnasium agent orchestration still lives
-  in legacy `model`
-- no dedicated `problems` / `domains` subsystem; reusable problem definitions
-  remain scattered between `fitness` helpers and experiment-specific code
 - experiments and examples still depend primarily on legacy representation and
   legacy model packages rather than the typed `core` + `evolution` stack
 - legacy packages are still active workflow packages, not merely
@@ -678,8 +683,6 @@ What is still missing relative to the original plan:
 
 Representative locations:
 
-- `gymnasium/`
-- `model/gymnasium-agents.go`
 - `experiments/*`
 - `examples/gymnasium/*`
 - `evolution/package_map_test.go`
@@ -976,6 +979,37 @@ Required outcome:
   subsystem where appropriate
 - define typed problem-facing seams over `core` + `evolution`
 - continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
+
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- added a dedicated `problems` subsystem with package-level godoc and exported
+  `Case`, `BoolProblem`, `FloatProblem`, `NewBoolProblem`, `NewFloatProblem`,
+  `BoolProblem.NumHitsScoringFunc`, `FloatProblem.NumHitsAbsScoringFunc`,
+  `FloatProblem.MeanSquaredErrorAbsScoringFunc`, and
+  `FloatProblem.RSquareScoringFunc` APIs:
+  - `problems/doc.go`
+  - `problems/problems.go`
+- `problems` imports only `core` and `fitness/*`; it does not import any legacy
+  `gene`, `genome`, or `model` packages, satisfying the typed seam requirement
+- `fitness/bool` and `fitness/float` remain unchanged as narrow helper layers
+  providing raw slice-based fitness math; `problems` bridges from typed
+  `core.Genome[T]` evaluation to those fitness helpers
+- scoring functions return `func(core.Genome[T]) float64`, the exact type
+  accepted by `evolution.New` as its `scoringFunc` argument — no additional
+  adaptation is required at call sites
+- package boundary enforcement added to `evolution/package_map_test.go`:
+  - `TestPhase4MilestoneC_ProblemsPackageBoundaries` passes
+  - `allowedImportPrefixes` extended with a `problems` case
+- focused tests added in `problems/problems_test.go` covering constructor
+  validation, all three boolean scoring paths, and all three float scoring paths
+- verification commands passed:
+  ```
+  go test ./problems/...
+  go test ./evolution/...   # TestPhase4MilestoneC_ProblemsPackageBoundaries passes
+  ./scripts/test-all.sh
+  ```
 
 ### P4-D: Rewire experiments and examples to the separated subsystems
 
