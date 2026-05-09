@@ -122,10 +122,10 @@ func TestBoolProblem_NumHitsScoringFunc_AllCorrect(t *testing.T) {
 func TestBoolProblem_NumHitsScoringFunc_PartialCorrect(t *testing.T) {
 	// Genome returns d0; NAND cases where d0 is only sometimes correct.
 	cases := []Case[bool]{
-		{In: []bool{false, false}, Out: true},  // d0=false, want true  → miss
-		{In: []bool{false, true}, Out: true},   // d0=false, want true  → miss
-		{In: []bool{true, false}, Out: true},   // d0=true,  want true  → hit
-		{In: []bool{true, true}, Out: false},   // d0=true,  want false → miss
+		{In: []bool{false, false}, Out: true}, // d0=false, want true  → miss
+		{In: []bool{false, true}, Out: true},  // d0=false, want true  → miss
+		{In: []bool{true, false}, Out: true},  // d0=true,  want true  → hit
+		{In: []bool{true, true}, Out: false},  // d0=true,  want false → miss
 	}
 	p, err := NewBoolProblem(cases)
 	if err != nil {
