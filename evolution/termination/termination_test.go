@@ -111,8 +111,8 @@ func TestNoImprovement_ImprovementResetsCounter_Maximize(t *testing.T) {
 		t.Fatal("improvement should reset stagnation counter")
 	}
 	// Two more stagnant gens (need patience=3 to stop again)
-	c.ShouldStop(4, 20.0) // stagnant 1
-	c.ShouldStop(5, 20.0) // stagnant 2
+	c.ShouldStop(4, 20.0)      // stagnant 1
+	c.ShouldStop(5, 20.0)      // stagnant 2
 	if c.ShouldStop(6, 20.0) { // stagnant 3 – should stop now
 		// ok
 	} else {
@@ -137,8 +137,8 @@ func TestNoImprovement_ImprovementResetsCounter_Minimize(t *testing.T) {
 
 func TestNoImprovement_PatienceLessThanOneClamped(t *testing.T) {
 	c := NoImprovement(0, false) // should be clamped to 1
-	c.ShouldStop(0, 1.0)        // initialize
-	if !c.ShouldStop(1, 1.0) {  // patience=1: one stagnant gen => stop
+	c.ShouldStop(0, 1.0)         // initialize
+	if !c.ShouldStop(1, 1.0) {   // patience=1: one stagnant gen => stop
 		t.Fatal("patience clamped to 1: one stagnant gen should stop")
 	}
 }

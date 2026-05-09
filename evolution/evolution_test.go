@@ -821,7 +821,7 @@ func TestEvolve_TerminationCriteria_AnyComposite(t *testing.T) {
 	g := newTestGeneration(t, 39, sf)
 	g.TerminationCriteria = []termination.Criterion{
 		termination.Any(
-			termination.ScoreThreshold(1e9, false),  // never fires
+			termination.ScoreThreshold(1e9, false),   // never fires
 			termination.ScoreThreshold(500.0, false), // fires at 500
 		),
 	}
