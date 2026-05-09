@@ -15,11 +15,13 @@ import (
 	"math"
 	"os"
 
+	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/evolution"
+	evolutionMutation "github.com/gmlewis/gep/v2/evolution/mutation"
 	"github.com/gmlewis/gep/v2/functions"
-	"github.com/gmlewis/gep/v2/gene"
+	mathNodes "github.com/gmlewis/gep/v2/functions/math_nodes"
 	"github.com/gmlewis/gep/v2/genome"
 	"github.com/gmlewis/gep/v2/grammars"
-	"github.com/gmlewis/gep/v2/model"
 )
 
 // srTests is a random sample of inputs and outputs for the function "a^4 + a^3 + a^2 + a"
@@ -42,10 +44,10 @@ var srTests = []struct {
 	{[]float64{-100}, 99009900},
 }
 
-func validateFunc(g *genome.Genome) float64 {
+func validateFunc(g core.Genome[float64]) float64 {
 	result := 0.0
 	for _, n := range srTests {
-		r, err := g.EvalMath(n.in)
+		r, err := g.Eval(n.in)
 		if err != nil {
 			return 0
 		}
@@ -62,19 +64,46 @@ func validateFunc(g *genome.Genome) float64 {
 }
 
 func main() {
-	funcs := []gene.FuncWeight{
-		{Symbol: "+", Weight: 1},
-		{Symbol: "-", Weight: 1},
-		{Symbol: "*", Weight: 1},
+	funcs := []string{
+		"+",
+		"-",
+		"*",
 	}
+	fm := make(functions.FuncMap, len(funcs))
+	for _, sym := range funcs {
+		fn, ok := mathNodes.Math[sym]
+		if !ok {
+			log.Fatalf("unsupported math function %q", sym)
+		}
+		fm[sym] = fn
+	}
+	cat, err := mathNodes.CatalogFrom(fm)
+	if err != nil {
+		log.Fatalf("CatalogFrom failed: %v", err)
+	}
+
+	linkNode, ok := mathNodes.Math["+"]
+	if !ok {
+		log.Fatal(`link function "+" not found`)
+	}
+	link, err := core.NewLinkFunc[float64]("+", linkNode.Float64Function)
+	if err != nil {
+		log.Fatalf("NewLinkFunc failed: %v", err)
+	}
+
 	numIn := len(srTests[0].in)
-	population, err := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc, false)
+	population, err := evolution.New(cat, 30, 8, 4, numIn, 0, link, validateFunc)
 	if err != nil {
 		log.Fatalf("New failed: %v", err)
 	}
-	solution, err := population.Evolve(10000)
+	population.MutationConfig = evolutionMutation.Config{
+		PointMutationRate: 0.044,
+		InversionRate:     0.1,
+	}
+	solution := population.Evolve(10000)
+	legacySolution, err := genome.NewFromCoreFloat64(solution.Genome)
 	if err != nil {
-		log.Fatalf("Evolve failed: %v", err)
+		log.Fatalf("NewFromCoreFloat64 failed: %v", err)
 	}
 
 	// Write out the Go source code for the solution.
@@ -84,6 +113,8 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %v\n", solution)
-	solution.Write(os.Stdout, gr)
+	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %v\n", legacySolution)
+	if err := legacySolution.Write(os.Stdout, gr); err != nil {
+		log.Fatalf("Write failed: %v", err)
+	}
 }

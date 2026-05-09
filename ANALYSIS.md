@@ -624,29 +624,24 @@ P1-A completion evidence:
   equivalent across the legacy packages (`gene`, `genome`, `model`)
 - full repo validation passed via `scripts/test-all.sh`
 
-### Phase 2 status: mostly faithful, but not yet dominant
+### Phase 2 status: complete (after P2-A)
 
 What appears complete:
 
 - a typed generic `core` package exists
-- typed nodes, terminals/constants, genomes, and link operators exist
-- bridge adapters exist between the typed and legacy representations
-
-Remaining deviation from the original Phase 2 intent:
-
-- the typed core is not yet the default execution path for the repository
-- major entrypoints and examples still run through legacy `model` /
-  `gene` / `genome`
-- the old `FuncType` architecture is still the primary surface for several
-  real workflows, which is broader than the intended "compatibility/reference
-  layer"
+- a typed generic `evolution` engine exists and is used as the default
+  execution surface for the experiment entrypoints
+- compatibility conversion code is isolated behind explicitly named adapter
+  surfaces (`gene/core_bridge.go`, `genome/core_bridge.go`)
+- legacy `gene`, `genome`, and `model` packages are explicitly marked as
+  deprecated compatibility/reference layers with migration guidance
 
 Representative locations:
 
 - `core/core.go`
 - `gene/core_bridge.go`
 - `genome/core_bridge.go`
-- `model/model.go`
+- `model/doc.go`
 - `experiments/*`
 - `examples/gymnasium/*`
 
@@ -808,6 +803,37 @@ Required outcome:
 - mark any remaining legacy packages as `deprecated` to the package-level documentation and document how the new packages should be used in their places
 
 This milestone corrects the remaining Phase 2 deviation.
+
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- migrated the experiment workflow entrypoints from legacy `model.New` to typed
+  `evolution.New`:
+  - `experiments/nand/main.go`
+  - `experiments/odd-3-parity/main.go`
+  - `experiments/odd-7-parity/main.go`
+  - `experiments/6-multiplexer/main.go`
+  - `experiments/symbolic_regression/main.go`
+- updated experiment scoring paths to evaluate typed `core.Genome[T]` directly
+  and use explicit compatibility adapters only at the codegen boundary
+  (`genome.NewFromCoreBool` / `genome.NewFromCoreFloat64`) when writing legacy
+  grammar output
+- preserved compatibility conversion behind clearly named adapter surfaces:
+  - `gene/core_bridge.go`
+  - `genome/core_bridge.go`
+- marked remaining legacy packages as deprecated with package-level migration
+  guidance:
+  - `gene/doc.go`
+  - `genome/doc.go`
+  - `model/doc.go`
+- updated typed benchmark coverage in
+  `experiments/symbolic_regression/main_test.go` to construct populations via
+  `evolution.New`
+- verification commands passed:
+  - `go test ./experiments/symbolic_regression`
+  - `go test ./experiments/nand ./experiments/odd-3-parity ./experiments/odd-7-parity ./experiments/6-multiplexer`
+  - `./scripts/test-all.sh`
 
 ### P3-A: Extract transposition into a first-class evolution subsystem
 
