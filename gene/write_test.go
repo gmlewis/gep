@@ -14,7 +14,7 @@ import (
 
 func TestExpression_Bool(t *testing.T) {
 	want := "(((!((d[0] && d[1]))) && (d[0] || d[1])) || (!((d[1] && d[1]))))"
-	g := New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0", functions.Bool)
+	g := mustNew(t, "Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0", functions.Bool)
 	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
 		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
@@ -37,7 +37,7 @@ func TestExpression_Bool(t *testing.T) {
 
 func TestConstants_Float64(t *testing.T) {
 	want := "(d[0]+0.5)"
-	g := New("+.d0.c1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0", functions.Float64)
+	g := mustNew(t, "+.d0.c1.+.+.+.+.d0.d1.d1.d1.d0.d1.d1.d0", functions.Float64)
 	g.Constants = []float64{0.1, 0.5}
 	grammar, err := grammars.LoadGoMathGrammar()
 	if err != nil {
@@ -60,7 +60,7 @@ func TestConstants_Float64(t *testing.T) {
 }
 
 func TestExpression_InvalidTerminalIndexReturnsError(t *testing.T) {
-	g := New("d1", functions.Float64)
+	g := mustNew(t, "d1", functions.Float64)
 	g.numTerminals = 1
 	grammar, err := grammars.LoadGoMathGrammar()
 	if err != nil {
@@ -77,7 +77,7 @@ func TestExpression_InvalidTerminalIndexReturnsError(t *testing.T) {
 }
 
 func TestExpression_InvalidConstantIndexReturnsError(t *testing.T) {
-	g := New("c1", functions.Float64)
+	g := mustNew(t, "c1", functions.Float64)
 	g.Constants = []float64{0.5}
 	grammar, err := grammars.LoadGoMathGrammar()
 	if err != nil {
@@ -94,7 +94,7 @@ func TestExpression_InvalidConstantIndexReturnsError(t *testing.T) {
 }
 
 func TestBuildExp_ArgsLengthMismatchReturnsError(t *testing.T) {
-	g := New("+.d0.d0", functions.Float64)
+	g := mustNew(t, "+.d0.d0", functions.Float64)
 	grammar, err := grammars.LoadGoMathGrammar()
 	if err != nil {
 		t.Fatalf("unable to LoadGoMathGrammar(): %v", err)

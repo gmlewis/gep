@@ -130,7 +130,7 @@ func newGeneration(
 		debug:       debug,
 		rng:         rng,
 	}
-	n, _ := maxArityWithError(fs, funcType)
+	n, _ := maxArity(fs, funcType)
 	tailSize := headSize*(n-1) + 1
 	for i := range r.Individuals {
 		genes := make([]*gene.Gene, numGenesPerGenome)
@@ -146,16 +146,11 @@ func newGeneration(
 // Evolution stops early when StopFunc (if set) returns true for the current best
 // genome. When StopFunc is nil, the default criterion of Score >= 1000 is used.
 func (g *Generation) Evolve(iterations int) (*genome.Genome, error) {
-	return g.EvolveWithError(iterations)
-}
-
-// EvolveWithError runs the GEP algorithm for the given number of iterations and
-// returns explicit errors for invalid scoring or invalid crossover preconditions.
-func (g *Generation) EvolveWithError(iterations int) (*genome.Genome, error) {
+	// Algorithm flow diagram, figure 3.1, book page 56
 	// Algorithm flow diagram, figure 3.1, book page 56
 	for i := 0; i < iterations; i++ {
 		// fmt.Printf("Iteration #%v...\n", i)
-		bestGenome, err := g.getBestWithError() // Preserve the best genome
+		bestGenome, err := g.getBest() // Preserve the best genome
 		if err != nil {
 			return nil, err
 		}
@@ -169,12 +164,16 @@ func (g *Generation) EvolveWithError(iterations int) (*genome.Genome, error) {
 			return bestGenome, nil
 		}
 		// fmt.Printf("Best genome (score %v): %v\n", bestGenome.Score, *bestGenome)
-		saveCopy, err := bestGenome.DupWithError()
+		saveCopy, err := bestGenome.Dup()
 		if err != nil {
 			return nil, err
 		}
-		g.replication() // Section 3.3.1, book page 75
-		g.mutation()    // Section 3.3.2, book page 77
+		if err := g.replication(); err != nil { // Section 3.3.1, book page 75
+			return nil, err
+		}
+		if err := g.mutation(); err != nil { // Section 3.3.2, book page 77
+			return nil, err
+		}
 		// g.isTransposition()
 		// g.risTransposition()
 		// g.geneTransposition()
@@ -184,7 +183,7 @@ func (g *Generation) EvolveWithError(iterations int) (*genome.Genome, error) {
 		// Now that replication is done, restore the best genome (aka "elitism")
 		g.Individuals[0] = saveCopy
 	}
-	return g.getBestWithError()
+	return g.getBest()
 }
 
 // replication replaces all individuals in the population by
@@ -195,7 +194,7 @@ func (g *Generation) EvolveWithError(iterations int) (*genome.Genome, error) {
 //
 // This algorithm is slightly tricky because the scores can have
 // any possible float64 range.
-func (g *Generation) replication() {
+func (g *Generation) replication() error {
 	// roulette wheel selection - see www.youtube.com/watch?v=aHLslaWO-AQ
 	minWeight, maxWeight := 0.0, 0.0
 	for i, v := range g.Individuals {
@@ -226,35 +225,42 @@ func (g *Generation) replication() {
 			beta -= scaledScore
 			index = (index + 1) % len(g.Individuals)
 		}
-		result = append(result, g.Individuals[index].Dup())
+		dup, err := g.Individuals[index].Dup()
+		if err != nil {
+			return err
+		}
+		result = append(result, dup)
 	}
 	g.Individuals = result
+	return nil
 }
 
-func (g *Generation) singleMutation(index int) {
+func (g *Generation) singleMutation(index int) error {
 	gen := g.Individuals[index]
 	// Determine the total number of mutations to perform within the genome
 	numMutations := 1 + g.randIntn(2)
 	// fmt.Printf("\nMutating genome #%v %v times, before:\n%v\n", genomeNum, numMutations, genome)
-	gen.Mutate(numMutations)
+	if err := gen.Mutate(numMutations); err != nil {
+		return err
+	}
 	// fmt.Printf("after:\n%v\n", gen)
+	return nil
 }
 
-func (g *Generation) mutation() {
+func (g *Generation) mutation() error {
 	// Determine the total number of individuals to mutate
 	numMutations := 1 + g.randIntn(len(g.Individuals)-1)
 	for i := 0; i < numMutations; i++ {
 		// Pick a random genome
 		genomeNum := g.randIntn(len(g.Individuals))
-		g.singleMutation(genomeNum)
+		if err := g.singleMutation(genomeNum); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (g *Generation) singleCrossover(idx1, idx2 int) {
-	_ = g.singleCrossoverWithError(idx1, idx2)
-}
-
-func (g *Generation) singleCrossoverWithError(idx1, idx2 int) error {
+func (g *Generation) singleCrossover(idx1, idx2 int) error {
 	genome1 := g.Individuals[idx1]
 	genome2 := g.Individuals[idx2]
 
@@ -293,9 +299,9 @@ func (g *Generation) singleCrossoverWithError(idx1, idx2 int) error {
 	return nil
 }
 
-func (g *Generation) crossover() {
+func (g *Generation) crossover() error {
 	if len(g.Individuals) < 2 {
-		return
+		return nil
 	}
 
 	// Determine the total number of individuals pairs to crossover
@@ -310,37 +316,22 @@ func (g *Generation) crossover() {
 				break
 			}
 		}
-		g.singleCrossover(genomeNum1, genomeNum2)
+		if err := g.singleCrossover(genomeNum1, genomeNum2); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // getBest evaluates all individuals and returns a pointer to the best one.
-func (g *Generation) getBest() *genome.Genome {
-	highestEffectiveScore := math.Inf(-1)
-	bestGenome := g.Individuals[0]
-	c := make(chan *genome.Genome)
-	for i := 0; i < len(g.Individuals); i++ { // Evaluate individuals concurrently
-		go g.Individuals[i].EvaluateWithScore(g.ScoringFunc, c)
-	}
-	for i := 0; i < len(g.Individuals); i++ { // Collect and return the highest scoring Genome
-		gn := <-c
-		effectiveScore := g.effectiveScore(gn.Score)
-		if effectiveScore > highestEffectiveScore {
-			bestGenome = gn
-			highestEffectiveScore = effectiveScore
-		}
-	}
-	return bestGenome
-}
-
-func (g *Generation) getBestWithError() (*genome.Genome, error) {
+func (g *Generation) getBest() (*genome.Genome, error) {
 	if len(g.Individuals) == 0 {
 		return nil, fmt.Errorf("no individuals in generation")
 	}
 	highestEffectiveScore := math.Inf(-1)
 	bestGenome := g.Individuals[0]
 	for _, gn := range g.Individuals {
-		if err := gn.EvaluateWithScoreWithError(g.ScoringFunc); err != nil {
+		if err := gn.EvaluateWithScore(g.ScoringFunc); err != nil {
 			return nil, err
 		}
 		effectiveScore := g.effectiveScore(gn.Score)
@@ -353,12 +344,7 @@ func (g *Generation) getBestWithError() (*genome.Genome, error) {
 }
 
 // maxArity determines the maximum number of input terminals for the given set of symbols.
-func maxArity(fs []gene.FuncWeight, funcType functions.FuncType) int {
-	r, _ := maxArityWithError(fs, funcType)
-	return r
-}
-
-func maxArityWithError(fs []gene.FuncWeight, funcType functions.FuncType) (int, error) {
+func maxArity(fs []gene.FuncWeight, funcType functions.FuncType) (int, error) {
 	var lookup functions.FuncMap
 	switch funcType {
 	case functions.Bool:

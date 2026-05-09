@@ -12,25 +12,22 @@ import (
 )
 
 func (g *Gene) generateMathFunc() {
-	argOrder := g.getArgOrder()
+	argOrder, err := g.getArgOrder()
+	if err != nil {
+		return
+	}
 	g.SymbolMap = make(map[string]int)
 	g.mf = g.buildMathTree(0, argOrder)
 }
 
 // EvalMath evaluates the gene as a floating-point expression and returns the result.
 // in represents the float64 inputs available to the gene.
-func (g *Gene) EvalMath(in []float64) float64 {
-	v, _ := g.EvalMathWithError(in)
-	return v
-}
-
-// EvalMathWithError evaluates the gene as a floating-point expression and returns the result.
-func (g *Gene) EvalMathWithError(in []float64) (float64, error) {
+func (g *Gene) EvalMath(in []float64) (float64, error) {
 	if err := g.validateMathSymbols(in); err != nil {
 		return 0.0, err
 	}
 	if g.mf == nil {
-		if _, err := g.getArgOrderWithError(); err != nil {
+		if _, err := g.getArgOrder(); err != nil {
 			return 0.0, err
 		}
 		g.generateMathFunc()

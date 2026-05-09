@@ -26,7 +26,10 @@ var nandTests = []struct {
 func validateNand(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range nandTests {
-		r := g.EvalBool(n.in)
+		r, err := g.EvalBool(n.in)
+		if err != nil {
+			return 0
+		}
 		if r == n.out {
 			correct++
 		}

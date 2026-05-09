@@ -33,7 +33,10 @@ var srTests = []struct {
 func validateFunc(g *genome.Genome) float64 {
 	result := 0.0
 	for _, n := range srTests {
-		r := g.EvalMath(n.in)
+		r, err := g.EvalMath(n.in)
+		if err != nil {
+			return 0
+		}
 		if math.IsInf(r, 0) {
 			return 0.0
 		}

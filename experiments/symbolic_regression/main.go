@@ -45,7 +45,10 @@ var srTests = []struct {
 func validateFunc(g *genome.Genome) float64 {
 	result := 0.0
 	for _, n := range srTests {
-		r := g.EvalMath(n.in)
+		r, err := g.EvalMath(n.in)
+		if err != nil {
+			return 0
+		}
 		// fmt.Printf("r=%v, n.in=%v, n.out=%v, g=%v\n", r, n.in, n.out, g)
 		if math.IsInf(r, 0) {
 			return 0.0
@@ -78,6 +81,6 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %q\n", solution)
+	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %v\n", solution)
 	solution.Write(os.Stdout, gr)
 }

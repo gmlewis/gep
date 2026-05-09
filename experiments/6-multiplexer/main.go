@@ -93,7 +93,10 @@ var multiTests = []struct {
 func validateMulti(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range multiTests {
-		r := g.EvalBool(n.in)
+		r, err := g.EvalBool(n.in)
+		if err != nil {
+			return 0
+		}
 		if r == n.out {
 			correct++
 		}
@@ -123,6 +126,6 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// 6-multiplexer solution karva expression:\n// %q\n", solution)
+	fmt.Printf("// 6-multiplexer solution karva expression:\n// %v\n", solution)
 	solution.Write(os.Stdout, gr)
 }

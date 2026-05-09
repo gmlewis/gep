@@ -12,25 +12,22 @@ import (
 )
 
 func (g *Gene) generateBoolFunc() {
-	argOrder := g.getArgOrder()
+	argOrder, err := g.getArgOrder()
+	if err != nil {
+		return
+	}
 	g.SymbolMap = make(map[string]int)
 	g.bf = g.buildBoolTree(0, argOrder)
 }
 
 // EvalBool evaluates the gene as a boolean expression and returns the result.
 // "in" represents the boolean inputs available to the gene.
-func (g *Gene) EvalBool(in []bool) bool {
-	v, _ := g.EvalBoolWithError(in)
-	return v
-}
-
-// EvalBoolWithError evaluates the gene as a boolean expression and returns the result.
-func (g *Gene) EvalBoolWithError(in []bool) (bool, error) {
+func (g *Gene) EvalBool(in []bool) (bool, error) {
 	if err := g.validateBoolSymbols(in); err != nil {
 		return false, err
 	}
 	if g.bf == nil {
-		if _, err := g.getArgOrderWithError(); err != nil {
+		if _, err := g.getArgOrder(); err != nil {
 			return false, err
 		}
 		g.generateBoolFunc()

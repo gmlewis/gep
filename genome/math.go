@@ -12,23 +12,17 @@ import (
 
 // EvalMath evaluates the genome as a floating-point expression and returns the result.
 // in represents the float64 inputs available to the genome.
-func (g *Genome) EvalMath(in []float64) float64 {
-	v, _ := g.EvalMathWithError(in)
-	return v
-}
-
-// EvalMathWithError evaluates the genome as a floating-point expression and returns the result.
-func (g *Genome) EvalMathWithError(in []float64) (float64, error) {
+func (g *Genome) EvalMath(in []float64) (float64, error) {
 	lf, ok := mn.Math[g.LinkFunc]
 	if !ok {
 		return 0.0, fmt.Errorf("unable to find linking function: %v", g.LinkFunc)
 	}
-	result, err := g.Genes[0].EvalMathWithError(in)
+	result, err := g.Genes[0].EvalMath(in)
 	if err != nil {
 		return 0.0, err
 	}
 	for i := 1; i < len(g.Genes); i++ {
-		next, err := g.Genes[i].EvalMathWithError(in)
+		next, err := g.Genes[i].EvalMath(in)
 		if err != nil {
 			return 0.0, err
 		}

@@ -12,23 +12,17 @@ import (
 
 // EvalInt evaluates the genome as an integer expression and returns the result.
 // in represents the int inputs available to the genome.
-func (g *Genome) EvalInt(in []int) int {
-	v, _ := g.EvalIntWithError(in)
-	return v
-}
-
-// EvalIntWithError evaluates the genome as an integer expression and returns the result.
-func (g *Genome) EvalIntWithError(in []int) (int, error) {
+func (g *Genome) EvalInt(in []int) (int, error) {
 	lf, ok := intN.Int[g.LinkFunc]
 	if !ok {
 		return 0, fmt.Errorf("unable to find linking function: %v", g.LinkFunc)
 	}
-	result, err := g.Genes[0].EvalIntWithError(in)
+	result, err := g.Genes[0].EvalInt(in)
 	if err != nil {
 		return 0, err
 	}
 	for i := 1; i < len(g.Genes); i++ {
-		next, err := g.Genes[i].EvalIntWithError(in)
+		next, err := g.Genes[i].EvalInt(in)
 		if err != nil {
 			return 0, err
 		}
@@ -40,21 +34,14 @@ func (g *Genome) EvalIntWithError(in []int) (int, error) {
 
 // EvalIntTuple evaluates the genome by evaluating each gene and assigning
 // its output to each element of the tuple.
-func (g *Genome) EvalIntTuple(in []int) []int {
-	values, _ := g.EvalIntTupleWithError(in)
-	return values
-}
-
-// EvalIntTupleWithError evaluates the genome by evaluating each gene and assigning
-// its output to each element of the tuple.
-func (g *Genome) EvalIntTupleWithError(in []int) ([]int, error) {
+func (g *Genome) EvalIntTuple(in []int) ([]int, error) {
 	result := make([]int, len(g.Genes))
 
 	// var wg sync.WaitGroup
 	for i := 0; i < len(g.Genes); i++ {
 		// wg.Add(1)
 		// go func(i int) {
-		v, err := g.Genes[i].EvalIntWithError(in)
+		v, err := g.Genes[i].EvalInt(in)
 		if err != nil {
 			return nil, err
 		}

@@ -78,7 +78,10 @@ func (g *Gene) buildExp(symbolIndex int, argOrder [][]int, grammar *grammars.Gra
 // Expression builds up the expression tree and returns the resulting string.
 // While building, it keeps track of any helper functions that are needed.
 func (g *Gene) Expression(grammar *grammars.Grammar, helpers grammars.HelperMap) (string, error) {
-	argOrder := g.getArgOrder()
+	argOrder, err := g.getArgOrder()
+	if err != nil {
+		return "", err
+	}
 	s, err := g.buildExp(0, argOrder, grammar, helpers)
 	return s, err
 }

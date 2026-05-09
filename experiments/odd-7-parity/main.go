@@ -157,7 +157,10 @@ var parityTests = []struct {
 func validateParity(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range parityTests {
-		r := g.EvalBool(n.in)
+		r, err := g.EvalBool(n.in)
+		if err != nil {
+			return 0
+		}
 		if r == n.out {
 			correct++
 		}
@@ -185,6 +188,6 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// odd-7-parity solution karva expression:\n// %q\n", solution)
+	fmt.Printf("// odd-7-parity solution karva expression:\n// %v\n", solution)
 	solution.Write(os.Stdout, gr)
 }

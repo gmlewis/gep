@@ -28,7 +28,7 @@ func gepModel(d []bool) bool {
 }
 `
 
-	g1 := gene.New("Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0", functions.Bool)
+	g1 := mustGene(t, "Or.And.Not.Not.Or.And.And.d0.d1.d1.d1.d0.d1.d1.d0", functions.Bool)
 	gn := New([]*gene.Gene{g1}, "Or")
 	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
@@ -36,7 +36,9 @@ func gepModel(d []bool) bool {
 	}
 
 	b := new(bytes.Buffer)
-	gn.Write(b, grammar)
+	if err := gn.Write(b, grammar); err != nil {
+		t.Fatalf("gn.Write() error: %v", err)
+	}
 	if b.String() != want {
 		t.Errorf("gen.Write() got:\n%v\nwant:\n%v", b.String(), want)
 	}
@@ -61,10 +63,10 @@ func gepModel(d []float64) float64 {
 }
 `
 
-	g1 := gene.New("*.d0.d0.*.d0.*.*.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0", functions.Float64)
-	g2 := gene.New("d0.*.d0.*.*.d0.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0", functions.Float64)
-	g3 := gene.New("*.d0.*.d0.d0.*.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0", functions.Float64)
-	g4 := gene.New("*.*.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0", functions.Float64)
+	g1 := mustGene(t, "*.d0.d0.*.d0.*.*.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0", functions.Float64)
+	g2 := mustGene(t, "d0.*.d0.*.*.d0.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0", functions.Float64)
+	g3 := mustGene(t, "*.d0.*.d0.d0.*.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0", functions.Float64)
+	g4 := mustGene(t, "*.*.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0", functions.Float64)
 	gn := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	grammar, err := grammars.LoadGoMathGrammar()
 	if err != nil {
@@ -72,7 +74,9 @@ func gepModel(d []float64) float64 {
 	}
 
 	b := new(bytes.Buffer)
-	gn.Write(b, grammar)
+	if err := gn.Write(b, grammar); err != nil {
+		t.Fatalf("gn.Write() error: %v", err)
+	}
 	if b.String() != want {
 		t.Errorf("gen.Write() got:\n%v\nwant:\n%v", b.String(), want)
 	}
@@ -101,10 +105,10 @@ func gepNor(x, y bool) bool {
 }
 `
 
-	g1 := gene.New("Or.d3.Or.Or.Nand.Nor.And.Or.d2.d1.d3.d2.d0.d1.d0.d0.d0", functions.Bool)
-	g2 := gene.New("Nand.Or.d0.Nor.Nor.Or.Nand.Or.d3.d5.d5.d1.d0.d2.d0.d1.d3", functions.Bool)
-	g3 := gene.New("Nor.And.Nor.And.Nor.Or.Nor.And.d4.d0.d4.d1.d4.d4.d0.d1.d2", functions.Bool)
-	g4 := gene.New("Or.Nor.Nand.Nor.Not.Nand.Nor.Nand.d1.d2.d1.d3.d0.d2.d2.d4.d4", functions.Bool)
+	g1 := mustGene(t, "Or.d3.Or.Or.Nand.Nor.And.Or.d2.d1.d3.d2.d0.d1.d0.d0.d0", functions.Bool)
+	g2 := mustGene(t, "Nand.Or.d0.Nor.Nor.Or.Nand.Or.d3.d5.d5.d1.d0.d2.d0.d1.d3", functions.Bool)
+	g3 := mustGene(t, "Nor.And.Nor.And.Nor.Or.Nor.And.d4.d0.d4.d1.d4.d4.d0.d1.d2", functions.Bool)
+	g4 := mustGene(t, "Or.Nor.Nand.Nor.Not.Nand.Nor.Nand.d1.d2.d1.d3.d0.d2.d2.d4.d4", functions.Bool)
 	gn := New([]*gene.Gene{g1, g2, g3, g4}, "And")
 	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
@@ -112,14 +116,16 @@ func gepNor(x, y bool) bool {
 	}
 
 	b := new(bytes.Buffer)
-	gn.Write(b, grammar)
+	if err := gn.Write(b, grammar); err != nil {
+		t.Fatalf("gn.Write() error: %v", err)
+	}
 	if b.String() != want {
 		t.Errorf("gen.Write() got:\n%v\nwant:\n%v", b.String(), want)
 	}
 }
 
 func TestGenerateCode_MissingLinkFunctionReturnsError(t *testing.T) {
-	g1 := gene.New("d0", functions.Bool)
+	g1 := mustGene(t, "d0", functions.Bool)
 	gn := New([]*gene.Gene{g1}, "MissingLink")
 	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
@@ -142,8 +148,8 @@ func TestGenerateCode_MissingLinkFunctionReturnsError(t *testing.T) {
 	}
 }
 
-func TestWriteWithError_MissingLinkFunctionReturnsError(t *testing.T) {
-	g1 := gene.New("d0", functions.Bool)
+func TestWrite_MissingLinkFunctionReturnsError(t *testing.T) {
+	g1 := mustGene(t, "d0", functions.Bool)
 	gn := New([]*gene.Gene{g1}, "MissingLink")
 	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {
@@ -151,13 +157,13 @@ func TestWriteWithError_MissingLinkFunctionReturnsError(t *testing.T) {
 	}
 
 	var b bytes.Buffer
-	if err := gn.WriteWithError(&b, grammar); err == nil {
-		t.Fatalf("WriteWithError() error = nil, want non-nil")
+	if err := gn.Write(&b, grammar); err == nil {
+		t.Fatalf("Write() error = nil, want non-nil")
 	}
 }
 
 func TestWrite_MissingLinkFunctionDoesNotWriteStdout(t *testing.T) {
-	g1 := gene.New("d0", functions.Bool)
+	g1 := mustGene(t, "d0", functions.Bool)
 	gn := New([]*gene.Gene{g1}, "MissingLink")
 	grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
 	if err != nil {

@@ -120,7 +120,10 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 	// var genes []*gene.Gene
 	switch ga.ObsSpace.Type {
 	case "Discrete":
-		funcWeights := gene.AllSymbolsEqualWeights(functions.Int)
+		funcWeights, err := gene.AllSymbolsEqualWeights(functions.Int)
+		if err != nil {
+			return nil, err
+		}
 		// for i := 0; i < numGenes; i++ {
 		// 	genes = append(genes, gene.RandomNew(headSize, tailSize, 1, numConstants, funcs, functions.Int))
 		// }
@@ -144,7 +147,10 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 
 	case "Tuple":
 		funcType := functions.Int
-		funcWeights := gene.AllSymbolsEqualWeights(functions.Int)
+		funcWeights, err := gene.AllSymbolsEqualWeights(functions.Int)
+		if err != nil {
+			return nil, err
+		}
 		numTerminals := len(ga.ObsSpace.Subspaces)
 		if ga.appendEpisodeSteps {
 			numTerminals++
@@ -220,11 +226,18 @@ func (ga *GymnasiumAgents) Evolve() error {
 	// Preserve a copy of the best performing individual which
 	// will be added back into the population after replication,
 	// mutation, and crossover.
-	bestInd := ga.Individuals[0].Dup()
+	bestInd, err := ga.Individuals[0].Dup()
+	if err != nil {
+		return err
+	}
 	gen := &Generation{Individuals: ga.Individuals, debug: ga.debug}
 	// gen.replication()  // This seems to eliminate all diversity - investigate
-	gen.mutation()
-	gen.crossover()
+	if err := gen.mutation(); err != nil {
+		return err
+	}
+	if err := gen.crossover(); err != nil {
+		return err
+	}
 	if len(gen.Individuals) == 0 {
 		return fmt.Errorf("programming error: no individuals available after evolution operators")
 	}

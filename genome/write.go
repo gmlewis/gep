@@ -24,11 +24,6 @@ type dump struct {
 }
 
 func (g *Genome) Write(w io.Writer, grammar *grammars.Grammar) error {
-	return g.WriteWithError(w, grammar)
-}
-
-// WriteWithError writes generated code to w and returns generation errors.
-func (g *Genome) WriteWithError(w io.Writer, grammar *grammars.Grammar) error {
 	d := &dump{
 		gr:     grammar,
 		genome: g,

@@ -34,7 +34,10 @@ var nandTests = []struct {
 func validateNand(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range nandTests {
-		r := g.EvalBool(n.in)
+		r, err := g.EvalBool(n.in)
+		if err != nil {
+			return 0
+		}
 		if r == n.out {
 			correct++
 		}
@@ -62,6 +65,6 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// nand solution karva expression:\n// %q\n", solution)
+	fmt.Printf("// nand solution karva expression:\n// %v\n", solution)
 	solution.Write(os.Stdout, gr)
 }

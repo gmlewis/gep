@@ -15,25 +15,22 @@ import (
 type VectorInt = functions.VectorInt
 
 func (g *Gene) generateVectorIntFunc() {
-	argOrder := g.getArgOrder()
+	argOrder, err := g.getArgOrder()
+	if err != nil {
+		return
+	}
 	g.SymbolMap = make(map[string]int)
 	g.vif = g.buildVectorIntTree(0, argOrder)
 }
 
 // EvalVectorInt evaluates the gene as a floating-point expression and returns the result.
 // in represents the int inputs available to the gene.
-func (g *Gene) EvalVectorInt(in []VectorInt) VectorInt {
-	v, _ := g.EvalVectorIntWithError(in)
-	return v
-}
-
-// EvalVectorIntWithError evaluates the gene as a vector-int expression and returns the result.
-func (g *Gene) EvalVectorIntWithError(in []VectorInt) (VectorInt, error) {
+func (g *Gene) EvalVectorInt(in []VectorInt) (VectorInt, error) {
 	if err := g.validateVectorIntSymbols(in); err != nil {
 		return VectorInt{}, err
 	}
 	if g.vif == nil {
-		if _, err := g.getArgOrderWithError(); err != nil {
+		if _, err := g.getArgOrder(); err != nil {
 			return VectorInt{}, err
 		}
 		g.generateVectorIntFunc()

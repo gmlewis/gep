@@ -79,15 +79,9 @@ func (g *Gene) randPerm(n int) []int {
 	return rand.Perm(n)
 }
 
-// New creates a new gene based on the Karva string representation.
-func New(x string, funcType functions.FuncType) *Gene {
-	g, _ := NewWithError(x, funcType)
-	return g
-}
-
-// NewWithError creates a new gene based on the Karva string representation
+// New creates a new gene based on the Karva string representation
 // and returns an error when the symbol indexes are malformed.
-func NewWithError(x string, funcType functions.FuncType) (*Gene, error) {
+func New(x string, funcType functions.FuncType) (*Gene, error) {
 	parts := strings.Split(x, ".")
 	numConstants, numTerminals := 0, 0
 	var errs []error
@@ -174,15 +168,9 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 	return r
 }
 
-// String returns the Karva representation of the gene.
-func (g Gene) String() string {
-	s, _ := g.StringWithError()
-	return s
-}
-
-// StringWithError returns the Karva representation of the gene and any
+// String returns the Karva representation of the gene and any
 // symbol-format errors encountered while rendering constants.
-func (g Gene) StringWithError() (string, error) {
+func (g Gene) String() (string, error) {
 	var syms []string
 	var errs []error
 	for _, s := range g.Symbols {
@@ -216,14 +204,7 @@ func (g Gene) DotGraph() string {
 // Note that this count is typically different from the number
 // of times the symbol appears in the Karva expression.  This can be
 // a handy metric to assist in the fitness evaluation of a Gene.
-func (g *Gene) SymbolCount(sym string) int {
-	n, _ := g.SymbolCountWithError(sym)
-	return n
-}
-
-// SymbolCountWithError returns the count of the number of times the symbol
-// is actually used in the Gene while surfacing unsupported function types.
-func (g *Gene) SymbolCountWithError(sym string) (int, error) {
+func (g *Gene) SymbolCount(sym string) (int, error) {
 	if g.SymbolMap == nil {
 		switch g.funcType {
 		case functions.Bool:
@@ -241,14 +222,9 @@ func (g *Gene) SymbolCountWithError(sym string) (int, error) {
 	return g.SymbolMap[sym], nil
 }
 
-// Mutate mutates a gene by performing a single random symbol exchange within the gene.
-func (g *Gene) Mutate() {
-	_ = g.MutateWithError()
-}
-
-// MutateWithError mutates a gene by performing a single random symbol exchange
+// Mutate mutates a gene by performing a single random symbol exchange
 // within the gene and surfaces invalid mutation preconditions.
-func (g *Gene) MutateWithError() error {
+func (g *Gene) Mutate() error {
 	position := g.randIntn(len(g.Symbols))
 	if g.numTerminals < 2 {
 		position %= g.HeadSize // Force choice to be within the head
@@ -278,13 +254,7 @@ func (g *Gene) MutateWithError() error {
 }
 
 // Dup duplicates the gene into the provided destination gene.
-func (g *Gene) Dup() *Gene {
-	dup, _ := g.DupWithError()
-	return dup
-}
-
-// DupWithError duplicates the gene into the provided destination gene.
-func (g *Gene) DupWithError() (*Gene, error) {
+func (g *Gene) Dup() (*Gene, error) {
 	if g == nil {
 		return nil, fmt.Errorf("gene.Dup error: src and dst must be non-nil")
 	}
@@ -359,12 +329,7 @@ func CheckEqual(g1 *Gene, g2 *Gene) error {
 //
 //	'+.*.-./' => [[1, 2], [3, 4], [5, 6], [7, 8]]
 //	'+.d0.c0./' => [[1, 2], nil, nil, [3, 4]]
-func (g *Gene) getArgOrder() [][]int {
-	argOrder, _ := g.getArgOrderWithError()
-	return argOrder
-}
-
-func (g *Gene) getArgOrderWithError() ([][]int, error) {
+func (g *Gene) getArgOrder() ([][]int, error) {
 	var lookup functions.FuncMap
 	switch g.funcType {
 	case functions.Bool:

@@ -20,14 +20,7 @@ type FuncWeight struct {
 
 // AllSymbolsEqualWeights returns all symbols with equal weights
 // for the given node type.
-func AllSymbolsEqualWeights(funcType functions.FuncType) []FuncWeight {
-	result, _ := AllSymbolsEqualWeightsWithError(funcType)
-	return result
-}
-
-// AllSymbolsEqualWeightsWithError returns all symbols with equal weights
-// for the given node type, surfacing unsupported function types.
-func AllSymbolsEqualWeightsWithError(funcType functions.FuncType) ([]FuncWeight, error) {
+func AllSymbolsEqualWeights(funcType functions.FuncType) ([]FuncWeight, error) {
 	var lookup functions.FuncMap
 	switch funcType {
 	case functions.Bool:

@@ -16,6 +16,57 @@ import (
 
 const delta = 1.0
 
+func mustGenePanic(karva string, funcType functions.FuncType) *gene.Gene {
+	g, err := gene.New(karva, funcType)
+	if err != nil {
+		panic(err)
+	}
+	return g
+}
+
+func mustEvalBoolGenome(t *testing.T, g *Genome, in []bool) bool {
+	t.Helper()
+	v, err := g.EvalBool(in)
+	if err != nil {
+		t.Fatalf("EvalBool() error: %v", err)
+	}
+	return v
+}
+
+func mustEvalMathGenome(t *testing.T, g *Genome, in []float64) float64 {
+	t.Helper()
+	v, err := g.EvalMath(in)
+	if err != nil {
+		t.Fatalf("EvalMath() error: %v", err)
+	}
+	return v
+}
+
+func mustSymbolCountGenome(t *testing.T, g *Genome, sym string) int {
+	t.Helper()
+	v, err := g.SymbolCount(sym)
+	if err != nil {
+		t.Fatalf("SymbolCount() error: %v", err)
+	}
+	return v
+}
+
+func mustMutateGenome(t *testing.T, g *Genome, n int) {
+	t.Helper()
+	if err := g.Mutate(n); err != nil {
+		t.Fatalf("Mutate() error: %v", err)
+	}
+}
+
+func mustDupGenome(t *testing.T, g *Genome) *Genome {
+	t.Helper()
+	v, err := g.Dup()
+	if err != nil {
+		t.Fatalf("Dup() error: %v", err)
+	}
+	return v
+}
+
 // Logic Synthesis
 
 var sixMultiplexerTests = []struct {
@@ -90,28 +141,28 @@ var sixMultiplexerTests = []struct {
 
 func validateSixMultiplexer(t *testing.T, g *Genome) {
 	for i, n := range sixMultiplexerTests {
-		r := g.EvalBool(n.in)
+		r := mustEvalBoolGenome(t, g, n.in)
 		if r != n.out {
-			t.Errorf("%v: sixMultiplexer.EvalBool(%#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
+			t.Errorf("%v: mustEvalBoolGenome(t, sixMultiplexer, %#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
 		}
 	}
 }
 
 func TestSixMultiplexer(t *testing.T) {
 	mux := New([]*gene.Gene{
-		gene.New("Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2", functions.Bool),
-		gene.New("Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3", functions.Bool),
-		gene.New("Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0", functions.Bool),
-		gene.New("Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1", functions.Bool),
+		mustGene(t, "Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2", functions.Bool),
+		mustGene(t, "Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3", functions.Bool),
+		mustGene(t, "Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0", functions.Bool),
+		mustGene(t, "Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1", functions.Bool),
 	},
 		"And")
 	validateSixMultiplexer(t, mux)
-	mux.SymbolCount("Or") // Force creation of SymbolMap.
+	mustSymbolCountGenome(t, mux, "Or") // Force creation of SymbolMap.
 	w := map[string]int{
 		"Or": 7, "d1": 7, "d4": 6, "d3": 5, "d5": 2, "And": 9, "d0": 7, "d2": 4, "Nor": 7, "Not": 3, "Nand": 7,
 	}
 	if !reflect.DeepEqual(mux.SymbolMap, w) {
-		t.Errorf("Genome %q SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
+		t.Errorf("Genome %v SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
 	}
 }
 
@@ -131,27 +182,27 @@ var odd3ParityTests = []struct {
 
 func validateOdd3Parity(t *testing.T, g *Genome) {
 	for i, n := range odd3ParityTests {
-		r := g.EvalBool(n.in)
+		r := mustEvalBoolGenome(t, g, n.in)
 		if r != n.out {
-			t.Errorf("%v: odd3Parity.EvalBool(%#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
+			t.Errorf("%v: mustEvalBoolGenome(t, odd3Parity, %#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
 		}
 	}
 }
 
 func TestOdd3Parity(t *testing.T) {
 	mux := New([]*gene.Gene{
-		gene.New("Or.Or.d1.And.Or.d0.And.d2.d0.d2.d1.d1.d1.d0.d1", functions.Bool),
-		gene.New("Not.And.And.Not.Or.And.And.d0.d1.d2.d2.d1.d0.d2.d2", functions.Bool),
-		gene.New("Or.Or.Or.And.And.Not.Not.d1.d2.d0.d2.d1.d0.d0.d2", functions.Bool),
+		mustGene(t, "Or.Or.d1.And.Or.d0.And.d2.d0.d2.d1.d1.d1.d0.d1", functions.Bool),
+		mustGene(t, "Not.And.And.Not.Or.And.And.d0.d1.d2.d2.d1.d0.d2.d2", functions.Bool),
+		mustGene(t, "Or.Or.Or.And.And.Not.Not.d1.d2.d0.d2.d1.d0.d0.d2", functions.Bool),
 	},
 		"And")
 	validateOdd3Parity(t, mux)
-	mux.SymbolCount("Or") // Force creation of SymbolMap.
+	mustSymbolCountGenome(t, mux, "Or") // Force creation of SymbolMap.
 	w := map[string]int{
 		"d1": 6, "Or": 7, "Not": 4, "And": 10, "d2": 6, "d0": 6,
 	}
 	if !reflect.DeepEqual(mux.SymbolMap, w) {
-		t.Errorf("Genome %q SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
+		t.Errorf("Genome %v SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
 	}
 }
 
@@ -291,28 +342,28 @@ var odd7ParityTests = []struct {
 
 func validateOdd7Parity(t *testing.T, g *Genome) {
 	for i, n := range odd7ParityTests {
-		r := g.EvalBool(n.in)
+		r := mustEvalBoolGenome(t, g, n.in)
 		if r != n.out {
-			t.Errorf("%v: odd7Parity.EvalBool(%#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
+			t.Errorf("%v: mustEvalBoolGenome(t, odd7Parity, %#v, BoolAllGates) => %v, want %v", i, n.in, r, n.out)
 		}
 	}
 }
 
 func TestOdd7Parity(t *testing.T) {
 	mux := New([]*gene.Gene{
-		gene.New("Nor.Nand.d4.Or.Or.Xor.Or.Xor.d1.d4.d1.d0.d5.d2.d2.d1.d1", functions.Bool),
-		gene.New("And.Or.Nor.Nand.Xor.Xor.Xor.Nor.d5.d0.d4.d3.d3.d6.d5.d5.d1", functions.Bool),
-		gene.New("Xor.Xor.Xor.Xor.Nand.Or.Nand.Nor.d0.d2.d2.d4.d1.d1.d3.d1.d3", functions.Bool),
-		gene.New("And.And.And.Xor.Nor.And.Xor.Not.d2.d5.d5.d5.d1.d6.d6.d1.d1", functions.Bool),
+		mustGene(t, "Nor.Nand.d4.Or.Or.Xor.Or.Xor.d1.d4.d1.d0.d5.d2.d2.d1.d1", functions.Bool),
+		mustGene(t, "And.Or.Nor.Nand.Xor.Xor.Xor.Nor.d5.d0.d4.d3.d3.d6.d5.d5.d1", functions.Bool),
+		mustGene(t, "Xor.Xor.Xor.Xor.Nand.Or.Nand.Nor.d0.d2.d2.d4.d1.d1.d3.d1.d3", functions.Bool),
+		mustGene(t, "And.And.And.Xor.Nor.And.Xor.Not.d2.d5.d5.d5.d1.d6.d6.d1.d1", functions.Bool),
 	},
 		"Xor")
 	validateOdd7Parity(t, mux)
-	mux.SymbolCount("Or") // Force creation of SymbolMap.
+	mustSymbolCountGenome(t, mux, "Or") // Force creation of SymbolMap.
 	w := map[string]int{
 		"Nor": 5, "Or": 5, "d2": 5, "d4": 4, "d0": 3, "d6": 3, "And": 5, "Xor": 14, "d5": 7, "Nand": 4, "d1": 8, "d3": 4, "Not": 1,
 	}
 	if !reflect.DeepEqual(mux.SymbolMap, w) {
-		t.Errorf("Genome %q SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
+		t.Errorf("Genome %v SymbolMap=%#v, want %v", mux, mux.SymbolMap, w)
 	}
 }
 
@@ -347,20 +398,20 @@ var maunaLoaCO2Tests = []struct {
 
 func validateMaunaLoaCO2(t *testing.T, g *Genome) {
 	for i, n := range maunaLoaCO2Tests {
-		r := g.EvalMath(n.in)
+		r := mustEvalMathGenome(t, g, n.in)
 		e := math.Abs(r - n.out)
 		if e > delta {
-			t.Errorf("%v: maunaLoaCO2.EvalMath(%#v) => %v, want %v, e=%v", i, n.in, r, n.out, e)
+			t.Errorf("%v: mustEvalMathGenome(t, maunaLoaCO2, %#v) => %v, want %v, e=%v", i, n.in, r, n.out, e)
 		}
 	}
 }
 
 func TestMaunaLoaCO2(t *testing.T) {
-	g1 := gene.New("Avg2.Avg2.Avg2.Avg2.Max2.+.-.3Rt.*.+.d10.d10.d5.d5.d9.c6.c4.d3.d10.d10.c1", functions.Float64)
-	g2 := gene.New("5Rt.-.d10.-.Floor.5Rt.Max2.Min2.Max2.Max2.d4.c3.d1.c8.d0.d8.d1.d1.d1.c0.c9", functions.Float64)
-	g3 := gene.New("-.Ln.*.Avg2.Min2.Min2.+.X4.d6.Min2.d0.c9.d5.d5.c1.c7.d1.d10.d3.c4.d10", functions.Float64)
-	g4 := gene.New("3Rt.+.NOT.Min2.c0.+./.*.*.-.c5.c4.c1.c8.d3.d8.d10.d8.c8.c0.d0", functions.Float64)
-	g5 := gene.New("Max2.-./.Min2.-.-.-.d10.-.Max2.d0.d10.d10.c4.c0.d6.c6.c0.c9.d10.d10", functions.Float64)
+	g1 := mustGene(t, "Avg2.Avg2.Avg2.Avg2.Max2.+.-.3Rt.*.+.d10.d10.d5.d5.d9.c6.c4.d3.d10.d10.c1", functions.Float64)
+	g2 := mustGene(t, "5Rt.-.d10.-.Floor.5Rt.Max2.Min2.Max2.Max2.d4.c3.d1.c8.d0.d8.d1.d1.d1.c0.c9", functions.Float64)
+	g3 := mustGene(t, "-.Ln.*.Avg2.Min2.Min2.+.X4.d6.Min2.d0.c9.d5.d5.c1.c7.d1.d10.d3.c4.d10", functions.Float64)
+	g4 := mustGene(t, "3Rt.+.NOT.Min2.c0.+./.*.*.-.c5.c4.c1.c8.d3.d8.d10.d8.c8.c0.d0", functions.Float64)
+	g5 := mustGene(t, "Max2.-./.Min2.-.-.-.d10.-.Max2.d0.d10.d10.c4.c0.d6.c6.c0.c9.d10.d10", functions.Float64)
 	g1.Constants = []float64{
 		2.05725272377697,
 		-8.22715872676778,
@@ -423,7 +474,7 @@ func TestMaunaLoaCO2(t *testing.T) {
 	}
 	gn := New([]*gene.Gene{g1, g2, g3, g4, g5}, "Avg2")
 	validateMaunaLoaCO2(t, gn)
-	gn.SymbolCount("NOT") // Force creation of SymbolMap.
+	mustSymbolCountGenome(t, gn, "NOT") // Force creation of SymbolMap.
 	w := map[string]int{
 		"-": 10, "d9": 1, "d0": 3, "c3": 1, "c0": 3, "c4": 3, "Min2": 6, "3Rt": 2,
 		"d5": 4, "+": 5, "d4": 1, "X4": 1, "c1": 2, "/": 2, "*": 4, "Max2": 6,
@@ -431,7 +482,7 @@ func TestMaunaLoaCO2(t *testing.T) {
 		"Floor": 1, "d8": 2, "d6": 2, "c5": 1, "d3": 2, "c6": 2, "c7": 1,
 	}
 	if !reflect.DeepEqual(gn.SymbolMap, w) {
-		t.Errorf("Genome %q SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
+		t.Errorf("Genome %v SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
 	}
 }
 
@@ -543,18 +594,18 @@ var irisPlantsTests = []struct {
 
 func validateIrisPlants(t *testing.T, g *Genome) {
 	for i, n := range irisPlantsTests {
-		r := g.EvalMath(n.in)
+		r := mustEvalMathGenome(t, g, n.in)
 		e := math.Abs(r - n.out)
 		if e > 100 { // Disable test for now until classification is figured out
-			t.Errorf("%v: irisPlants.EvalMath(%#v) => %v, want %v, e=%v", i, n.in, r, n.out, e)
+			t.Errorf("%v: mustEvalMathGenome(t, irisPlants, %#v) => %v, want %v, e=%v", i, n.in, r, n.out, e)
 		}
 	}
 }
 
 func TestIrisPlants(t *testing.T) {
-	g1 := gene.New("Sqrt.GOE2E.d2.d2.d2.c6.+.d3.d2.c3.c4.c9.d2.c7.d0.d3.d3", functions.Float64)
-	g2 := gene.New("d2.*.3Rt.Ln.*.Ln.OR2.GOE2A.c7.d2.c3.d3.d2.d3.d2.c1.c9", functions.Float64)
-	g3 := gene.New("AND2.Avg2.GOE2C.d3.AND1.GOE2A.3Rt.AND2.d0.c1.d3.d2.d0.c6.c3.c7.d0", functions.Float64)
+	g1 := mustGene(t, "Sqrt.GOE2E.d2.d2.d2.c6.+.d3.d2.c3.c4.c9.d2.c7.d0.d3.d3", functions.Float64)
+	g2 := mustGene(t, "d2.*.3Rt.Ln.*.Ln.OR2.GOE2A.c7.d2.c3.d3.d2.d3.d2.c1.c9", functions.Float64)
+	g3 := mustGene(t, "AND2.Avg2.GOE2C.d3.AND1.GOE2A.3Rt.AND2.d0.c1.d3.d2.d0.c6.c3.c7.d0", functions.Float64)
 	g1.Constants = []float64{
 		-7.36991485335856,
 		3.02133243812372e-02,
@@ -593,13 +644,13 @@ func TestIrisPlants(t *testing.T) {
 	}
 	gn := New([]*gene.Gene{g1, g2, g3}, "+")
 	validateIrisPlants(t, gn)
-	gn.SymbolCount("AND1") // Force creation of SymbolMap.
+	mustSymbolCountGenome(t, gn, "AND1") // Force creation of SymbolMap.
 	w := map[string]int{
 		"GOE2C": 1, "Avg2": 1, "c1": 1, "d0": 2, "+": 2, "d2": 4, "d3": 2, "AND1": 1, "c6": 1,
 		"AND2": 2, "3Rt": 1, "GOE2A": 1, "Sqrt": 1, "GOE2E": 1,
 	}
 	if !reflect.DeepEqual(gn.SymbolMap, w) {
-		t.Errorf("Genome %q SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
+		t.Errorf("Genome %v SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
 	}
 }
 
@@ -621,19 +672,19 @@ var emotivEEGTests = []struct {
 
 func validateEmotivEEG(t *testing.T, g *Genome) {
 	for i, n := range emotivEEGTests {
-		r := g.EvalMath(n.in)
+		r := mustEvalMathGenome(t, g, n.in)
 		e := math.Abs(r - n.out)
 		if e > 4000 { // Disable test for now until logistic regression is figured out
-			t.Errorf("%v: emotivEEG.EvalMath(%#v) => %v, want %v, e=%v", i, n.in, r, n.out, e)
+			t.Errorf("%v: mustEvalMathGenome(t, emotivEEG, %#v) => %v, want %v, e=%v", i, n.in, r, n.out, e)
 		}
 	}
 }
 
 func TestEmotivEEG(t *testing.T) {
-	g1 := gene.New("Inv./.c2.+.Avg2.+.-.+.d8.-.d0.d2.d3.d3.d8.d1.c2.c2.d3.c2.d9", functions.Float64)
-	g2 := gene.New("Avg2.c2.Logi.+.*.*.*.-.d4.d8.d9.c3.d9.d7.d9.c3.d7.d2.c2.d8.d10", functions.Float64)
-	g3 := gene.New("-.Avg2.d4.c7.+.-.-.+.d0./.d9.c7.d5.d9.c2.c4.c6.d11.c1.d12.d10", functions.Float64)
-	g4 := gene.New("d8.d5.Inv.-.*.-.-.-.d5.-.c2.d0.c4.d8.d2.c1.d0.d6.d7.d12.d9", functions.Float64)
+	g1 := mustGene(t, "Inv./.c2.+.Avg2.+.-.+.d8.-.d0.d2.d3.d3.d8.d1.c2.c2.d3.c2.d9", functions.Float64)
+	g2 := mustGene(t, "Avg2.c2.Logi.+.*.*.*.-.d4.d8.d9.c3.d9.d7.d9.c3.d7.d2.c2.d8.d10", functions.Float64)
+	g3 := mustGene(t, "-.Avg2.d4.c7.+.-.-.+.d0./.d9.c7.d5.d9.c2.c4.c6.d11.c1.d12.d10", functions.Float64)
+	g4 := mustGene(t, "d8.d5.Inv.-.*.-.-.-.d5.-.c2.d0.c4.d8.d2.c1.d0.d6.d7.d12.d9", functions.Float64)
 	g1.Constants = []float64{
 		-3.66252632221442,
 		4.32132938627278,
@@ -684,13 +735,13 @@ func TestEmotivEEG(t *testing.T) {
 	}
 	gn := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	validateEmotivEEG(t, gn)
-	gn.SymbolCount("Logi") // Force creation of SymbolMap.
+	mustSymbolCountGenome(t, gn, "Logi") // Force creation of SymbolMap.
 	w := map[string]int{
 		"c2": 3, "d0": 2, "Logi": 1, "d4": 2, "d9": 4, "d7": 1, "+": 9, "d1": 1, "d5": 1,
 		"c7": 2, "Avg2": 3, "d2": 1, "*": 3, "d3": 2, "d8": 4, "c3": 1, "/": 2, "-": 6, "Inv": 1,
 	}
 	if !reflect.DeepEqual(gn.SymbolMap, w) {
-		t.Errorf("Genome %q SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
+		t.Errorf("Genome %v SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
 	}
 }
 
@@ -766,19 +817,19 @@ var fuelConsumptionTests = []struct {
 
 func validateFuelConsumption(t *testing.T, g *Genome) {
 	for i, n := range fuelConsumptionTests {
-		r := g.EvalMath(n.in)
+		r := mustEvalMathGenome(t, g, n.in)
 		e := math.Abs(r - n.out)
 		if e > 11 { // Disable test for now until regression is figured out
-			t.Errorf("%v: fuelConsumption.EvalMath(%#v) => %v, want %v, e=%v", i, n.in, r, n.out, e)
+			t.Errorf("%v: mustEvalMathGenome(t, fuelConsumption, %#v) => %v, want %v, e=%v", i, n.in, r, n.out, e)
 		}
 	}
 }
 
 func newFuelConsumption() *Genome {
-	g1 := gene.New("+.d2.-.+./.Atan./.*.c4.d0.d5.d0.d0.d0.d5.d2.d0", functions.Float64)
-	g2 := gene.New("c7.+.+.+.Avg2.d4.d6.-.d4.c7.d1.d2.c2.d6.c8.d6.d2", functions.Float64)
-	g3 := gene.New("Min2.-.+.d6.*.*.Ln.Tanh.c4.c4.d0.c4.d6.d4.d4.c2.c4", functions.Float64)
-	g4 := gene.New("-.-.d2.+.+.Tanh.+.c1.c4.d0.d0.d6.d6.c9.d5.c9.c7", functions.Float64)
+	g1 := mustGenePanic("+.d2.-.+./.Atan./.*.c4.d0.d5.d0.d0.d0.d5.d2.d0", functions.Float64)
+	g2 := mustGenePanic("c7.+.+.+.Avg2.d4.d6.-.d4.c7.d1.d2.c2.d6.c8.d6.d2", functions.Float64)
+	g3 := mustGenePanic("Min2.-.+.d6.*.*.Ln.Tanh.c4.c4.d0.c4.d6.d4.d4.c2.c4", functions.Float64)
+	g4 := mustGenePanic("-.-.d2.+.+.Tanh.+.c1.c4.d0.d0.d6.d6.c9.d5.c9.c7", functions.Float64)
 	g1.Constants = []float64{
 		-6.89063692129276,
 		-5.68895535142064,
@@ -833,13 +884,13 @@ func newFuelConsumption() *Genome {
 func TestFuelConsumption(t *testing.T) {
 	gn := newFuelConsumption()
 	validateFuelConsumption(t, gn)
-	gn.SymbolCount("/") // Force creation of SymbolMap.
+	mustSymbolCountGenome(t, gn, "/") // Force creation of SymbolMap.
 	w := map[string]int{
 		"*": 3, "d0": 7, "-": 4, "d5": 1, "Ln": 1, "Tanh": 2, "c1": 1, "+": 9, "c7": 1,
 		"Min2": 1, "/": 2, "c4": 5, "d2": 2, "Atan": 1, "d6": 3,
 	}
 	if !reflect.DeepEqual(gn.SymbolMap, w) {
-		t.Errorf("Genome %q SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
+		t.Errorf("Genome %v SymbolMap=%#v, want %v", gn, gn.SymbolMap, w)
 	}
 }
 
@@ -866,14 +917,14 @@ func checkEqual(g1 *Genome, g2 *Genome) error {
 
 func TestDup(t *testing.T) {
 	mux := New([]*gene.Gene{
-		gene.New("Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2", functions.Bool),
-		gene.New("Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3", functions.Bool),
-		gene.New("Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0", functions.Bool),
-		gene.New("Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1", functions.Bool),
+		mustGene(t, "Nand.Or.And.Not.Nor.Not.Nor.And.d3.d2.d0.d2.d1.d4.d1.d4.d2", functions.Bool),
+		mustGene(t, "Nor.Nor.And.Or.Nor.And.Nor.Or.d0.d1.d0.d2.d3.d1.d2.d0.d3", functions.Bool),
+		mustGene(t, "Or.Or.Nand.d4.Not.Or.Nand.Nand.d0.d4.d3.d4.d1.d1.d3.d2.d0", functions.Bool),
+		mustGene(t, "Or.And.And.Nand.d5.Nand.Nand.Nor.d4.d3.d5.d0.d1.d0.d4.d0.d1", functions.Bool),
 	},
 		"And")
 	validateSixMultiplexer(t, mux) // Force evaluation
-	gn := mux.Dup()
+	gn := mustDupGenome(t, mux)
 	if err := checkEqual(gn, mux); err != nil {
 		t.Errorf("TestDup after Dup failed: gn != mux: %v\n", err)
 	}
@@ -882,7 +933,7 @@ func TestDup(t *testing.T) {
 
 	gn = newFuelConsumption()
 	validateFuelConsumption(t, gn) // Force evaluation
-	mux = gn.Dup()
+	mux = mustDupGenome(t, gn)
 	if err := checkEqual(gn, mux); err != nil {
 		t.Errorf("TestDup after Dup failed: gn != mux: %v\n", err)
 	}
@@ -907,8 +958,8 @@ func TestMutate(t *testing.T) {
 		gene.RandomNew(headSize, tailSize, numTerminals, 0, funcs, functions.Bool),
 	},
 		"And")
-	gn := mux.Dup()
-	mux.Mutate(1)
+	gn := mustDupGenome(t, mux)
+	mustMutateGenome(t, mux, 1)
 	if err := checkEqual(gn, mux); err == nil {
 		t.Errorf("TestMutate failed: gn == mux\n")
 	}
@@ -916,31 +967,24 @@ func TestMutate(t *testing.T) {
 
 func TestEvaluateWithScore_NilScoringFuncDoesNotExit(t *testing.T) {
 	g := &Genome{}
-	c := make(chan *Genome, 1)
-	g.EvaluateWithScore(nil, c)
-
-	got := <-c
-	if got != g {
-		t.Fatalf("EvaluateWithScore(nil, c) sent %p, want %p", got, g)
-	}
-	if !math.IsInf(g.Score, -1) {
-		t.Fatalf("g.Score = %v, want -Inf", g.Score)
+	if err := g.EvaluateWithScore(nil); err == nil {
+		t.Fatalf("EvaluateWithScore(nil) error = nil, want non-nil")
 	}
 }
 
-func TestEvaluateWithScoreWithError_NilScoringFuncReturnsError(t *testing.T) {
+func TestEvaluateWithScore_NilScoringFuncReturnsError(t *testing.T) {
 	g := &Genome{}
-	if err := g.EvaluateWithScoreWithError(nil); err == nil {
-		t.Fatal("EvaluateWithScoreWithError(nil) error = nil, want non-nil")
+	if err := g.EvaluateWithScore(nil); err == nil {
+		t.Fatal("EvaluateWithScore(nil) error = nil, want non-nil")
 	}
 }
 
-func TestEvalIntWithError_MissingLinkFunctionReturnsError(t *testing.T) {
+func TestEvalInt_MissingLinkFunctionReturnsError(t *testing.T) {
 	g := New([]*gene.Gene{
-		gene.New("d0", functions.Int),
+		mustGene(t, "d0", functions.Int),
 	}, "MissingLink")
-	if _, err := g.EvalIntWithError([]int{1}); err == nil {
-		t.Fatal("EvalIntWithError() error = nil, want non-nil")
+	if _, err := g.EvalInt([]int{1}); err == nil {
+		t.Fatal("EvalInt() error = nil, want non-nil")
 	}
 }
 
@@ -961,7 +1005,9 @@ func BenchmarkMutate(b *testing.B) {
 	g4 := gene.RandomNew(headSize, tailSize, numTerminals, numConstants, funcs, functions.Float64)
 	g := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	for i := 0; i < b.N; i++ {
-		g.Mutate(1)
+		if err := g.Mutate(1); err != nil {
+			b.Fatalf("Mutate() error: %v", err)
+		}
 	}
 }
 
@@ -985,7 +1031,11 @@ func BenchmarkDup(b *testing.B) {
 	g := New([]*gene.Gene{g1, g2, g3, g4}, "+")
 	var v *Genome
 	for i := 0; i < b.N; i++ {
-		v = g.Dup()
+		var err error
+		v, err = g.Dup()
+		if err != nil {
+			b.Fatalf("Dup() error: %v", err)
+		}
 	}
 	result = v
 }

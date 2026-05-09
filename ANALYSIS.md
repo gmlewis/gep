@@ -608,14 +608,11 @@ P1-A completion evidence:
 - direct library `log.Printf` / `fmt.Printf` emissions were removed from legacy
   `gene`, `genome`, and `model` packages
 - explicit error-return surfaces were added for legacy invalid states:
-  - `gene`: `NewWithError`, `StringWithError`, `SymbolCountWithError`,
-    `MutateWithError`, `DupWithError`, `EvalIntWithError`,
-    `EvalMathWithError`, `EvalBoolWithError`, `EvalVectorIntWithError`,
-    `AllSymbolsEqualWeightsWithError`
-  - `genome`: `EvalIntWithError`, `EvalMathWithError`, `EvalBoolWithError`,
-    `EvalIntTupleWithError`, `DupWithError`, `EvaluateWithScoreWithError`
-  - `model`: `EvolveWithError`, `singleCrossoverWithError`,
-    `maxArityWithError`
+  - `gene`: `New`, `String`, `SymbolCount`, `Mutate`, `Dup`, `EvalInt`,
+    `EvalMath`, `EvalBool`, `EvalVectorInt`, `AllSymbolsEqualWeights`
+  - `genome`: `EvalInt`, `EvalMath`, `EvalBool`, `EvalIntTuple`, `Dup`,
+    `EvaluateWithScore`
+  - `model`: `Evolve`, `singleCrossover`, `maxArity`
 - legacy codegen now has an explicit error-return surface:
   `(*genome.Genome).Write(...) error`
 - focused tests now prove no direct stdout/stderr emission on representative
@@ -731,31 +728,28 @@ Completion proof:
 - `genome/write.go` now exposes `Write(...) error` as the explicit
   codegen error surface
 - explicit error-return APIs were added across legacy packages:
-  - `gene`: `NewWithError`, `StringWithError`, `SymbolCountWithError`,
-    `MutateWithError`, `DupWithError`, `Eval*WithError`,
-    `AllSymbolsEqualWeightsWithError`
-  - `genome`: `Eval*WithError`, `EvalIntTupleWithError`, `DupWithError`,
-    `EvaluateWithScoreWithError`
-  - `model`: `Evolve(...) (*genome.Genome, error)`, `EvolveWithError`,
-    `singleCrossoverWithError`,
-    `maxArityWithError`
+  - `gene`: `New`, `String`, `SymbolCount`, `Mutate`, `Dup`, `Eval*`,
+    `AllSymbolsEqualWeights`
+  - `genome`: `Eval*`, `EvalIntTuple`, `Dup`, `EvaluateWithScore`
+  - `model`: `Evolve(...) (*genome.Genome, error)`, `singleCrossover`,
+    `maxArity`
 - added regression tests:
   - `gene/gene_test.go`: `TestNew_InvalidSymbolIndexesDoNotWriteStderr`
-  - `gene/gene_test.go`: `TestNewWithError_InvalidSymbolIndexesReturnsError`,
-    `TestAllSymbolsEqualWeightsWithError_UnknownFuncTypeReturnsError`,
-    `TestEvalIntWithError_UnknownSymbolReturnsError`,
-    `TestMutateWithError_TooFewChoicesReturnsError`
+  - `gene/gene_test.go`: `TestNew_InvalidSymbolIndexesReturnsError`,
+    `TestAllSymbolsEqualWeights_UnknownFuncTypeReturnsError`,
+    `TestEvalInt_UnknownSymbolReturnsError`,
+    `TestMutate_TooFewChoicesReturnsError`
   - `genome/genome_test.go`:
-    `TestEvaluateWithScoreWithError_NilScoringFuncReturnsError`,
-    `TestEvalIntWithError_MissingLinkFunctionReturnsError`
+    `TestEvaluateWithScore_NilScoringFuncReturnsError`,
+    `TestEvalInt_MissingLinkFunctionReturnsError`
   - `genome/write_test.go`:
-    `TestWriteWithError_MissingLinkFunctionReturnsError`,
+    `TestWrite_MissingLinkFunctionReturnsError`,
     `TestWrite_MissingLinkFunctionDoesNotWriteStdout`
   - `model/model_test.go`:
     `TestEvolve_DoesNotWriteStdoutOnStop`,
-    `TestMaxArityWithError_UnknownFuncTypeReturnsError`,
-    `TestGetBestWithError_NilScoringFuncReturnsError`,
-    `TestSingleCrossoverWithError_MismatchedGenesReturnsError`
+    `TestMaxArity_UnknownFuncTypeReturnsError`,
+    `TestGetBest_NilScoringFuncReturnsError`,
+    `TestSingleCrossover_MismatchedGenesReturnsError`
 - verification commands passed:
   - `go test ./gene ./genome ./model`
   - `./scripts/test-all.sh`

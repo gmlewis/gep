@@ -12,25 +12,22 @@ import (
 )
 
 func (g *Gene) generateIntFunc() {
-	argOrder := g.getArgOrder()
+	argOrder, err := g.getArgOrder()
+	if err != nil {
+		return
+	}
 	g.SymbolMap = make(map[string]int)
 	g.intF = g.buildIntTree(0, argOrder)
 }
 
 // EvalInt evaluates the gene as a floating-point expression and returns the result.
 // in represents the int inputs available to the gene.
-func (g *Gene) EvalInt(in []int) int {
-	v, _ := g.EvalIntWithError(in)
-	return v
-}
-
-// EvalIntWithError evaluates the gene as an integer expression and returns the result.
-func (g *Gene) EvalIntWithError(in []int) (int, error) {
+func (g *Gene) EvalInt(in []int) (int, error) {
 	if err := g.validateIntSymbols(in); err != nil {
 		return 0, err
 	}
 	if g.intF == nil {
-		if _, err := g.getArgOrderWithError(); err != nil {
+		if _, err := g.getArgOrder(); err != nil {
 			return 0, err
 		}
 		g.generateIntFunc()
