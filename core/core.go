@@ -470,6 +470,16 @@ func (g Gene[T]) KarvaString() string {
 	return strings.Join(names, ".")
 }
 
+// SymbolNames returns the Karva symbol name for each symbol in the gene.
+// The returned slice has the same length as g.Symbols.
+func (g Gene[T]) SymbolNames() []string {
+	names := make([]string, len(g.Symbols))
+	for i, sym := range g.Symbols {
+		names[i] = sym.Name
+	}
+	return names
+}
+
 // Dup returns a deep copy of the gene.
 func (g Gene[T]) Dup() Gene[T] {
 	syms := make([]Symbol[T], len(g.Symbols))

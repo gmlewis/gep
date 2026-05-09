@@ -10,7 +10,6 @@ import (
 
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution"
-	"github.com/gmlewis/gep/v2/functions"
 	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
 
@@ -39,27 +38,13 @@ func validateNand(g core.Genome[bool]) float64 {
 }
 
 func main() {
-	funcs := []string{"Not", "And", "Or"}
-	fm := make(functions.FuncMap, len(funcs))
-	for _, sym := range funcs {
-		fn, ok := boolNodes.BoolAllGates[sym]
-		if !ok {
-			log.Fatalf("unsupported boolean function %q", sym)
-		}
-		fm[sym] = fn
-	}
-	cat, err := boolNodes.CatalogFrom(fm)
+	cat, err := boolNodes.CatalogFromNames([]string{"Not", "And", "Or"})
 	if err != nil {
-		log.Fatalf("CatalogFrom failed: %v", err)
+		log.Fatalf("CatalogFromNames failed: %v", err)
 	}
-
-	linkNode, ok := boolNodes.BoolAllGates["Or"]
-	if !ok {
-		log.Fatal(`link function "Or" not found`)
-	}
-	link, err := core.NewLinkFunc[bool]("Or", linkNode.BoolFunction)
+	link, err := boolNodes.LinkFuncFrom("Or")
 	if err != nil {
-		log.Fatalf("NewLinkFunc failed: %v", err)
+		log.Fatalf("LinkFuncFrom failed: %v", err)
 	}
 
 	population, err := evolution.New(cat, 30, 7, 1, 2, 0, link, validateNand)

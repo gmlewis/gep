@@ -16,7 +16,22 @@ import (
 	"github.com/gmlewis/gep/v2/grammars"
 )
 
-// KarvaExpressor implements Expressor from pre-extracted Karva symbol names
+// ProgramFromSymbols creates a Program from pre-extracted per-gene Karva
+// symbol-name slices and optional per-gene float64 constant slices. Pass nil
+// for constsPerGene when the genome has no constants (e.g. boolean or integer
+// genes).
+func ProgramFromSymbols(symsPerGene [][]string, constsPerGene [][]float64, linkFunc string) Program {
+	genes := make([]Expressor, len(symsPerGene))
+	for i, syms := range symsPerGene {
+		var consts []float64
+		if i < len(constsPerGene) {
+			consts = constsPerGene[i]
+		}
+		genes[i] = KarvaExpressor{Symbols: syms, Float64Constants: consts}
+	}
+	return Program{Genes: genes, LinkFunc: linkFunc}
+}
+
 // and numeric constants. It computes the argument-order tree from the grammar
 // at render time so no typed node-arity information from the original genome
 // is required. This allows experiment and example code to call codegen directly

@@ -19,7 +19,6 @@ import (
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution"
 	evolutionMutation "github.com/gmlewis/gep/v2/evolution/mutation"
-	"github.com/gmlewis/gep/v2/functions"
 	mathNodes "github.com/gmlewis/gep/v2/functions/math_nodes"
 	"github.com/gmlewis/gep/v2/grammars"
 )
@@ -69,26 +68,14 @@ func main() {
 		"-",
 		"*",
 	}
-	fm := make(functions.FuncMap, len(funcs))
-	for _, sym := range funcs {
-		fn, ok := mathNodes.Math[sym]
-		if !ok {
-			log.Fatalf("unsupported math function %q", sym)
-		}
-		fm[sym] = fn
-	}
-	cat, err := mathNodes.CatalogFrom(fm)
+	cat, err := mathNodes.CatalogFromNames(funcs)
 	if err != nil {
-		log.Fatalf("CatalogFrom failed: %v", err)
+		log.Fatalf("CatalogFromNames failed: %v", err)
 	}
 
-	linkNode, ok := mathNodes.Math["+"]
-	if !ok {
-		log.Fatal(`link function "+" not found`)
-	}
-	link, err := core.NewLinkFunc[float64]("+", linkNode.Float64Function)
+	link, err := mathNodes.LinkFuncFrom("+")
 	if err != nil {
-		log.Fatalf("NewLinkFunc failed: %v", err)
+		log.Fatalf("LinkFuncFrom failed: %v", err)
 	}
 
 	numIn := len(srTests[0].in)
@@ -108,15 +95,13 @@ func main() {
 		log.Printf("unable to load grammar: %v", err)
 	}
 
-	genes := make([]codegen.Expressor, len(solution.Genome.Genes))
+	symsPerGene := make([][]string, len(solution.Genome.Genes))
+	constsPerGene := make([][]float64, len(solution.Genome.Genes))
 	for i, g := range solution.Genome.Genes {
-		syms := make([]string, len(g.Symbols))
-		for j, sym := range g.Symbols {
-			syms[j] = sym.Name
-		}
-		genes[i] = codegen.KarvaExpressor{Symbols: syms, Float64Constants: g.Constants}
+		symsPerGene[i] = g.SymbolNames()
+		constsPerGene[i] = g.Constants
 	}
-	prog := codegen.Program{Genes: genes, LinkFunc: solution.Genome.Link.Symbol()}
+	prog := codegen.ProgramFromSymbols(symsPerGene, constsPerGene, solution.Genome.Link.Symbol())
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
 	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %v\n", solution.Genome.KarvaString())

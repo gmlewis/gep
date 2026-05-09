@@ -11,7 +11,6 @@ import (
 
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution"
-	"github.com/gmlewis/gep/v2/functions"
 	mathNodes "github.com/gmlewis/gep/v2/functions/math_nodes"
 )
 
@@ -49,27 +48,13 @@ func validateFunc(g core.Genome[float64]) float64 {
 }
 
 func main() {
-	funcs := []string{"+", "-", "*", "/"}
-	fm := make(functions.FuncMap, len(funcs))
-	for _, sym := range funcs {
-		fn, ok := mathNodes.Math[sym]
-		if !ok {
-			log.Fatalf("unsupported math function %q", sym)
-		}
-		fm[sym] = fn
-	}
-	cat, err := mathNodes.CatalogFrom(fm)
+	cat, err := mathNodes.CatalogFromNames([]string{"+", "-", "*", "/"})
 	if err != nil {
-		log.Fatalf("CatalogFrom failed: %v", err)
+		log.Fatalf("CatalogFromNames failed: %v", err)
 	}
-
-	linkNode, ok := mathNodes.Math["+"]
-	if !ok {
-		log.Fatal(`link function "+" not found`)
-	}
-	link, err := core.NewLinkFunc[float64]("+", linkNode.Float64Function)
+	link, err := mathNodes.LinkFuncFrom("+")
 	if err != nil {
-		log.Fatalf("NewLinkFunc failed: %v", err)
+		log.Fatalf("LinkFuncFrom failed: %v", err)
 	}
 
 	population, err := evolution.New(cat, 30, 6, 1, 1, 0, link, validateFunc)

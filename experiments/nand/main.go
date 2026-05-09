@@ -18,7 +18,6 @@ import (
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution"
 	evolutionMutation "github.com/gmlewis/gep/v2/evolution/mutation"
-	"github.com/gmlewis/gep/v2/functions"
 	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
 	"github.com/gmlewis/gep/v2/grammars"
 )
@@ -53,26 +52,14 @@ func main() {
 		"And",
 		"Or",
 	}
-	fm := make(functions.FuncMap, len(funcs))
-	for _, sym := range funcs {
-		fn, ok := boolNodes.BoolAllGates[sym]
-		if !ok {
-			log.Fatalf("unsupported boolean function %q", sym)
-		}
-		fm[sym] = fn
-	}
-	cat, err := boolNodes.CatalogFrom(fm)
+	cat, err := boolNodes.CatalogFromNames(funcs)
 	if err != nil {
-		log.Fatalf("CatalogFrom failed: %v", err)
+		log.Fatalf("CatalogFromNames failed: %v", err)
 	}
 
-	linkNode, ok := boolNodes.BoolAllGates["Or"]
-	if !ok {
-		log.Fatal(`link function "Or" not found`)
-	}
-	link, err := core.NewLinkFunc[bool]("Or", linkNode.BoolFunction)
+	link, err := boolNodes.LinkFuncFrom("Or")
 	if err != nil {
-		log.Fatalf("NewLinkFunc failed: %v", err)
+		log.Fatalf("LinkFuncFrom failed: %v", err)
 	}
 
 	numIn := len(nandTests[0].in)
@@ -92,15 +79,11 @@ func main() {
 		log.Printf("unable to load Boolean grammar: %v", err)
 	}
 
-	genes := make([]codegen.Expressor, len(solution.Genome.Genes))
+	symsPerGene := make([][]string, len(solution.Genome.Genes))
 	for i, g := range solution.Genome.Genes {
-		syms := make([]string, len(g.Symbols))
-		for j, sym := range g.Symbols {
-			syms[j] = sym.Name
-		}
-		genes[i] = codegen.KarvaExpressor{Symbols: syms}
+		symsPerGene[i] = g.SymbolNames()
 	}
-	prog := codegen.Program{Genes: genes, LinkFunc: solution.Genome.Link.Symbol()}
+	prog := codegen.ProgramFromSymbols(symsPerGene, nil, solution.Genome.Link.Symbol())
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
 	fmt.Printf("// nand solution karva expression:\n// %v\n", solution.Genome.KarvaString())
