@@ -10,15 +10,18 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/evolution"
+	evolutionMutation "github.com/gmlewis/gep/v2/evolution/mutation"
 	"github.com/gmlewis/gep/v2/functions"
-	"github.com/gmlewis/gep/v2/gene"
+	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
 	"github.com/gmlewis/gep/v2/genome"
 	"github.com/gmlewis/gep/v2/grammars"
-	"github.com/gmlewis/gep/v2/model"
 )
 
 var nandTests = []struct {
@@ -31,10 +34,10 @@ var nandTests = []struct {
 	{[]bool{true, true}, false},
 }
 
-func validateNand(g *genome.Genome) float64 {
+func validateNand(g core.Genome[bool]) float64 {
 	correct := 0
 	for _, n := range nandTests {
-		r, err := g.EvalBool(n.in)
+		r, err := g.Eval(n.in)
 		if err != nil {
 			return 0
 		}
@@ -46,19 +49,46 @@ func validateNand(g *genome.Genome) float64 {
 }
 
 func main() {
-	funcs := []gene.FuncWeight{
-		{Symbol: "Not", Weight: 1},
-		{Symbol: "And", Weight: 5},
-		{Symbol: "Or", Weight: 5},
+	funcs := []string{
+		"Not",
+		"And",
+		"Or",
 	}
+	fm := make(functions.FuncMap, len(funcs))
+	for _, sym := range funcs {
+		fn, ok := boolNodes.BoolAllGates[sym]
+		if !ok {
+			log.Fatalf("unsupported boolean function %q", sym)
+		}
+		fm[sym] = fn
+	}
+	cat, err := boolNodes.CatalogFrom(fm)
+	if err != nil {
+		log.Fatalf("CatalogFrom failed: %v", err)
+	}
+
+	linkNode, ok := boolNodes.BoolAllGates["Or"]
+	if !ok {
+		log.Fatal(errors.New(`link function "Or" not found`))
+	}
+	link, err := core.NewLinkFunc[bool]("Or", linkNode.BoolFunction)
+	if err != nil {
+		log.Fatalf("NewLinkFunc failed: %v", err)
+	}
+
 	numIn := len(nandTests[0].in)
-	population, err := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand, false)
+	population, err := evolution.New(cat, 30, 7, 1, numIn, 0, link, validateNand)
 	if err != nil {
 		log.Fatalf("New failed: %v", err)
 	}
-	solution, err := population.Evolve(1000)
+	population.MutationConfig = evolutionMutation.Config{
+		PointMutationRate: 0.044,
+		InversionRate:     0.1,
+	}
+	solution := population.Evolve(1000)
+	legacySolution, err := genome.NewFromCoreBool(solution.Genome)
 	if err != nil {
-		log.Fatalf("Evolve failed: %v", err)
+		log.Fatalf("NewFromCoreBool failed: %v", err)
 	}
 
 	// Write out the Go source code for the solution.
@@ -68,6 +98,8 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// nand solution karva expression:\n// %v\n", solution)
-	solution.Write(os.Stdout, gr)
+	fmt.Printf("// nand solution karva expression:\n// %v\n", legacySolution)
+	if err := legacySolution.Write(os.Stdout, gr); err != nil {
+		log.Fatalf("Write failed: %v", err)
+	}
 }
