@@ -5,6 +5,7 @@
 package gene
 
 import (
+	"fmt"
 	"strconv"
 
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
@@ -19,10 +20,25 @@ func (g *Gene) generateBoolFunc() {
 // EvalBool evaluates the gene as a boolean expression and returns the result.
 // "in" represents the boolean inputs available to the gene.
 func (g *Gene) EvalBool(in []bool) bool {
+	v, _ := g.EvalBoolWithError(in)
+	return v
+}
+
+// EvalBoolWithError evaluates the gene as a boolean expression and returns the result.
+func (g *Gene) EvalBoolWithError(in []bool) (bool, error) {
+	if err := g.validateBoolSymbols(in); err != nil {
+		return false, err
+	}
 	if g.bf == nil {
+		if _, err := g.getArgOrderWithError(); err != nil {
+			return false, err
+		}
 		g.generateBoolFunc()
 	}
-	return g.bf(in)
+	if g.bf == nil {
+		return false, fmt.Errorf("unable to generate bool evaluator")
+	}
+	return g.bf(in), nil
 }
 
 func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int) func([]bool) bool {

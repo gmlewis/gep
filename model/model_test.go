@@ -40,6 +40,12 @@ func TestMaxArity_UnknownFuncTypeReturnsZero(t *testing.T) {
 	}
 }
 
+func TestMaxArityWithError_UnknownFuncTypeReturnsError(t *testing.T) {
+	if _, err := maxArityWithError(nil, functions.FuncType(999)); err == nil {
+		t.Fatal("maxArityWithError(nil, unknown) error = nil, want non-nil")
+	}
+}
+
 func BenchmarkReplication(b *testing.B) {
 	funcs := []gene.FuncWeight{
 		{Symbol: "+", Weight: 1},
@@ -112,6 +118,16 @@ func TestGetBestHandlesAllNegativeScores(t *testing.T) {
 	}
 }
 
+func TestGetBestWithError_NilScoringFuncReturnsError(t *testing.T) {
+	g := &Generation{
+		Individuals: []*genome.Genome{{}},
+		ScoringFunc: nil,
+	}
+	if _, err := g.getBestWithError(); err == nil {
+		t.Fatal("getBestWithError() error = nil, want non-nil")
+	}
+}
+
 func TestGetBest_MinimizeScore(t *testing.T) {
 	g1 := &genome.Genome{}
 	g2 := &genome.Genome{}
@@ -151,6 +167,20 @@ func TestSingleCrossover_MismatchedGenesDoesNotMutate(t *testing.T) {
 	}
 	if got, want := g.Individuals[1].Genes[0].Symbols, []string{"d0", "d1"}; len(got) != len(want) || got[0] != want[0] || got[1] != want[1] {
 		t.Fatalf("genome[1] symbols changed: got %v, want %v", got, want)
+	}
+}
+
+func TestSingleCrossoverWithError_MismatchedGenesReturnsError(t *testing.T) {
+	gene1 := &gene.Gene{Symbols: []string{"d0"}, HeadSize: 1}
+	gene2 := &gene.Gene{Symbols: []string{"d0", "d1"}, HeadSize: 2}
+	g := &Generation{
+		Individuals: []*genome.Genome{
+			{Genes: []*gene.Gene{gene1}},
+			{Genes: []*gene.Gene{gene2}},
+		},
+	}
+	if err := g.singleCrossoverWithError(0, 1); err == nil {
+		t.Fatal("singleCrossoverWithError() error = nil, want non-nil")
 	}
 }
 

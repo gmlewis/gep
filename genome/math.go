@@ -5,20 +5,35 @@
 package genome
 
 import (
+	"fmt"
+
 	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
 )
 
 // EvalMath evaluates the genome as a floating-point expression and returns the result.
 // in represents the float64 inputs available to the genome.
 func (g *Genome) EvalMath(in []float64) float64 {
+	v, _ := g.EvalMathWithError(in)
+	return v
+}
+
+// EvalMathWithError evaluates the genome as a floating-point expression and returns the result.
+func (g *Genome) EvalMathWithError(in []float64) (float64, error) {
 	lf, ok := mn.Math[g.LinkFunc]
 	if !ok {
-		return 0.0
+		return 0.0, fmt.Errorf("unable to find linking function: %v", g.LinkFunc)
 	}
-	result := g.Genes[0].EvalMath(in)
+	result, err := g.Genes[0].EvalMathWithError(in)
+	if err != nil {
+		return 0.0, err
+	}
 	for i := 1; i < len(g.Genes); i++ {
-		x := []float64{result, g.Genes[i].EvalMath(in)}
+		next, err := g.Genes[i].EvalMathWithError(in)
+		if err != nil {
+			return 0.0, err
+		}
+		x := []float64{result, next}
 		result = lf.Float64Function(x)
 	}
-	return result
+	return result, nil
 }

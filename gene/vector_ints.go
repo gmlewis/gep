@@ -5,6 +5,7 @@
 package gene
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gmlewis/gep/v2/functions"
@@ -22,10 +23,25 @@ func (g *Gene) generateVectorIntFunc() {
 // EvalVectorInt evaluates the gene as a floating-point expression and returns the result.
 // in represents the int inputs available to the gene.
 func (g *Gene) EvalVectorInt(in []VectorInt) VectorInt {
+	v, _ := g.EvalVectorIntWithError(in)
+	return v
+}
+
+// EvalVectorIntWithError evaluates the gene as a vector-int expression and returns the result.
+func (g *Gene) EvalVectorIntWithError(in []VectorInt) (VectorInt, error) {
+	if err := g.validateVectorIntSymbols(in); err != nil {
+		return VectorInt{}, err
+	}
 	if g.vif == nil {
+		if _, err := g.getArgOrderWithError(); err != nil {
+			return VectorInt{}, err
+		}
 		g.generateVectorIntFunc()
 	}
-	return g.vif(in)
+	if g.vif == nil {
+		return VectorInt{}, fmt.Errorf("unable to generate vector-int evaluator")
+	}
+	return g.vif(in), nil
 }
 
 func (g *Gene) buildVectorIntTree(symbolIndex int, argOrder [][]int) func([]VectorInt) VectorInt {

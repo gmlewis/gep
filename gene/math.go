@@ -5,6 +5,7 @@
 package gene
 
 import (
+	"fmt"
 	"strconv"
 
 	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
@@ -19,10 +20,25 @@ func (g *Gene) generateMathFunc() {
 // EvalMath evaluates the gene as a floating-point expression and returns the result.
 // in represents the float64 inputs available to the gene.
 func (g *Gene) EvalMath(in []float64) float64 {
+	v, _ := g.EvalMathWithError(in)
+	return v
+}
+
+// EvalMathWithError evaluates the gene as a floating-point expression and returns the result.
+func (g *Gene) EvalMathWithError(in []float64) (float64, error) {
+	if err := g.validateMathSymbols(in); err != nil {
+		return 0.0, err
+	}
 	if g.mf == nil {
+		if _, err := g.getArgOrderWithError(); err != nil {
+			return 0.0, err
+		}
 		g.generateMathFunc()
 	}
-	return g.mf(in)
+	if g.mf == nil {
+		return 0.0, fmt.Errorf("unable to generate math evaluator")
+	}
+	return g.mf(in), nil
 }
 
 func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) float64 {

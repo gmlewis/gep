@@ -25,6 +25,16 @@ func TestNew_InvalidSymbolIndexesDoNotExit(t *testing.T) {
 	}
 }
 
+func TestNewWithError_InvalidSymbolIndexesReturnsError(t *testing.T) {
+	g, err := NewWithError("dX.cY", functions.Float64)
+	if g == nil {
+		t.Fatalf("NewWithError() = nil, want non-nil")
+	}
+	if err == nil {
+		t.Fatalf("NewWithError() error = nil, want non-nil")
+	}
+}
+
 func TestNew_InvalidSymbolIndexesDoNotWriteStderr(t *testing.T) {
 	orig := os.Stderr
 	r, w, err := os.Pipe()
@@ -58,6 +68,31 @@ func TestSymbolCount_UnknownFuncTypeReturnsZero(t *testing.T) {
 func TestAllSymbolsEqualWeights_UnknownFuncTypeReturnsNil(t *testing.T) {
 	if got := AllSymbolsEqualWeights(functions.FuncType(999)); got != nil {
 		t.Fatalf("AllSymbolsEqualWeights(unknown) = %v, want nil", got)
+	}
+}
+
+func TestAllSymbolsEqualWeightsWithError_UnknownFuncTypeReturnsError(t *testing.T) {
+	if _, err := AllSymbolsEqualWeightsWithError(functions.FuncType(999)); err == nil {
+		t.Fatal("AllSymbolsEqualWeightsWithError(unknown) error = nil, want non-nil")
+	}
+}
+
+func TestEvalIntWithError_UnknownSymbolReturnsError(t *testing.T) {
+	g := New("UNKNOWN.d0", functions.Int)
+	if _, err := g.EvalIntWithError([]int{1}); err == nil {
+		t.Fatal("EvalIntWithError() error = nil, want non-nil")
+	}
+}
+
+func TestMutateWithError_TooFewChoicesReturnsError(t *testing.T) {
+	g := &Gene{
+		Symbols:      []string{"d0"},
+		HeadSize:     1,
+		choiceSlice:  []string{"d0"},
+		numTerminals: 1,
+	}
+	if err := g.MutateWithError(); err == nil {
+		t.Fatal("MutateWithError() error = nil, want non-nil")
 	}
 }
 

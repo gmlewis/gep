@@ -5,6 +5,8 @@
 package genome
 
 import (
+	"fmt"
+
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
 
@@ -12,14 +14,27 @@ import (
 // in represents the boolean inputs available to the genome.
 // fm is the map of available boolean functions to the genome.
 func (g *Genome) EvalBool(in []bool) bool {
+	v, _ := g.EvalBoolWithError(in)
+	return v
+}
+
+// EvalBoolWithError evaluates the genome as a boolean expression and returns the result.
+func (g *Genome) EvalBoolWithError(in []bool) (bool, error) {
 	lf, ok := bn.BoolAllGates[g.LinkFunc]
 	if !ok {
-		return false
+		return false, fmt.Errorf("unable to find linking function: %v", g.LinkFunc)
 	}
-	result := g.Genes[0].EvalBool(in)
+	result, err := g.Genes[0].EvalBoolWithError(in)
+	if err != nil {
+		return false, err
+	}
 	for i := 1; i < len(g.Genes); i++ {
-		x := []bool{result, g.Genes[i].EvalBool(in)}
+		next, err := g.Genes[i].EvalBoolWithError(in)
+		if err != nil {
+			return false, err
+		}
+		x := []bool{result, next}
 		result = lf.BoolFunction(x)
 	}
-	return result
+	return result, nil
 }

@@ -5,6 +5,7 @@
 package gene
 
 import (
+	"fmt"
 	"strconv"
 
 	in "github.com/gmlewis/gep/v2/functions/int_nodes"
@@ -19,10 +20,25 @@ func (g *Gene) generateIntFunc() {
 // EvalInt evaluates the gene as a floating-point expression and returns the result.
 // in represents the int inputs available to the gene.
 func (g *Gene) EvalInt(in []int) int {
+	v, _ := g.EvalIntWithError(in)
+	return v
+}
+
+// EvalIntWithError evaluates the gene as an integer expression and returns the result.
+func (g *Gene) EvalIntWithError(in []int) (int, error) {
+	if err := g.validateIntSymbols(in); err != nil {
+		return 0, err
+	}
 	if g.intF == nil {
+		if _, err := g.getArgOrderWithError(); err != nil {
+			return 0, err
+		}
 		g.generateIntFunc()
 	}
-	return g.intF(in)
+	if g.intF == nil {
+		return 0, fmt.Errorf("unable to generate int evaluator")
+	}
+	return g.intF(in), nil
 }
 
 func (g *Gene) buildIntTree(symbolIndex int, argOrder [][]int) func([]int) int {

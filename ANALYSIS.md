@@ -607,6 +607,15 @@ P1-A completion evidence:
 
 - direct library `log.Printf` / `fmt.Printf` emissions were removed from legacy
   `gene`, `genome`, and `model` packages
+- explicit error-return surfaces were added for legacy invalid states:
+  - `gene`: `NewWithError`, `StringWithError`, `SymbolCountWithError`,
+    `MutateWithError`, `DupWithError`, `EvalIntWithError`,
+    `EvalMathWithError`, `EvalBoolWithError`, `EvalVectorIntWithError`,
+    `AllSymbolsEqualWeightsWithError`
+  - `genome`: `EvalIntWithError`, `EvalMathWithError`, `EvalBoolWithError`,
+    `EvalIntTupleWithError`, `DupWithError`, `EvaluateWithScoreWithError`
+  - `model`: `EvolveWithError`, `singleCrossoverWithError`,
+    `maxArityWithError`
 - legacy codegen now has an explicit error-return surface:
   `(*genome.Genome).WriteWithError(...) error`, while `Write(...)` remains as a
   narrow compatibility wrapper
@@ -722,12 +731,31 @@ Completion proof:
   - `model/*.go`
 - `genome/write.go` now exposes `WriteWithError(...) error` as the explicit
   codegen error surface, with `Write(...)` retained as compatibility wrapper
+- explicit error-return APIs were added across legacy packages:
+  - `gene`: `NewWithError`, `StringWithError`, `SymbolCountWithError`,
+    `MutateWithError`, `DupWithError`, `Eval*WithError`,
+    `AllSymbolsEqualWeightsWithError`
+  - `genome`: `Eval*WithError`, `EvalIntTupleWithError`, `DupWithError`,
+    `EvaluateWithScoreWithError`
+  - `model`: `EvolveWithError`, `singleCrossoverWithError`,
+    `maxArityWithError`
 - added regression tests:
   - `gene/gene_test.go`: `TestNew_InvalidSymbolIndexesDoNotWriteStderr`
+  - `gene/gene_test.go`: `TestNewWithError_InvalidSymbolIndexesReturnsError`,
+    `TestAllSymbolsEqualWeightsWithError_UnknownFuncTypeReturnsError`,
+    `TestEvalIntWithError_UnknownSymbolReturnsError`,
+    `TestMutateWithError_TooFewChoicesReturnsError`
+  - `genome/genome_test.go`:
+    `TestEvaluateWithScoreWithError_NilScoringFuncReturnsError`,
+    `TestEvalIntWithError_MissingLinkFunctionReturnsError`
   - `genome/write_test.go`:
     `TestWriteWithError_MissingLinkFunctionReturnsError`,
     `TestWrite_MissingLinkFunctionDoesNotWriteStdout`
-  - `model/model_test.go`: `TestEvolve_DoesNotWriteStdoutOnStop`
+  - `model/model_test.go`:
+    `TestEvolve_DoesNotWriteStdoutOnStop`,
+    `TestMaxArityWithError_UnknownFuncTypeReturnsError`,
+    `TestGetBestWithError_NilScoringFuncReturnsError`,
+    `TestSingleCrossoverWithError_MismatchedGenesReturnsError`
 - verification commands passed:
   - `go test ./gene ./genome ./model`
   - `./scripts/test-all.sh`

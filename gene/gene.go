@@ -6,6 +6,7 @@
 package gene
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -80,12 +81,25 @@ func (g *Gene) randPerm(n int) []int {
 
 // New creates a new gene based on the Karva string representation.
 func New(x string, funcType functions.FuncType) *Gene {
+	g, _ := NewWithError(x, funcType)
+	return g
+}
+
+// NewWithError creates a new gene based on the Karva string representation
+// and returns an error when the symbol indexes are malformed.
+func NewWithError(x string, funcType functions.FuncType) (*Gene, error) {
 	parts := strings.Split(x, ".")
 	numConstants, numTerminals := 0, 0
+	var errs []error
 	for _, sym := range parts {
+		if len(sym) == 0 {
+			errs = append(errs, fmt.Errorf("empty symbol"))
+			continue
+		}
 		if sym[0:1] == "d" {
 			index, err := strconv.Atoi(sym[1:])
 			if err != nil {
+				errs = append(errs, fmt.Errorf("unable to parse variable index %q: %w", sym, err))
 				continue
 			}
 			if index >= numTerminals {
@@ -94,6 +108,7 @@ func New(x string, funcType functions.FuncType) *Gene {
 		} else if sym[0:1] == "c" {
 			index, err := strconv.Atoi(sym[1:])
 			if err != nil {
+				errs = append(errs, fmt.Errorf("unable to parse constant index %q: %w", sym, err))
 				continue
 			}
 			if index >= numConstants {
@@ -106,7 +121,7 @@ func New(x string, funcType functions.FuncType) *Gene {
 		Constants:    make([]float64, numConstants),
 		funcType:     funcType,
 		numTerminals: numTerminals + numConstants,
-	}
+	}, errors.Join(errs...)
 }
 
 // RandomNew generates a new, random gene for further manipulation by the GEP
@@ -161,13 +176,23 @@ func RandomNew(headSize, tailSize, numTerminals, numConstants int, functions []F
 
 // String returns the Karva representation of the gene.
 func (g Gene) String() string {
+	s, _ := g.StringWithError()
+	return s
+}
+
+// StringWithError returns the Karva representation of the gene and any
+// symbol-format errors encountered while rendering constants.
+func (g Gene) StringWithError() (string, error) {
 	var syms []string
+	var errs []error
 	for _, s := range g.Symbols {
 		if strings.HasPrefix(s, "c") {
 			i, err := strconv.Atoi(s[1:])
 			if err != nil || i < 0 || i >= len(g.Constants) {
 				if err != nil {
+					errs = append(errs, fmt.Errorf("bad constant name %q: %w", s, err))
 				} else {
+					errs = append(errs, fmt.Errorf("constant index out of range: symbol=%q index=%v len(constants)=%v", s, i, len(g.Constants)))
 				}
 				syms = append(syms, s)
 				continue
@@ -177,7 +202,7 @@ func (g Gene) String() string {
 			syms = append(syms, s)
 		}
 	}
-	return strings.Join(syms, ".")
+	return strings.Join(syms, "."), errors.Join(errs...)
 }
 
 // DotGraph returns a graphviz "dot" language representation of the gene.
@@ -192,6 +217,13 @@ func (g Gene) DotGraph() string {
 // of times the symbol appears in the Karva expression.  This can be
 // a handy metric to assist in the fitness evaluation of a Gene.
 func (g *Gene) SymbolCount(sym string) int {
+	n, _ := g.SymbolCountWithError(sym)
+	return n
+}
+
+// SymbolCountWithError returns the count of the number of times the symbol
+// is actually used in the Gene while surfacing unsupported function types.
+func (g *Gene) SymbolCountWithError(sym string) (int, error) {
 	if g.SymbolMap == nil {
 		switch g.funcType {
 		case functions.Bool:
@@ -203,21 +235,27 @@ func (g *Gene) SymbolCount(sym string) int {
 		case functions.VectorInts:
 			g.generateVectorIntFunc()
 		default:
-			return 0
+			return 0, fmt.Errorf("unknown funcType: %v", g.funcType)
 		}
 	}
-	return g.SymbolMap[sym]
+	return g.SymbolMap[sym], nil
 }
 
 // Mutate mutates a gene by performing a single random symbol exchange within the gene.
 func (g *Gene) Mutate() {
+	_ = g.MutateWithError()
+}
+
+// MutateWithError mutates a gene by performing a single random symbol exchange
+// within the gene and surfaces invalid mutation preconditions.
+func (g *Gene) MutateWithError() error {
 	position := g.randIntn(len(g.Symbols))
 	if g.numTerminals < 2 {
 		position %= g.HeadSize // Force choice to be within the head
 	}
 	if position < g.HeadSize {
 		if len(g.choiceSlice) < 2 {
-			return
+			return fmt.Errorf("must have choice of more than one function")
 		}
 		symbol := g.Symbols[position]
 		for symbol == g.Symbols[position] { // Force new symbol to be different from old one
@@ -236,12 +274,19 @@ func (g *Gene) Mutate() {
 		g.Symbols[position] = terminal
 	}
 	g.InvalidateCache()
+	return nil
 }
 
 // Dup duplicates the gene into the provided destination gene.
 func (g *Gene) Dup() *Gene {
+	dup, _ := g.DupWithError()
+	return dup
+}
+
+// DupWithError duplicates the gene into the provided destination gene.
+func (g *Gene) DupWithError() (*Gene, error) {
 	if g == nil {
-		return nil
+		return nil, fmt.Errorf("gene.Dup error: src and dst must be non-nil")
 	}
 	r := &Gene{
 		Symbols:      make([]string, len(g.Symbols)),
@@ -255,7 +300,7 @@ func (g *Gene) Dup() *Gene {
 	copy(r.Symbols, g.Symbols)
 	copy(r.Constants, g.Constants)
 	copy(r.choiceSlice, g.choiceSlice)
-	return r
+	return r, nil
 }
 
 // InvalidateCache clears all cached generated functions and symbol counts.
@@ -315,6 +360,11 @@ func CheckEqual(g1 *Gene, g2 *Gene) error {
 //	'+.*.-./' => [[1, 2], [3, 4], [5, 6], [7, 8]]
 //	'+.d0.c0./' => [[1, 2], nil, nil, [3, 4]]
 func (g *Gene) getArgOrder() [][]int {
+	argOrder, _ := g.getArgOrderWithError()
+	return argOrder
+}
+
+func (g *Gene) getArgOrderWithError() ([][]int, error) {
 	var lookup functions.FuncMap
 	switch g.funcType {
 	case functions.Bool:
@@ -326,7 +376,7 @@ func (g *Gene) getArgOrder() [][]int {
 	case functions.VectorInts:
 		lookup = vin.VectorIntFuncs
 	default:
-		return nil
+		return nil, fmt.Errorf("unknown funcType: %v", g.funcType)
 	}
 
 	argOrder := make([][]int, len(g.Symbols))
@@ -348,5 +398,5 @@ func (g *Gene) getArgOrder() [][]int {
 		}
 		argOrder[i] = args
 	}
-	return argOrder
+	return argOrder, nil
 }

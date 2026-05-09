@@ -6,6 +6,8 @@
 package model
 
 import (
+	"errors"
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -128,7 +130,7 @@ func newGeneration(
 		debug:       debug,
 		rng:         rng,
 	}
-	n := maxArity(fs, funcType)
+	n, _ := maxArityWithError(fs, funcType)
 	tailSize := headSize*(n-1) + 1
 	for i := range r.Individuals {
 		genes := make([]*gene.Gene, numGenesPerGenome)
@@ -144,10 +146,23 @@ func newGeneration(
 // Evolution stops early when StopFunc (if set) returns true for the current best
 // genome. When StopFunc is nil, the default criterion of Score >= 1000 is used.
 func (g *Generation) Evolve(iterations int) *genome.Genome {
+	best, err := g.EvolveWithError(iterations)
+	if err != nil {
+		return g.getBest()
+	}
+	return best
+}
+
+// EvolveWithError runs the GEP algorithm for the given number of iterations and
+// returns explicit errors for invalid scoring or invalid crossover preconditions.
+func (g *Generation) EvolveWithError(iterations int) (*genome.Genome, error) {
 	// Algorithm flow diagram, figure 3.1, book page 56
 	for i := 0; i < iterations; i++ {
 		// fmt.Printf("Iteration #%v...\n", i)
-		bestGenome := g.getBest() // Preserve the best genome
+		bestGenome, err := g.getBestWithError() // Preserve the best genome
+		if err != nil {
+			return nil, err
+		}
 		stop := false
 		if g.StopFunc != nil {
 			stop = g.StopFunc(bestGenome)
@@ -155,10 +170,13 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 			stop = bestGenome.Score >= 1000.0
 		}
 		if stop {
-			return bestGenome
+			return bestGenome, nil
 		}
 		// fmt.Printf("Best genome (score %v): %v\n", bestGenome.Score, *bestGenome)
-		saveCopy := bestGenome.Dup()
+		saveCopy, err := bestGenome.DupWithError()
+		if err != nil {
+			return nil, err
+		}
 		g.replication() // Section 3.3.1, book page 75
 		g.mutation()    // Section 3.3.2, book page 77
 		// g.isTransposition()
@@ -170,7 +188,7 @@ func (g *Generation) Evolve(iterations int) *genome.Genome {
 		// Now that replication is done, restore the best genome (aka "elitism")
 		g.Individuals[0] = saveCopy
 	}
-	return g.getBest()
+	return g.getBestWithError()
 }
 
 // replication replaces all individuals in the population by
@@ -237,6 +255,10 @@ func (g *Generation) mutation() {
 }
 
 func (g *Generation) singleCrossover(idx1, idx2 int) {
+	_ = g.singleCrossoverWithError(idx1, idx2)
+}
+
+func (g *Generation) singleCrossoverWithError(idx1, idx2 int) error {
 	genome1 := g.Individuals[idx1]
 	genome2 := g.Individuals[idx2]
 
@@ -247,7 +269,7 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 	gene2 := genome2.Genes[geneIdx2]
 
 	if len(gene1.Symbols) != len(gene2.Symbols) || gene1.HeadSize != gene2.HeadSize {
-		return
+		return fmt.Errorf("programming error: gene1: %v symbols (headSize=%v), gene2: %v symbols (headSize=%v)", len(gene1.Symbols), gene1.HeadSize, len(gene2.Symbols), gene2.HeadSize)
 	}
 
 	// Pick a random location within the head of both gene's symbols to crossover.
@@ -263,7 +285,7 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 	newSyms2 = append(newSyms2, tail2...)
 
 	if len(newSyms1) != len(newSyms2) || len(newSyms1) != len(gene1.Symbols) {
-		return
+		return fmt.Errorf("programming error: newSyms1: %v symbols, newSyms2: %v symbols, gene1: %v symbols", len(newSyms1), len(newSyms2), len(gene1.Symbols))
 	}
 
 	gene1.Symbols = newSyms1
@@ -272,6 +294,7 @@ func (g *Generation) singleCrossover(idx1, idx2 int) {
 	gene2.InvalidateCache()
 	genome1.SymbolMap = nil
 	genome2.SymbolMap = nil
+	return nil
 }
 
 func (g *Generation) crossover() {
@@ -314,8 +337,32 @@ func (g *Generation) getBest() *genome.Genome {
 	return bestGenome
 }
 
+func (g *Generation) getBestWithError() (*genome.Genome, error) {
+	if len(g.Individuals) == 0 {
+		return nil, fmt.Errorf("no individuals in generation")
+	}
+	highestEffectiveScore := math.Inf(-1)
+	bestGenome := g.Individuals[0]
+	for _, gn := range g.Individuals {
+		if err := gn.EvaluateWithScoreWithError(g.ScoringFunc); err != nil {
+			return nil, err
+		}
+		effectiveScore := g.effectiveScore(gn.Score)
+		if effectiveScore > highestEffectiveScore {
+			bestGenome = gn
+			highestEffectiveScore = effectiveScore
+		}
+	}
+	return bestGenome, nil
+}
+
 // maxArity determines the maximum number of input terminals for the given set of symbols.
 func maxArity(fs []gene.FuncWeight, funcType functions.FuncType) int {
+	r, _ := maxArityWithError(fs, funcType)
+	return r
+}
+
+func maxArityWithError(fs []gene.FuncWeight, funcType functions.FuncType) (int, error) {
 	var lookup functions.FuncMap
 	switch funcType {
 	case functions.Bool:
@@ -325,17 +372,19 @@ func maxArity(fs []gene.FuncWeight, funcType functions.FuncType) int {
 	case functions.Float64:
 		lookup = mn.Math
 	default:
-		return 0
+		return 0, fmt.Errorf("unknown funcType: %v", funcType)
 	}
 
 	r := 0
+	var errs []error
 	for _, f := range fs {
 		if fn, ok := lookup[f.Symbol]; ok {
 			if fn.Terminals() > r {
 				r = fn.Terminals()
 			}
 		} else {
+			errs = append(errs, fmt.Errorf("unable to find symbol %v in function map", f.Symbol))
 		}
 	}
-	return r
+	return r, errors.Join(errs...)
 }

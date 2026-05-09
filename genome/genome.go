@@ -123,8 +123,14 @@ func (g *Genome) Mutate(numMutations int) {
 
 // Dup duplicates the genome into the provided destination genome.
 func (g *Genome) Dup() *Genome {
+	dup, _ := g.DupWithError()
+	return dup
+}
+
+// DupWithError duplicates the genome and surfaces invalid nil callers.
+func (g *Genome) DupWithError() (*Genome, error) {
 	if g == nil {
-		return nil
+		return nil, fmt.Errorf("genome.Dup error: src and dst must be non-nil")
 	}
 	dst := &Genome{
 		Genes:    make([]*gene.Gene, len(g.Genes)),
@@ -133,9 +139,13 @@ func (g *Genome) Dup() *Genome {
 		rng:      g.rng,
 	}
 	for i := range g.Genes {
-		dst.Genes[i] = g.Genes[i].Dup()
+		dup, err := g.Genes[i].DupWithError()
+		if err != nil {
+			return nil, err
+		}
+		dst.Genes[i] = dup
 	}
-	return dst
+	return dst, nil
 }
 
 // ScoringFunc is the function that is used to evaluate the fitness of the model.
@@ -145,19 +155,28 @@ type ScoringFunc func(g *Genome) float64
 
 // EvaluateWithScore scores a genome and sends the result to a channel.
 func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
-	if sf == nil {
+	if err := g.EvaluateWithScoreWithError(sf); err != nil {
 		g.Score = math.Inf(-1)
-		c <- g
-		return
+	}
+	c <- g
+}
+
+// EvaluateWithScoreWithError scores a genome and surfaces a nil scoring function.
+func (g *Genome) EvaluateWithScoreWithError(sf ScoringFunc) error {
+	if sf == nil {
+		return fmt.Errorf("genome.EvaluateWithScore: ScoringFunc must not be nil")
 	}
 	g.Score = sf(g)
-	c <- g
+	return nil
 }
 
 // Evaluate runs the model with the observations and populates the provided action
 // based on the link function.
 func (g *Genome) Evaluate(observations []int, action any) error {
-	result := g.EvalIntTuple(observations)
+	result, err := g.EvalIntTupleWithError(observations)
+	if err != nil {
+		return err
+	}
 
 	switch v := action.(type) {
 	case *[]int:

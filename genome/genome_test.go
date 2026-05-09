@@ -928,6 +928,22 @@ func TestEvaluateWithScore_NilScoringFuncDoesNotExit(t *testing.T) {
 	}
 }
 
+func TestEvaluateWithScoreWithError_NilScoringFuncReturnsError(t *testing.T) {
+	g := &Genome{}
+	if err := g.EvaluateWithScoreWithError(nil); err == nil {
+		t.Fatal("EvaluateWithScoreWithError(nil) error = nil, want non-nil")
+	}
+}
+
+func TestEvalIntWithError_MissingLinkFunctionReturnsError(t *testing.T) {
+	g := New([]*gene.Gene{
+		gene.New("d0", functions.Int),
+	}, "MissingLink")
+	if _, err := g.EvalIntWithError([]int{1}); err == nil {
+		t.Fatal("EvalIntWithError() error = nil, want non-nil")
+	}
+}
+
 func BenchmarkMutate(b *testing.B) {
 	headSize := 7
 	maxArity := 2
