@@ -925,6 +925,7 @@ Required outcome:
 - move Gymnasium agent evolution/training logic out of
   `model/gymnasium-agents.go` into a dedicated `env` / RL package
 - ensure RL flows no longer depend on legacy `model` as their primary engine
+- continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
 ### P4-C: Create a dedicated problems / domains subsystem
 
@@ -939,6 +940,7 @@ Required outcome:
 - keep `fitness` only as a narrow helper layer, or fold it into the new
   subsystem where appropriate
 - define typed problem-facing seams over `core` + `evolution`
+- continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
 ### P4-D: Rewire experiments and examples to the separated subsystems
 
@@ -953,6 +955,7 @@ Required outcome:
   `env`, and/or `problems`
 - stop using legacy `model`, `gene`, and `genome` as the default workflow
   path for new or migrated examples
+- continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
 Dependencies:
 
@@ -970,6 +973,7 @@ Required outcome:
   not prove user-visible architectural behavior
 - replace them with integration tests that exercise the real separated seams:
   typed evolution, codegen, env/RL, and problem/domain wiring
+- continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
 Dependencies:
 
