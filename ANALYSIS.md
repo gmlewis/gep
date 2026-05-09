@@ -1023,7 +1023,7 @@ Required outcome:
 - migrate experiments/examples to import `core`, `evolution`, `codegen`,
   `env`, and/or `problems`
 - stop using legacy `model`, `gene`, and `genome` as the default workflow
-  path for new or migrated examples
+  path for new or migrated examples and completely delete all unused legacy packages
 - continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
 Dependencies:
