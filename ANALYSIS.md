@@ -886,7 +886,8 @@ Required outcome:
   `genome/write.go`, and ad hoc grammar coupling into a dedicated `codegen`
   package (or small `codegen/*` package tree)
 - keep legacy `gene` / `genome` write methods as thin adapters only, if they
-  remain at all
+  remain at all and remove them if they no longer remain
+- continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
 
 ### P4-B: Create a dedicated env / RL subsystem
 
