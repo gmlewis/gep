@@ -11,6 +11,7 @@ import (
 
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution/mutation"
+	"github.com/gmlewis/gep/v2/evolution/recombination"
 )
 
 // --- helpers ---
@@ -446,6 +447,43 @@ func TestEvolve_MaxIterationsReturnsCurrentBest(t *testing.T) {
 
 // --- Mutate tests ---
 
+func TestRecombine_PreservesPopulationSize(t *testing.T) {
+	g := newTestGeneration(t, 5, nil)
+	before := len(g.Individuals)
+	g.Recombine()
+	if got := len(g.Individuals); got != before {
+		t.Fatalf("Recombine changed population size: got %d, want %d", got, before)
+	}
+}
+
+func TestRecombine_ZeroRates_GenomesUnchanged(t *testing.T) {
+	g := newTestGeneration(t, 6, nil)
+	origKarvas := make([]string, len(g.Individuals))
+	for i, ind := range g.Individuals {
+		origKarvas[i] = ind.Genome.KarvaString()
+	}
+	g.Recombine()
+	for i, ind := range g.Individuals {
+		if ind.Genome.KarvaString() != origKarvas[i] {
+			t.Errorf("individual[%d] changed with zero recombination rates", i)
+		}
+	}
+}
+
+func TestRecombine_Operators_RecombinedGenomesAreValid(t *testing.T) {
+	g := newTestGeneration(t, 10, nil)
+	g.RecombinationConfig = recombination.Config{
+		OnePointRate: 1.0,
+		TwoPointRate: 1.0,
+	}
+	g.Recombine()
+	for i, ind := range g.Individuals {
+		if err := ind.Genome.Validate(); err != nil {
+			t.Errorf("individual[%d].Genome invalid after Recombine: %v", i, err)
+		}
+	}
+}
+
 func TestMutate_PreservesPopulationSize(t *testing.T) {
 	g := newTestGeneration(t, 5, nil)
 	before := len(g.Individuals)
@@ -549,5 +587,25 @@ func TestEvolve_WithMutation_StillConverges(t *testing.T) {
 	best := g.Evolve(200)
 	if best.Score < 1000.0 {
 		t.Fatalf("Evolve with mutation: best.Score=%v, want >= 1000", best.Score)
+	}
+}
+
+func TestEvolve_WithRecombination_StillConverges(t *testing.T) {
+	var callCount atomic.Int64
+	sf := func(core.Genome[int]) float64 {
+		n := callCount.Add(1)
+		if n >= int64(5*10) {
+			return 1000.0
+		}
+		return 0.0
+	}
+	g := newTestGeneration(t, 13, sf)
+	g.RecombinationConfig = recombination.Config{
+		OnePointRate: 0.2,
+		TwoPointRate: 0.2,
+	}
+	best := g.Evolve(200)
+	if best.Score < 1000.0 {
+		t.Fatalf("Evolve with recombination: best.Score=%v, want >= 1000", best.Score)
 	}
 }
