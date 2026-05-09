@@ -181,6 +181,8 @@ func TestPhase4Milestone5_FunctionPackageBoundaries(t *testing.T) {
 
 func TestPhase4Milestone6_LegacyRepresentationPackageBoundaries(t *testing.T) {
 	metas := mustListPackages(t,
+		modulePath+"/codegen",
+		modulePath+"/codegen/...",
 		modulePath+"/grammars",
 		modulePath+"/gene",
 		modulePath+"/gene/...",
@@ -208,7 +210,7 @@ func TestPhase4Milestone6_LegacyRepresentationPackageBoundaries(t *testing.T) {
 	}
 
 	if !foundAny {
-		t.Fatalf("expected to inspect packages under %s/gene, %s/genome, and %s/grammars", modulePath, modulePath, modulePath)
+		t.Fatalf("expected to inspect packages under %s/codegen, %s/gene, %s/genome, and %s/grammars", modulePath, modulePath, modulePath, modulePath)
 	}
 }
 
@@ -232,10 +234,16 @@ func allowedImportPrefixes(importPath string) []string {
 		return []string{modulePath + "/fitness"}
 	case strings.HasPrefix(importPath, modulePath+"/functions"):
 		return []string{modulePath + "/core", modulePath + "/functions"}
+	case strings.HasPrefix(importPath, modulePath+"/codegen"):
+		return []string{
+			modulePath + "/codegen",
+			modulePath + "/grammars",
+		}
 	case strings.HasPrefix(importPath, modulePath+"/grammars"):
 		return []string{modulePath + "/functions", modulePath + "/grammars"}
 	case strings.HasPrefix(importPath, modulePath+"/gene"):
 		return []string{
+			modulePath + "/codegen",
 			modulePath + "/core",
 			modulePath + "/functions",
 			modulePath + "/gene",
@@ -243,6 +251,7 @@ func allowedImportPrefixes(importPath string) []string {
 		}
 	case strings.HasPrefix(importPath, modulePath+"/genome"):
 		return []string{
+			modulePath + "/codegen",
 			modulePath + "/core",
 			modulePath + "/functions",
 			modulePath + "/gene",

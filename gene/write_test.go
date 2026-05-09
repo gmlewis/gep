@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gmlewis/gep/v2/codegen"
 	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/grammars"
 )
@@ -93,18 +94,17 @@ func TestExpression_InvalidConstantIndexReturnsError(t *testing.T) {
 	}
 }
 
-func TestBuildExp_ArgsLengthMismatchReturnsError(t *testing.T) {
-	g := mustNew(t, "+.d0.d0", functions.Float64)
+func TestExpression_ArgsLengthMismatchReturnsError(t *testing.T) {
 	grammar, err := grammars.LoadGoMathGrammar()
 	if err != nil {
 		t.Fatalf("unable to LoadGoMathGrammar(): %v", err)
 	}
 
-	_, err = g.buildExp(0, [][]int{{1}}, grammar, make(grammars.HelperMap))
+	_, err = codegen.Expression([]string{"+", "d0", "d0"}, nil, 1, [][]int{{1}}, grammar, make(grammars.HelperMap))
 	if err == nil {
-		t.Fatalf("g.buildExp() error = nil, want non-nil")
+		t.Fatalf("codegen.Expression() error = nil, want non-nil")
 	}
 	if !strings.Contains(err.Error(), "args length mismatch") {
-		t.Fatalf("g.buildExp() error = %q, want args length mismatch", err)
+		t.Fatalf("codegen.Expression() error = %q, want args length mismatch", err)
 	}
 }

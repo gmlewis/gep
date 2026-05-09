@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gmlewis/gep/v2/codegen"
 	"github.com/gmlewis/gep/v2/functions"
 	"github.com/gmlewis/gep/v2/gene"
 	"github.com/gmlewis/gep/v2/grammars"
@@ -132,19 +133,19 @@ func TestGenerateCode_MissingLinkFunctionReturnsError(t *testing.T) {
 		t.Fatalf("unable to LoadGoBooleanAllGatesGrammar(): %v", err)
 	}
 
-	d := &dump{
-		gr:     grammar,
-		genome: gn,
-		subs: map[string]string{
-			"CHARX": "X",
-		},
+	genes := make([]codegen.Expressor, len(gn.Genes))
+	for i, gene := range gn.Genes {
+		genes[i] = gene
 	}
-	_, err = d.generateCode()
+	_, err = codegen.Generate(codegen.Program{
+		Genes:    genes,
+		LinkFunc: gn.LinkFunc,
+	}, grammar)
 	if err == nil {
-		t.Fatalf("generateCode() error = nil, want non-nil")
+		t.Fatalf("codegen.Generate() error = nil, want non-nil")
 	}
 	if !strings.Contains(err.Error(), "MissingLink") {
-		t.Fatalf("generateCode() error = %q, want mention of missing link function", err)
+		t.Fatalf("codegen.Generate() error = %q, want mention of missing link function", err)
 	}
 }
 

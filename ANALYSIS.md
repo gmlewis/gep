@@ -659,7 +659,7 @@ Representative locations:
 - `evolution/mutation/mutation.go`
 - `evolution/transposition/transposition.go`
 
-### Phase 4 status: not faithful
+### Phase 4 status: still not faithful (after P4-A)
 
 The current repository does **not** yet satisfy the original Phase 4 intent.
 The work completed under "Phase 4" mostly enforced package import boundaries,
@@ -667,8 +667,6 @@ but the original Phase 4 was about **actual subsystem separation**.
 
 What is still missing relative to the original plan:
 
-- no dedicated `codegen` subsystem; code generation remains split across
-  `grammars`, `gene/write.go`, and `genome/write.go`
 - no dedicated `env` / RL subsystem; Gymnasium agent orchestration still lives
   in legacy `model`
 - no dedicated `problems` / `domains` subsystem; reusable problem definitions
@@ -680,9 +678,6 @@ What is still missing relative to the original plan:
 
 Representative locations:
 
-- `grammars/`
-- `gene/write.go`
-- `genome/write.go`
 - `gymnasium/`
 - `model/gymnasium-agents.go`
 - `experiments/*`
@@ -888,6 +883,35 @@ Required outcome:
 - keep legacy `gene` / `genome` write methods as thin adapters only, if they
   remain at all and remove them if they no longer remain
 - continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
+
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- added a dedicated `codegen` subsystem with package-level godoc and exported
+  `Expressor`, `Program`, `Expression`, `Generate`, and `Write` APIs:
+  - `codegen/doc.go`
+  - `codegen/codegen.go`
+- moved legacy gene-expression rendering orchestration out of `gene/write.go`
+  into `codegen.Expression`, leaving `(*gene.Gene).Expression` as a thin
+  adapter that supplies legacy gene data and arg-order metadata:
+  - `gene/write.go`
+- moved legacy full-program rendering orchestration out of `genome/write.go`
+  into `codegen.Generate` / `codegen.Write`, leaving `(*genome.Genome).Write`
+  as a thin adapter over the dedicated subsystem:
+  - `genome/write.go`
+- added dedicated subsystem regression coverage and preserved legacy adapter
+  coverage:
+  - `codegen/codegen_test.go`
+  - `gene/write_test.go`
+  - `genome/write_test.go`
+- updated Phase 4 package-boundary coverage so the new dedicated `codegen`
+  subsystem is part of the inspected architecture and legacy representation
+  packages are allowed to depend on it as thin adapters:
+  - `evolution/package_map_test.go`
+- verification commands passed:
+  - `go test ./codegen ./gene ./genome ./evolution`
+  - `./scripts/test-all.sh`
 
 ### P4-B: Create a dedicated env / RL subsystem
 
