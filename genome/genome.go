@@ -12,9 +12,8 @@
 package genome
 
 import (
+	"errors"
 	"fmt"
-	"log"
-	"math"
 	"math/rand"
 	"strings"
 
@@ -66,26 +65,33 @@ func merge(dst *map[string]int, src map[string]int) {
 // Note that this count is typically different from the number
 // of times the symbol appears in the Karva expression.  This can be
 // a handy metric to assist in the fitness evaluation of a Genome.
-func (g *Genome) SymbolCount(sym string) int {
+func (g *Genome) SymbolCount(sym string) (int, error) {
 	if g.SymbolMap == nil {
 		g.SymbolMap = make(map[string]int)
 		g.SymbolMap[g.LinkFunc] = len(g.Genes) - 1
 		for i := 0; i < len(g.Genes); i++ {
-			g.Genes[i].SymbolCount(sym) // force evaluation
+			if _, err := g.Genes[i].SymbolCount(sym); err != nil {
+				return 0, err
+			}
 			m := g.Genes[i].SymbolMap
 			merge(&(g.SymbolMap), m)
 		}
 	}
-	return g.SymbolMap[sym]
+	return g.SymbolMap[sym], nil
 }
 
 // String returns the Karva representation of the genome.
-func (g Genome) String() string {
+func (g Genome) String() (string, error) {
 	var result []string
+	var errs []error
 	for _, gene := range g.Genes {
-		result = append(result, gene.String())
+		s, err := gene.String()
+		if err != nil {
+			errs = append(errs, err)
+		}
+		result = append(result, s)
 	}
-	return fmt.Sprintf("%v, score=%v", strings.Join(result, "|"+g.LinkFunc+"|"), g.Score)
+	return fmt.Sprintf("%v, score=%v", strings.Join(result, "|"+g.LinkFunc+"|"), g.Score), errors.Join(errs...)
 }
 
 // Expression returns the expression of the genome.
@@ -112,21 +118,24 @@ func (g Genome) DotGraph() string {
 }
 
 // Mutate mutates a genome by performing numMutations random symbol exchanges within the genome.
-func (g *Genome) Mutate(numMutations int) {
+func (g *Genome) Mutate(numMutations int) error {
+	var errs []error
 	for i := 0; i < numMutations; i++ {
 		n := g.randIntn(len(g.Genes))
 		// fmt.Printf("\nMutating gene #%v, before:\n%v\n", n, g.Genes[n])
-		g.Genes[n].Mutate()
+		if err := g.Genes[n].Mutate(); err != nil {
+			errs = append(errs, err)
+		}
 		// fmt.Printf("after:\n%v\n", g.Genes[n])
 	}
 	g.SymbolMap = nil
+	return errors.Join(errs...)
 }
 
 // Dup duplicates the genome into the provided destination genome.
-func (g *Genome) Dup() *Genome {
+func (g *Genome) Dup() (*Genome, error) {
 	if g == nil {
-		log.Printf("denome.Dup error: src and dst must be non-nil")
-		return nil
+		return nil, errors.New("genome.Dup error: src and dst must be non-nil")
 	}
 	dst := &Genome{
 		Genes:    make([]*gene.Gene, len(g.Genes)),
@@ -135,9 +144,13 @@ func (g *Genome) Dup() *Genome {
 		rng:      g.rng,
 	}
 	for i := range g.Genes {
-		dst.Genes[i] = g.Genes[i].Dup()
+		dup, err := g.Genes[i].Dup()
+		if err != nil {
+			return nil, err
+		}
+		dst.Genes[i] = dup
 	}
-	return dst
+	return dst, nil
 }
 
 // ScoringFunc is the function that is used to evaluate the fitness of the model.
@@ -145,22 +158,22 @@ func (g *Genome) Dup() *Genome {
 // a valid solution and a return value of 1000 (or higher) means a perfect solution.
 type ScoringFunc func(g *Genome) float64
 
-// EvaluateWithScore scores a genome and sends the result to a channel.
-func (g *Genome) EvaluateWithScore(sf ScoringFunc, c chan<- *Genome) {
+// EvaluateWithScore scores a genome and surfaces a nil scoring function.
+func (g *Genome) EvaluateWithScore(sf ScoringFunc) error {
 	if sf == nil {
-		log.Printf("genome.EvaluateWithScore: ScoringFunc must not be nil")
-		g.Score = math.Inf(-1)
-		c <- g
-		return
+		return errors.New("genome.EvaluateWithScore: ScoringFunc must not be nil")
 	}
 	g.Score = sf(g)
-	c <- g
+	return nil
 }
 
 // Evaluate runs the model with the observations and populates the provided action
 // based on the link function.
 func (g *Genome) Evaluate(observations []int, action any) error {
-	result := g.EvalIntTuple(observations)
+	result, err := g.EvalIntTuple(observations)
+	if err != nil {
+		return err
+	}
 
 	switch v := action.(type) {
 	case *[]int:

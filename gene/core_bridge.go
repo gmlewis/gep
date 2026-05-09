@@ -5,6 +5,7 @@
 package gene
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -37,10 +38,10 @@ func hasCoreConstantSymbol[T any](symbols []core.Symbol[T]) bool {
 // CoreBool converts a legacy boolean gene into the typed core representation.
 func (g *Gene) CoreBool() (core.Gene[bool], error) {
 	if g == nil {
-		return core.Gene[bool]{}, fmt.Errorf("gene.CoreBool: gene cannot be nil")
+		return core.Gene[bool]{}, errors.New("gene.CoreBool: gene cannot be nil")
 	}
 	if len(g.Constants) > 0 || hasLegacyConstantSymbol(g.Symbols) {
-		return core.Gene[bool]{}, fmt.Errorf("gene.CoreBool: bool genes do not support constants")
+		return core.Gene[bool]{}, errors.New("gene.CoreBool: bool genes do not support constants")
 	}
 	cat, err := bn.CatalogFrom(bn.BoolAllGates)
 	if err != nil {
@@ -56,7 +57,7 @@ func (g *Gene) CoreBool() (core.Gene[bool], error) {
 // CoreInt converts a legacy integer gene into the typed core representation.
 func (g *Gene) CoreInt() (core.Gene[int], error) {
 	if g == nil {
-		return core.Gene[int]{}, fmt.Errorf("gene.CoreInt: gene cannot be nil")
+		return core.Gene[int]{}, errors.New("gene.CoreInt: gene cannot be nil")
 	}
 	cat, err := in.CatalogFrom(in.Int)
 	if err != nil {
@@ -76,7 +77,7 @@ func (g *Gene) CoreInt() (core.Gene[int], error) {
 // CoreFloat64 converts a legacy floating-point gene into the typed core representation.
 func (g *Gene) CoreFloat64() (core.Gene[float64], error) {
 	if g == nil {
-		return core.Gene[float64]{}, fmt.Errorf("gene.CoreFloat64: gene cannot be nil")
+		return core.Gene[float64]{}, errors.New("gene.CoreFloat64: gene cannot be nil")
 	}
 	cat, err := mn.CatalogFrom(mn.Math)
 	if err != nil {
@@ -94,10 +95,10 @@ func (g *Gene) CoreFloat64() (core.Gene[float64], error) {
 // CoreVectorInt converts a legacy vector-int gene into the typed core representation.
 func (g *Gene) CoreVectorInt() (core.Gene[functions.VectorInt], error) {
 	if g == nil {
-		return core.Gene[functions.VectorInt]{}, fmt.Errorf("gene.CoreVectorInt: gene cannot be nil")
+		return core.Gene[functions.VectorInt]{}, errors.New("gene.CoreVectorInt: gene cannot be nil")
 	}
 	if len(g.Constants) > 0 || hasLegacyConstantSymbol(g.Symbols) {
-		return core.Gene[functions.VectorInt]{}, fmt.Errorf("gene.CoreVectorInt: vector-int genes with scalar constants are not supported by core.Gene")
+		return core.Gene[functions.VectorInt]{}, errors.New("gene.CoreVectorInt: vector-int genes with scalar constants are not supported by core.Gene")
 	}
 	cat, err := vin.CatalogFrom(vin.VectorIntFuncs)
 	if err != nil {
@@ -113,14 +114,17 @@ func (g *Gene) CoreVectorInt() (core.Gene[functions.VectorInt], error) {
 // NewFromCoreBool converts a typed boolean gene into the legacy representation.
 func NewFromCoreBool(g core.Gene[bool]) (*Gene, error) {
 	if len(g.Constants) > 0 || hasCoreConstantSymbol(g.Symbols) {
-		return nil, fmt.Errorf("gene.NewFromCoreBool: bool genes do not support constants")
+		return nil, errors.New("gene.NewFromCoreBool: bool genes do not support constants")
 	}
-	return New(g.KarvaString(), functions.Bool), nil
+	return New(g.KarvaString(), functions.Bool)
 }
 
 // NewFromCoreInt converts a typed integer gene into the legacy representation.
 func NewFromCoreInt(g core.Gene[int]) (*Gene, error) {
-	r := New(g.KarvaString(), functions.Int)
+	r, err := New(g.KarvaString(), functions.Int)
+	if err != nil {
+		return nil, err
+	}
 	r.Constants = make([]float64, len(g.Constants))
 	for i, v := range g.Constants {
 		r.Constants[i] = float64(v)
@@ -130,7 +134,10 @@ func NewFromCoreInt(g core.Gene[int]) (*Gene, error) {
 
 // NewFromCoreFloat64 converts a typed floating-point gene into the legacy representation.
 func NewFromCoreFloat64(g core.Gene[float64]) (*Gene, error) {
-	r := New(g.KarvaString(), functions.Float64)
+	r, err := New(g.KarvaString(), functions.Float64)
+	if err != nil {
+		return nil, err
+	}
 	r.Constants = make([]float64, len(g.Constants))
 	copy(r.Constants, g.Constants)
 	return r, nil
@@ -139,7 +146,7 @@ func NewFromCoreFloat64(g core.Gene[float64]) (*Gene, error) {
 // NewFromCoreVectorInt converts a typed vector-int gene into the legacy representation.
 func NewFromCoreVectorInt(g core.Gene[functions.VectorInt]) (*Gene, error) {
 	if len(g.Constants) > 0 || hasCoreConstantSymbol(g.Symbols) {
-		return nil, fmt.Errorf("gene.NewFromCoreVectorInt: vector-int genes with typed constants are not supported by legacy gene.Gene")
+		return nil, errors.New("gene.NewFromCoreVectorInt: vector-int genes with typed constants are not supported by legacy gene.Gene")
 	}
-	return New(g.KarvaString(), functions.VectorInts), nil
+	return New(g.KarvaString(), functions.VectorInts)
 }

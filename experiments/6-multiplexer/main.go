@@ -93,7 +93,10 @@ var multiTests = []struct {
 func validateMulti(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range multiTests {
-		r := g.EvalBool(n.in)
+		r, err := g.EvalBool(n.in)
+		if err != nil {
+			return 0
+		}
 		if r == n.out {
 			correct++
 		}
@@ -110,8 +113,14 @@ func main() {
 		{Symbol: "Nor", Weight: 20},
 	}
 	numIn := len(multiTests[0].in)
-	population := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "And", validateMulti, false)
-	solution := population.Evolve(20000)
+	population, err := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "And", validateMulti, false)
+	if err != nil {
+		log.Fatalf("New failed: %v", err)
+	}
+	solution, err := population.Evolve(20000)
+	if err != nil {
+		log.Fatalf("Evolve failed: %v", err)
+	}
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()
@@ -120,6 +129,6 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// 6-multiplexer solution karva expression:\n// %q\n", solution)
+	fmt.Printf("// 6-multiplexer solution karva expression:\n// %v\n", solution)
 	solution.Write(os.Stdout, gr)
 }

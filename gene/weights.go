@@ -1,7 +1,7 @@
 package gene
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/gmlewis/gep/v2/functions"
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
@@ -20,7 +20,7 @@ type FuncWeight struct {
 
 // AllSymbolsEqualWeights returns all symbols with equal weights
 // for the given node type.
-func AllSymbolsEqualWeights(funcType functions.FuncType) []FuncWeight {
+func AllSymbolsEqualWeights(funcType functions.FuncType) ([]FuncWeight, error) {
 	var lookup functions.FuncMap
 	switch funcType {
 	case functions.Bool:
@@ -32,8 +32,7 @@ func AllSymbolsEqualWeights(funcType functions.FuncType) []FuncWeight {
 	case functions.VectorInts:
 		lookup = vin.VectorIntFuncs
 	default:
-		log.Printf("unknown funcType: %v", funcType)
-		return nil
+		return nil, fmt.Errorf("unknown funcType: %v", funcType)
 	}
 
 	result := make([]FuncWeight, 0, len(lookup))
@@ -43,5 +42,5 @@ func AllSymbolsEqualWeights(funcType functions.FuncType) []FuncWeight {
 			Weight: 1,
 		})
 	}
-	return result
+	return result, nil
 }

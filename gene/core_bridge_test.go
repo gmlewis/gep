@@ -11,8 +11,17 @@ import (
 	"github.com/gmlewis/gep/v2/functions"
 )
 
+func mustNewGene(t *testing.T, karva string, funcType functions.FuncType) *Gene {
+	t.Helper()
+	g, err := New(karva, funcType)
+	if err != nil {
+		t.Fatalf("New(%q) error: %v", karva, err)
+	}
+	return g
+}
+
 func TestCoreBool_RoundTrip(t *testing.T) {
-	legacy := New("Nand.d0.d1", functions.Bool)
+	legacy := mustNewGene(t, "Nand.d0.d1", functions.Bool)
 
 	typed, err := legacy.CoreBool()
 	if err != nil {
@@ -22,7 +31,11 @@ func TestCoreBool_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("typed.Eval(): %v", err)
 	}
-	if want := legacy.EvalBool([]bool{true, false}); got != want {
+	want, err := legacy.EvalBool([]bool{true, false})
+	if err != nil {
+		t.Fatalf("legacy.EvalBool(): %v", err)
+	}
+	if got != want {
 		t.Fatalf("typed.Eval()=%v, want %v", got, want)
 	}
 
@@ -36,7 +49,7 @@ func TestCoreBool_RoundTrip(t *testing.T) {
 }
 
 func TestCoreInt_RoundTrip(t *testing.T) {
-	legacy := New("+.c0.d0", functions.Int)
+	legacy := mustNewGene(t, "+.c0.d0", functions.Int)
 	legacy.Constants[0] = 7
 
 	typed, err := legacy.CoreInt()
@@ -47,7 +60,11 @@ func TestCoreInt_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("typed.Eval(): %v", err)
 	}
-	if want := legacy.EvalInt([]int{5}); got != want {
+	want, err := legacy.EvalInt([]int{5})
+	if err != nil {
+		t.Fatalf("legacy.EvalInt(): %v", err)
+	}
+	if got != want {
 		t.Fatalf("typed.Eval()=%v, want %v", got, want)
 	}
 
@@ -64,7 +81,7 @@ func TestCoreInt_RoundTrip(t *testing.T) {
 }
 
 func TestCoreFloat64_RoundTrip(t *testing.T) {
-	legacy := New("+.c0.d0", functions.Float64)
+	legacy := mustNewGene(t, "+.c0.d0", functions.Float64)
 	legacy.Constants[0] = 2.5
 
 	typed, err := legacy.CoreFloat64()
@@ -75,7 +92,11 @@ func TestCoreFloat64_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("typed.Eval(): %v", err)
 	}
-	if want := legacy.EvalMath([]float64{4}); got != want {
+	want, err := legacy.EvalMath([]float64{4})
+	if err != nil {
+		t.Fatalf("legacy.EvalMath(): %v", err)
+	}
+	if got != want {
 		t.Fatalf("typed.Eval()=%v, want %v", got, want)
 	}
 
@@ -92,7 +113,7 @@ func TestCoreFloat64_RoundTrip(t *testing.T) {
 }
 
 func TestCoreVectorInt_RoundTrip(t *testing.T) {
-	legacy := New("+.d0.d1", functions.VectorInts)
+	legacy := mustNewGene(t, "+.d0.d1", functions.VectorInts)
 
 	typed, err := legacy.CoreVectorInt()
 	if err != nil {
@@ -102,7 +123,11 @@ func TestCoreVectorInt_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("typed.Eval(): %v", err)
 	}
-	if want := legacy.EvalVectorInt([]functions.VectorInt{{1, 2}, {3, 4}}); !reflect.DeepEqual(got, want) {
+	want, err := legacy.EvalVectorInt([]functions.VectorInt{{1, 2}, {3, 4}})
+	if err != nil {
+		t.Fatalf("legacy.EvalVectorInt(): %v", err)
+	}
+	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("typed.Eval()=%v, want %v", got, want)
 	}
 
@@ -116,12 +141,12 @@ func TestCoreVectorInt_RoundTrip(t *testing.T) {
 }
 
 func TestCoreBridge_UnsupportedConstants(t *testing.T) {
-	boolGene := New("c0", functions.Bool)
+	boolGene := mustNewGene(t, "c0", functions.Bool)
 	if _, err := boolGene.CoreBool(); err == nil {
 		t.Fatal("CoreBool() with constants: got nil error, want non-nil")
 	}
 
-	vectorGene := New("c0", functions.VectorInts)
+	vectorGene := mustNewGene(t, "c0", functions.VectorInts)
 	if _, err := vectorGene.CoreVectorInt(); err == nil {
 		t.Fatal("CoreVectorInt() with constants: got nil error, want non-nil")
 	}

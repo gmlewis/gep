@@ -5,33 +5,48 @@
 package gene
 
 import (
-	"log"
+	"errors"
+	"fmt"
 	"strconv"
 
 	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
 )
 
-func (g *Gene) generateMathFunc() {
-	argOrder := g.getArgOrder()
+func (g *Gene) generateMathFunc() error {
+	argOrder, err := g.getArgOrder()
+	if err != nil {
+		return err
+	}
 	g.SymbolMap = make(map[string]int)
-	g.mf = g.buildMathTree(0, argOrder)
+	g.mf, err = g.buildMathTree(0, argOrder)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // EvalMath evaluates the gene as a floating-point expression and returns the result.
 // in represents the float64 inputs available to the gene.
-func (g *Gene) EvalMath(in []float64) float64 {
-	if g.mf == nil {
-		g.generateMathFunc()
+func (g *Gene) EvalMath(in []float64) (float64, error) {
+	if err := g.validateMathSymbols(in); err != nil {
+		return 0.0, err
 	}
-	return g.mf(in)
+	if g.mf == nil {
+		if err := g.generateMathFunc(); err != nil {
+			return 0.0, err
+		}
+	}
+	if g.mf == nil {
+		return 0.0, errors.New("unable to generate math evaluator")
+	}
+	return g.mf(in), nil
 }
 
-func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) float64 {
+func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) (func([]float64) float64, error) {
 	// count := make(map[string]int)
 	// log.Infof("buildMathTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex >= len(g.Symbols) {
-		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
-		return func(a []float64) float64 { return 0.0 }
+		return nil, fmt.Errorf("gene.buildMathTree error: symbolIndex %d out of bounds [0,%d)", symbolIndex, len(g.Symbols))
 	}
 	sym := g.Symbols[symbolIndex]
 	g.SymbolMap[sym]++
@@ -39,7 +54,10 @@ func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) 
 		args := argOrder[symbolIndex]
 		var funcs []func([]float64) float64
 		for _, arg := range args {
-			f := g.buildMathTree(arg, argOrder)
+			f, err := g.buildMathTree(arg, argOrder)
+			if err != nil {
+				return nil, err
+			}
 			funcs = append(funcs, f)
 		}
 		return func(in []float64) float64 {
@@ -48,34 +66,34 @@ func (g *Gene) buildMathTree(symbolIndex int, argOrder [][]int) func([]float64) 
 				values = append(values, f(in))
 			}
 			return s.Float64Function(values)
-		}
-	} else { // No named symbol found - look for d0, d1, ...
-		if sym[0:1] == "d" {
-			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse variable index: sym=%q", sym)
-			} else {
-				return func(in []float64) float64 {
-					if index >= len(in) {
-						log.Printf("error evaluating gene %q: index %v >= d length (%v)", sym, index, len(in))
-						return 0.0
-					}
-					return in[index]
-				}
-			}
-		} else if sym[0:1] == "c" {
-			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse constant index: sym=%v", sym)
-			} else {
-				return func(in []float64) float64 {
-					if index >= len(g.Constants) {
-						log.Printf("error evaluating gene %q: index %v >= c length (%v)", sym, index, len(g.Constants))
-						return 0.0
-					}
-					return g.Constants[index]
-				}
-			}
-		}
+		}, nil
 	}
-	log.Printf("unable to return function: unknown gene symbol %q", sym)
-	return func(in []float64) float64 { return 0.0 }
+	if sym == "" {
+		return nil, errors.New("gene.buildMathTree error: empty symbol")
+	}
+	if sym[0:1] == "d" { // No named symbol found - look for d0, d1, ...
+		index, err := strconv.Atoi(sym[1:])
+		if err != nil {
+			return nil, fmt.Errorf("gene.buildMathTree error: unable to parse terminal index for symbol %q: %w", sym, err)
+		}
+		return func(in []float64) float64 {
+			if index >= len(in) {
+				return 0.0
+			}
+			return in[index]
+		}, nil
+	}
+	if sym[0:1] == "c" {
+		index, err := strconv.Atoi(sym[1:])
+		if err != nil {
+			return nil, fmt.Errorf("gene.buildMathTree error: unable to parse constant index for symbol %q: %w", sym, err)
+		}
+		return func(in []float64) float64 {
+			if index >= len(g.Constants) {
+				return 0.0
+			}
+			return g.Constants[index]
+		}, nil
+	}
+	return nil, fmt.Errorf("gene.buildMathTree error: unknown symbol %q", sym)
 }

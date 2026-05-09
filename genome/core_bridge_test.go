@@ -12,10 +12,19 @@ import (
 	"github.com/gmlewis/gep/v2/gene"
 )
 
+func mustGene(t *testing.T, karva string, funcType functions.FuncType) *gene.Gene {
+	t.Helper()
+	g, err := gene.New(karva, funcType)
+	if err != nil {
+		t.Fatalf("gene.New(%q) error: %v", karva, err)
+	}
+	return g
+}
+
 func TestCoreBool_RoundTrip(t *testing.T) {
 	legacy := New([]*gene.Gene{
-		gene.New("Nand.d0.d1", functions.Bool),
-		gene.New("Or.d0.d1", functions.Bool),
+		mustGene(t, "Nand.d0.d1", functions.Bool),
+		mustGene(t, "Or.d0.d1", functions.Bool),
 	}, "And")
 
 	typed, err := legacy.CoreBool()
@@ -26,7 +35,11 @@ func TestCoreBool_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("typed.Eval(): %v", err)
 	}
-	if want := legacy.EvalBool([]bool{true, false}); got != want {
+	want, err := legacy.EvalBool([]bool{true, false})
+	if err != nil {
+		t.Fatalf("legacy.EvalBool(): %v", err)
+	}
+	if got != want {
 		t.Fatalf("typed.Eval()=%v, want %v", got, want)
 	}
 
@@ -45,9 +58,9 @@ func TestCoreBool_RoundTrip(t *testing.T) {
 }
 
 func TestCoreInt_RoundTrip(t *testing.T) {
-	g0 := gene.New("+.c0.d0", functions.Int)
+	g0 := mustGene(t, "+.c0.d0", functions.Int)
 	g0.Constants[0] = 3
-	g1 := gene.New("-.d0.c0", functions.Int)
+	g1 := mustGene(t, "-.d0.c0", functions.Int)
 	g1.Constants[0] = 1
 	legacy := New([]*gene.Gene{g0, g1}, "+")
 
@@ -59,7 +72,11 @@ func TestCoreInt_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("typed.Eval(): %v", err)
 	}
-	if want := legacy.EvalInt([]int{5}); got != want {
+	want, err := legacy.EvalInt([]int{5})
+	if err != nil {
+		t.Fatalf("legacy.EvalInt(): %v", err)
+	}
+	if got != want {
 		t.Fatalf("typed.Eval()=%v, want %v", got, want)
 	}
 
@@ -79,9 +96,9 @@ func TestCoreInt_RoundTrip(t *testing.T) {
 }
 
 func TestCoreFloat64_RoundTrip(t *testing.T) {
-	g0 := gene.New("+.c0.d0", functions.Float64)
+	g0 := mustGene(t, "+.c0.d0", functions.Float64)
 	g0.Constants[0] = 2.5
-	g1 := gene.New("-.d0.c0", functions.Float64)
+	g1 := mustGene(t, "-.d0.c0", functions.Float64)
 	g1.Constants[0] = 1.5
 	legacy := New([]*gene.Gene{g0, g1}, "+")
 
@@ -93,7 +110,11 @@ func TestCoreFloat64_RoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("typed.Eval(): %v", err)
 	}
-	if want := legacy.EvalMath([]float64{4}); got != want {
+	want, err := legacy.EvalMath([]float64{4})
+	if err != nil {
+		t.Fatalf("legacy.EvalMath(): %v", err)
+	}
+	if got != want {
 		t.Fatalf("typed.Eval()=%v, want %v", got, want)
 	}
 

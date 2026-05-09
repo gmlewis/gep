@@ -50,6 +50,7 @@
 package evolution
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 
@@ -191,13 +192,13 @@ func newGeneration[T any](
 	sf ScoringFunc[T],
 ) (*Generation[T], error) {
 	if numIndividuals <= 0 {
-		return nil, fmt.Errorf("evolution.New: numIndividuals must be > 0")
+		return nil, errors.New("evolution.New: numIndividuals must be > 0")
 	}
 	if cat == nil {
-		return nil, fmt.Errorf("evolution.New: catalog cannot be nil")
+		return nil, errors.New("evolution.New: catalog cannot be nil")
 	}
 	if link == nil {
-		return nil, fmt.Errorf("evolution.New: link operator cannot be nil")
+		return nil, errors.New("evolution.New: link operator cannot be nil")
 	}
 
 	individuals := make([]Individual[T], numIndividuals)

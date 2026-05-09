@@ -37,7 +37,10 @@ var parityTests = []struct {
 func validateParity(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range parityTests {
-		r := g.EvalBool(n.in)
+		r, err := g.EvalBool(n.in)
+		if err != nil {
+			return 0
+		}
 		if r == n.out {
 			correct++
 		}
@@ -52,8 +55,14 @@ func main() {
 		{Symbol: "Or", Weight: 20},
 	}
 	numIn := len(parityTests[0].in)
-	population := model.New(funcs, functions.Bool, 30, 7, 3, numIn, 0, "And", validateParity, false)
-	solution := population.Evolve(10000)
+	population, err := model.New(funcs, functions.Bool, 30, 7, 3, numIn, 0, "And", validateParity, false)
+	if err != nil {
+		log.Fatalf("New failed: %v", err)
+	}
+	solution, err := population.Evolve(10000)
+	if err != nil {
+		log.Fatalf("Evolve failed: %v", err)
+	}
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()
@@ -62,6 +71,6 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// odd-3-parity solution karva expression:\n// %q\n", solution)
+	fmt.Printf("// odd-3-parity solution karva expression:\n// %v\n", solution)
 	solution.Write(os.Stdout, gr)
 }

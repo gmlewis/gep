@@ -45,7 +45,10 @@ var srTests = []struct {
 func validateFunc(g *genome.Genome) float64 {
 	result := 0.0
 	for _, n := range srTests {
-		r := g.EvalMath(n.in)
+		r, err := g.EvalMath(n.in)
+		if err != nil {
+			return 0
+		}
 		// fmt.Printf("r=%v, n.in=%v, n.out=%v, g=%v\n", r, n.in, n.out, g)
 		if math.IsInf(r, 0) {
 			return 0.0
@@ -65,8 +68,14 @@ func main() {
 		{Symbol: "*", Weight: 1},
 	}
 	numIn := len(srTests[0].in)
-	population := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc, false)
-	solution := population.Evolve(10000)
+	population, err := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc, false)
+	if err != nil {
+		log.Fatalf("New failed: %v", err)
+	}
+	solution, err := population.Evolve(10000)
+	if err != nil {
+		log.Fatalf("Evolve failed: %v", err)
+	}
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoMathGrammar()
@@ -75,6 +84,6 @@ func main() {
 	}
 
 	fmt.Printf("\n// gepModel is auto-generated Go source code for the\n")
-	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %q\n", solution)
+	fmt.Printf("// (a^4 + a^3 + a^2 + a) solution karva expression:\n// %v\n", solution)
 	solution.Write(os.Stdout, gr)
 }

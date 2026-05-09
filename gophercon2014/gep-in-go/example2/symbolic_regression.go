@@ -33,7 +33,10 @@ var srTests = []struct {
 func validateFunc(g *genome.Genome) float64 {
 	result := 0.0
 	for _, n := range srTests {
-		r := g.EvalMath(n.in)
+		r, err := g.EvalMath(n.in)
+		if err != nil {
+			return 0
+		}
 		if math.IsInf(r, 0) {
 			return 0.0
 		}
@@ -51,7 +54,13 @@ func main() {
 		{Symbol: "*", Weight: 1},
 		{Symbol: "/", Weight: 1},
 	}
-	e := model.New(funcs, functions.Float64, 30, 6, 1, 1, 0, "+", validateFunc, false)
-	s := e.Evolve(10000)
+	e, err := model.New(funcs, functions.Float64, 30, 6, 1, 1, 0, "+", validateFunc, false)
+	if err != nil {
+		panic(err)
+	}
+	s, err := e.Evolve(10000)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Printf("(a^4 + a^3 + a^2 + a) solution: %v, score=%v\n", s, validateFunc(s))
 }

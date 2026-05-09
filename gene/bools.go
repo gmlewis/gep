@@ -5,33 +5,48 @@
 package gene
 
 import (
-	"log"
+	"errors"
+	"fmt"
 	"strconv"
 
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
 
-func (g *Gene) generateBoolFunc() {
-	argOrder := g.getArgOrder()
+func (g *Gene) generateBoolFunc() error {
+	argOrder, err := g.getArgOrder()
+	if err != nil {
+		return err
+	}
 	g.SymbolMap = make(map[string]int)
-	g.bf = g.buildBoolTree(0, argOrder)
+	g.bf, err = g.buildBoolTree(0, argOrder)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // EvalBool evaluates the gene as a boolean expression and returns the result.
 // "in" represents the boolean inputs available to the gene.
-func (g *Gene) EvalBool(in []bool) bool {
-	if g.bf == nil {
-		g.generateBoolFunc()
+func (g *Gene) EvalBool(in []bool) (bool, error) {
+	if err := g.validateBoolSymbols(in); err != nil {
+		return false, err
 	}
-	return g.bf(in)
+	if g.bf == nil {
+		if err := g.generateBoolFunc(); err != nil {
+			return false, err
+		}
+	}
+	if g.bf == nil {
+		return false, errors.New("unable to generate bool evaluator")
+	}
+	return g.bf(in), nil
 }
 
-func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int) func([]bool) bool {
+func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int) (func([]bool) bool, error) {
 	// count := make(map[string]int)
 	// log.Infof("buildBoolTree(%v, %#v, ...)", symbolIndex, argOrder)
 	if symbolIndex >= len(g.Symbols) {
-		log.Printf("bad symbolIndex %v for symbols: %v", symbolIndex, g.Symbols)
-		return func(a []bool) bool { return false }
+		return nil, fmt.Errorf("gene.buildBoolTree error: symbolIndex %d out of bounds [0,%d)", symbolIndex, len(g.Symbols))
 	}
 	sym := g.Symbols[symbolIndex]
 	g.SymbolMap[sym]++
@@ -39,7 +54,10 @@ func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int) func([]bool) boo
 		args := argOrder[symbolIndex]
 		var funcs []func([]bool) bool
 		for _, arg := range args {
-			f := g.buildBoolTree(arg, argOrder)
+			f, err := g.buildBoolTree(arg, argOrder)
+			if err != nil {
+				return nil, err
+			}
 			funcs = append(funcs, f)
 		}
 		return func(in []bool) bool {
@@ -48,23 +66,23 @@ func (g *Gene) buildBoolTree(symbolIndex int, argOrder [][]int) func([]bool) boo
 				values = append(values, f(in))
 			}
 			return s.BoolFunction(values)
-		}
-	} else { // No named symbol found - look for d0, d1, ...
-		if sym[0:1] == "d" {
-			if index, err := strconv.Atoi(sym[1:]); err != nil {
-				log.Printf("unable to parse variable index: sym=%q", sym)
-			} else {
-				return func(in []bool) bool {
-					if index >= len(in) {
-						log.Printf("error evaluating gene symbol %q: index %v >= d length (%v)", sym, index, len(in))
-						return false
-					}
-					return in[index]
-				}
-			}
-		}
-		// Note that constants c0, c1, ... don't make sense for bool expressions
+		}, nil
 	}
-	log.Printf("unable to return function: unknown gene symbol %q", sym)
-	return func(in []bool) bool { return false }
+	if sym == "" {
+		return nil, errors.New("gene.buildBoolTree error: empty symbol")
+	}
+	if sym[0:1] == "d" { // No named symbol found - look for d0, d1, ...
+		index, err := strconv.Atoi(sym[1:])
+		if err != nil {
+			return nil, fmt.Errorf("gene.buildBoolTree error: unable to parse terminal index for symbol %q: %w", sym, err)
+		}
+		return func(in []bool) bool {
+			if index >= len(in) {
+				return false
+			}
+			return in[index]
+		}, nil
+	}
+	// Note that constants c0, c1, ... don't make sense for bool expressions.
+	return nil, fmt.Errorf("gene.buildBoolTree error: unknown symbol %q", sym)
 }

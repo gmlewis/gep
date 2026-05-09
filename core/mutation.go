@@ -5,6 +5,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 )
@@ -20,17 +21,23 @@ func randIntn(n int, rng *rand.Rand) int {
 
 // buildTermChoices builds the terminal symbol slice (d0..d(numTerminals-1)
 // followed by c0..c(numConstants-1)) used by mutation operators.
-func buildTermChoices[T any](numTerminals, numConstants int) []Symbol[T] {
+func buildTermChoices[T any](numTerminals, numConstants int) ([]Symbol[T], error) {
 	choices := make([]Symbol[T], 0, numTerminals+numConstants)
 	for i := 0; i < numTerminals; i++ {
-		sym, _ := NewTerminalSymbol[T](i)
+		sym, err := NewTerminalSymbol[T](i)
+		if err != nil {
+			return nil, err
+		}
 		choices = append(choices, sym)
 	}
 	for i := 0; i < numConstants; i++ {
-		sym, _ := NewConstantSymbol[T](i)
+		sym, err := NewConstantSymbol[T](i)
+		if err != nil {
+			return nil, err
+		}
 		choices = append(choices, sym)
 	}
-	return choices
+	return choices, nil
 }
 
 // PointMutate performs a single point mutation on a copy of g.
@@ -44,25 +51,28 @@ func buildTermChoices[T any](numTerminals, numConstants int) []Symbol[T] {
 // sum must be > 0.  cat must be non-nil.  rng may be nil (global source used).
 func PointMutate[T any](g Gene[T], cat *Catalog[T], headSize, numTerminals, numConstants int, rng *rand.Rand) (Gene[T], error) {
 	if cat == nil {
-		return Gene[T]{}, fmt.Errorf("core.PointMutate: catalog cannot be nil")
+		return Gene[T]{}, errors.New("core.PointMutate: catalog cannot be nil")
 	}
 	if headSize < 0 {
-		return Gene[T]{}, fmt.Errorf("core.PointMutate: headSize must be >= 0")
+		return Gene[T]{}, errors.New("core.PointMutate: headSize must be >= 0")
 	}
 	if numTerminals < 0 {
-		return Gene[T]{}, fmt.Errorf("core.PointMutate: numTerminals must be >= 0")
+		return Gene[T]{}, errors.New("core.PointMutate: numTerminals must be >= 0")
 	}
 	if numConstants < 0 {
-		return Gene[T]{}, fmt.Errorf("core.PointMutate: numConstants must be >= 0")
+		return Gene[T]{}, errors.New("core.PointMutate: numConstants must be >= 0")
 	}
 	if numTerminals+numConstants == 0 {
-		return Gene[T]{}, fmt.Errorf("core.PointMutate: numTerminals+numConstants must be > 0")
+		return Gene[T]{}, errors.New("core.PointMutate: numTerminals+numConstants must be > 0")
 	}
 	if len(g.Symbols) == 0 {
-		return Gene[T]{}, fmt.Errorf("core.PointMutate: gene has no symbols")
+		return Gene[T]{}, errors.New("core.PointMutate: gene has no symbols")
 	}
 
-	termChoices := buildTermChoices[T](numTerminals, numConstants)
+	termChoices, err := buildTermChoices[T](numTerminals, numConstants)
+	if err != nil {
+		return Gene[T]{}, err
+	}
 	funcNames := cat.Symbols()
 
 	dst := g.Dup()
@@ -76,8 +86,15 @@ func PointMutate[T any](g Gene[T], cat *Catalog[T], headSize, numTerminals, numC
 		}
 		choice := randIntn(headChoiceCount, rng)
 		if choice < len(funcNames) {
-			node, _ := cat.Lookup(funcNames[choice])
-			sym, _ := NewFunctionSymbol[T](node)
+			name := funcNames[choice]
+			node, ok := cat.Lookup(name)
+			if !ok {
+				return Gene[T]{}, fmt.Errorf("core.PointMutate: function %q not found in catalog", name)
+			}
+			sym, err := NewFunctionSymbol[T](node)
+			if err != nil {
+				return Gene[T]{}, err
+			}
 			dst.Symbols[pos] = sym
 		} else {
 			dst.Symbols[pos] = termChoices[choice-len(funcNames)]
@@ -96,7 +113,7 @@ func PointMutate[T any](g Gene[T], cat *Catalog[T], headSize, numTerminals, numC
 // headSize must be >= 0.  rng may be nil.
 func Inversion[T any](g Gene[T], headSize int, rng *rand.Rand) (Gene[T], error) {
 	if headSize < 0 {
-		return Gene[T]{}, fmt.Errorf("core.Inversion: headSize must be >= 0")
+		return Gene[T]{}, errors.New("core.Inversion: headSize must be >= 0")
 	}
 	dst := g.Dup()
 	if headSize <= 1 || len(dst.Symbols) == 0 {
@@ -137,10 +154,10 @@ func Inversion[T any](g Gene[T], headSize int, rng *rand.Rand) (Gene[T], error) 
 // the gene is returned unchanged (deep-copied).
 func ISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) (Gene[T], error) {
 	if headSize < 0 {
-		return Gene[T]{}, fmt.Errorf("core.ISTransposition: headSize must be >= 0")
+		return Gene[T]{}, errors.New("core.ISTransposition: headSize must be >= 0")
 	}
 	if maxISLen < 1 {
-		return Gene[T]{}, fmt.Errorf("core.ISTransposition: maxISLen must be >= 1")
+		return Gene[T]{}, errors.New("core.ISTransposition: maxISLen must be >= 1")
 	}
 	dst := g.Dup()
 	if headSize <= 1 || len(dst.Symbols) == 0 {
@@ -202,10 +219,10 @@ func ISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) (
 // headSize must be >= 0.  maxISLen must be >= 1.  rng may be nil.
 func RISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) (Gene[T], error) {
 	if headSize < 0 {
-		return Gene[T]{}, fmt.Errorf("core.RISTransposition: headSize must be >= 0")
+		return Gene[T]{}, errors.New("core.RISTransposition: headSize must be >= 0")
 	}
 	if maxISLen < 1 {
-		return Gene[T]{}, fmt.Errorf("core.RISTransposition: maxISLen must be >= 1")
+		return Gene[T]{}, errors.New("core.RISTransposition: maxISLen must be >= 1")
 	}
 	dst := g.Dup()
 	if headSize == 0 || len(dst.Symbols) == 0 {
@@ -264,7 +281,7 @@ func RISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) 
 // rng may be nil.
 func OnePointRecombine[T any](g1, g2 Gene[T], rng *rand.Rand) (Gene[T], Gene[T], error) {
 	if len(g1.Symbols) == 0 || len(g2.Symbols) == 0 {
-		return Gene[T]{}, Gene[T]{}, fmt.Errorf("core.OnePointRecombine: genes must be non-empty")
+		return Gene[T]{}, Gene[T]{}, errors.New("core.OnePointRecombine: genes must be non-empty")
 	}
 	if len(g1.Symbols) != len(g2.Symbols) {
 		return Gene[T]{}, Gene[T]{}, fmt.Errorf("core.OnePointRecombine: genes must have equal symbol length (%d vs %d)",
@@ -287,7 +304,7 @@ func OnePointRecombine[T any](g1, g2 Gene[T], rng *rand.Rand) (Gene[T], Gene[T],
 // rng may be nil.
 func TwoPointRecombine[T any](g1, g2 Gene[T], rng *rand.Rand) (Gene[T], Gene[T], error) {
 	if len(g1.Symbols) == 0 || len(g2.Symbols) == 0 {
-		return Gene[T]{}, Gene[T]{}, fmt.Errorf("core.TwoPointRecombine: genes must be non-empty")
+		return Gene[T]{}, Gene[T]{}, errors.New("core.TwoPointRecombine: genes must be non-empty")
 	}
 	if len(g1.Symbols) != len(g2.Symbols) {
 		return Gene[T]{}, Gene[T]{}, fmt.Errorf("core.TwoPointRecombine: genes must have equal symbol length (%d vs %d)",

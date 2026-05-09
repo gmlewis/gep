@@ -595,7 +595,7 @@ Once the architecture is modernized:
 The notes below evaluate the current repository against that original intent
 without reinterpreting the phases.
 
-### Phase 1 status: partially faithful
+### Phase 1 status: complete (after P1-A)
 
 What appears complete:
 
@@ -603,21 +603,24 @@ What appears complete:
 - score orientation and stopping behavior are configurable
 - cache invalidation / duplication semantics were materially improved
 
-Remaining deviation from the original Phase 1 intent:
+P1-A completion evidence:
 
-- the legacy library path is still not fully stabilized because several
-  library APIs log or print on invalid state instead of surfacing errors
-  explicitly
-- examples include CLI exits as expected, but library packages still contain
-  "log-and-continue" / "print-and-continue" behavior that makes correctness
-  issues harder to detect and fix
-
-Representative locations:
-
-- `gene/gene.go`
-- `genome/genome.go`
-- `genome/write.go`
-- `model/model.go`
+- direct library `log.Printf` / `fmt.Printf` emissions were removed from legacy
+  `gene`, `genome`, and `model` packages
+- explicit error-return surfaces were added for legacy invalid states:
+  - `gene`: `New`, `String`, `SymbolCount`, `Mutate`, `Dup`, `EvalInt`,
+    `EvalMath`, `EvalBool`, `EvalVectorInt`, `AllSymbolsEqualWeights`
+  - `genome`: `EvalInt`, `EvalMath`, `EvalBool`, `EvalIntTuple`, `Dup`,
+    `EvaluateWithScore`
+  - `model`: `Evolve`, `singleCrossover`, `maxArity`
+- legacy codegen now has an explicit error-return surface:
+  `(*genome.Genome).Write(...) error`
+- focused tests now prove no direct stdout/stderr emission on representative
+  legacy error/stop paths:
+  - `gene.TestNew_InvalidSymbolIndexesDoNotWriteStderr`
+  - `genome.TestWrite_MissingLinkFunctionDoesNotWriteStdout`
+  - `model.TestEvolve_DoesNotWriteStdoutOnStop`
+- full repo validation passed via `scripts/test-all.sh`
 
 ### Phase 2 status: mostly faithful, but not yet dominant
 
@@ -713,7 +716,59 @@ Required outcome:
 - eliminate direct stdout/stderr emission from library packages
 - preserve existing behavior only where it is intentionally CLI/example-facing
 
-This milestone corrects the remaining Phase 1 deviation.
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- no direct runtime `log.Printf` / `fmt.Printf` emissions remain in legacy
+  library code for:
+  - `gene/*.go`
+  - `genome/*.go`
+  - `model/*.go`
+- `genome/write.go` now exposes `Write(...) error` as the explicit
+  codegen error surface
+- explicit error-return APIs were added across legacy packages:
+  - `gene`: `New`, `String`, `SymbolCount`, `Mutate`, `Dup`, `Eval*`,
+    `AllSymbolsEqualWeights`
+  - `genome`: `Eval*`, `EvalIntTuple`, `Dup`, `EvaluateWithScore`
+  - `model`: `Evolve(...) (*genome.Genome, error)`, `singleCrossover`,
+    `maxArity`
+- added regression tests:
+  - `gene/gene_test.go`: `TestNew_InvalidSymbolIndexesDoNotWriteStderr`
+  - `gene/gene_test.go`: `TestNew_InvalidSymbolIndexesReturnsError`,
+    `TestAllSymbolsEqualWeights_UnknownFuncTypeReturnsError`,
+    `TestEvalInt_UnknownSymbolReturnsError`,
+    `TestMutate_TooFewChoicesReturnsError`
+  - `genome/genome_test.go`:
+    `TestEvaluateWithScore_NilScoringFuncReturnsError`,
+    `TestEvalInt_MissingLinkFunctionReturnsError`
+  - `genome/write_test.go`:
+    `TestWrite_MissingLinkFunctionReturnsError`,
+    `TestWrite_MissingLinkFunctionDoesNotWriteStdout`
+  - `model/model_test.go`:
+    `TestEvolve_DoesNotWriteStdoutOnStop`,
+    `TestMaxArity_UnknownFuncTypeReturnsError`,
+    `TestGetBest_NilScoringFuncReturnsError`,
+    `TestSingleCrossover_MismatchedGenesReturnsError`
+- verification commands passed:
+  - `go test ./gene ./genome ./model`
+  - `./scripts/test-all.sh`
+
+### P1-B: Modernize legacy-style `for` loops to `range` where equivalent
+
+Goal:
+
+- improve readability by replacing legacy index-based loop forms with modern Go
+  `range` loops where behavior remains equivalent
+
+Required outcome:
+
+- audit repository packages for legacy-style `for` loops that can be safely
+  rewritten as `range` loops without changing semantics
+- convert those loops to `range` syntax in a behavior-preserving way
+- keep explicit index/counter loops only where they are required for semantics
+  (for example, custom stepping, reverse traversal, or mutation during index
+  iteration)
 
 ### P2-A: Make typed core/evolution the default execution surface
 

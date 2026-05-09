@@ -6,8 +6,8 @@ package model
 
 import (
 	"cmp"
+	"errors"
 	"fmt"
-	"log"
 	"sort"
 
 	"github.com/gmlewis/gep/v2/common"
@@ -121,7 +121,10 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 	// var genes []*gene.Gene
 	switch ga.ObsSpace.Type {
 	case "Discrete":
-		funcWeights := gene.AllSymbolsEqualWeights(functions.Int)
+		funcWeights, err := gene.AllSymbolsEqualWeights(functions.Int)
+		if err != nil {
+			return nil, err
+		}
 		// for i := 0; i < numGenes; i++ {
 		// 	genes = append(genes, gene.RandomNew(headSize, tailSize, 1, numConstants, funcs, functions.Int))
 		// }
@@ -130,7 +133,7 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 		if ga.appendEpisodeSteps {
 			numTerminals++
 		}
-		gen := New(
+		gen, err := New(
 			funcWeights,
 			functions.Int,
 			ga.numIndividuals,
@@ -141,16 +144,22 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 			"tuple",
 			nil,
 			ga.debug)
+		if err != nil {
+			return nil, err
+		}
 		return gen.Individuals, nil
 
 	case "Tuple":
 		funcType := functions.Int
-		funcWeights := gene.AllSymbolsEqualWeights(functions.Int)
+		funcWeights, err := gene.AllSymbolsEqualWeights(functions.Int)
+		if err != nil {
+			return nil, err
+		}
 		numTerminals := len(ga.ObsSpace.Subspaces)
 		if ga.appendEpisodeSteps {
 			numTerminals++
 		}
-		gen := New(
+		gen, err := New(
 			funcWeights,
 			funcType,
 			ga.numIndividuals,
@@ -161,6 +170,9 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 			"tuple",
 			nil,
 			ga.debug)
+		if err != nil {
+			return nil, err
+		}
 		return gen.Individuals, nil
 
 	// case "MultiBinary":
@@ -192,11 +204,7 @@ func (ga *GymnasiumAgents) EvaluateAgent(agentIdx, episodeSteps int, obs common.
 			(*v)[i] = clamp(val, 0, ga.ActionSpace.Subspaces[i].N-1)
 		}
 	case *int:
-		before := *v
 		*v = clamp(*v, 0, ga.ActionSpace.N-1)
-		if ga.debug {
-			log.Printf("EvaluateAgent(agentIdx=%v, obs=%+v)=%v => clamp(0,%v) => %v", agentIdx, observations, before, ga.ActionSpace.N-1, *v)
-		}
 	default:
 		return fmt.Errorf("agent.Evaluate: action type '%T' not yet supported", v)
 	}
@@ -225,13 +233,20 @@ func (ga *GymnasiumAgents) Evolve() error {
 	// Preserve a copy of the best performing individual which
 	// will be added back into the population after replication,
 	// mutation, and crossover.
-	bestInd := ga.Individuals[0].Dup()
+	bestInd, err := ga.Individuals[0].Dup()
+	if err != nil {
+		return err
+	}
 	gen := &Generation{Individuals: ga.Individuals, debug: ga.debug}
 	// gen.replication()  // This seems to eliminate all diversity - investigate
-	gen.mutation()
-	gen.crossover()
+	if err := gen.mutation(); err != nil {
+		return err
+	}
+	if err := gen.crossover(); err != nil {
+		return err
+	}
 	if len(gen.Individuals) == 0 {
-		return fmt.Errorf("programming error: no individuals available after evolution operators")
+		return errors.New("programming error: no individuals available after evolution operators")
 	}
 	gen.Individuals[len(gen.Individuals)-1] = bestInd // Overwrite lowest performer
 	ga.Individuals = gen.Individuals

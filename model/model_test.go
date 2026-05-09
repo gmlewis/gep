@@ -5,6 +5,8 @@
 package model
 
 import (
+	"io"
+	"os"
 	"sync/atomic"
 	"testing"
 
@@ -13,6 +15,15 @@ import (
 	"github.com/gmlewis/gep/v2/genome"
 )
 
+func mustGene(t *testing.T, karva string, funcType functions.FuncType) *gene.Gene {
+	t.Helper()
+	g, err := gene.New(karva, funcType)
+	if err != nil {
+		t.Fatalf("gene.New(%q) error: %v", karva, err)
+	}
+	return g
+}
+
 func TestMaxArity(t *testing.T) {
 	funcs := []gene.FuncWeight{
 		{Symbol: "+", Weight: 1},
@@ -20,21 +31,30 @@ func TestMaxArity(t *testing.T) {
 		{Symbol: "*", Weight: 3},
 		{Symbol: "/", Weight: 4},
 	}
-	if g, w := maxArity(funcs, functions.Float64), 2; g != w {
+	if g, err := maxArity(funcs, functions.Float64); err != nil || g != 2 {
+		w := 2
 		t.Errorf("maxArity(%v, functions.Float64) = %v, want %v", funcs, g, w)
 	}
 	funcs = append(funcs, gene.FuncWeight{
 		Symbol: "LT3A",
 		Weight: 1,
 	})
-	if g, w := maxArity(funcs, functions.Float64), 3; g != w {
+	if g, err := maxArity(funcs, functions.Float64); err != nil || g != 3 {
+		w := 3
 		t.Errorf("maxArity(%v, functions.Float64) = %v, want %v", funcs, g, w)
 	}
 }
 
-func TestMaxArity_UnknownFuncTypeReturnsZero(t *testing.T) {
-	if got := maxArity(nil, functions.FuncType(999)); got != 0 {
-		t.Fatalf("maxArity(nil, unknown) = %v, want 0", got)
+func TestMaxArity_UnknownFuncTypeReturnsError(t *testing.T) {
+	if _, err := maxArity(nil, functions.FuncType(999)); err == nil {
+		t.Fatal("maxArity(nil, unknown) error = nil, want non-nil")
+	}
+}
+
+func TestNew_UnknownFunctionSymbolReturnsError(t *testing.T) {
+	funcs := []gene.FuncWeight{{Symbol: "unknown", Weight: 1}}
+	if _, err := New(funcs, functions.Float64, 1, 1, 1, 1, 0, "+", nil, false); err == nil {
+		t.Fatal("New(...) error = nil, want non-nil")
 	}
 }
 
@@ -44,9 +64,14 @@ func BenchmarkReplication(b *testing.B) {
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
+	e, err := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
+	if err != nil {
+		b.Fatalf("New(...) error: %v", err)
+	}
 	for i := 0; i < b.N; i++ {
-		e.replication()
+		if err := e.replication(); err != nil {
+			b.Fatalf("replication() error: %v", err)
+		}
 	}
 }
 
@@ -56,9 +81,14 @@ func BenchmarkMutation(b *testing.B) {
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
+	e, err := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
+	if err != nil {
+		b.Fatalf("New(...) error: %v", err)
+	}
 	for i := 0; i < b.N; i++ {
-		e.mutation()
+		if err := e.mutation(); err != nil {
+			b.Fatalf("mutation() error: %v", err)
+		}
 	}
 }
 
@@ -78,7 +108,9 @@ func TestReplication(t *testing.T) {
 	}
 
 	before := len(g.Individuals)
-	g.replication()
+	if err := g.replication(); err != nil {
+		t.Fatalf("replication() error: %v", err)
+	}
 	got := len(g.Individuals)
 	if want := before; got != want {
 		t.Errorf("replication = %v individuals, want %v", got, want)
@@ -101,12 +133,25 @@ func TestGetBestHandlesAllNegativeScores(t *testing.T) {
 		},
 	}
 
-	got := g.getBest()
+	got, err := g.getBest()
+	if err != nil {
+		t.Fatalf("getBest() error: %v", err)
+	}
 	if got != g2 {
 		t.Fatalf("getBest() = %p (score=%v), want %p (score=%v)", got, scores[got], g2, scores[g2])
 	}
 	if scores[got] != -1 {
 		t.Fatalf("getBest() score = %v, want -1", scores[got])
+	}
+}
+
+func TestGetBest_NilScoringFuncReturnsError(t *testing.T) {
+	g := &Generation{
+		Individuals: []*genome.Genome{{}},
+		ScoringFunc: nil,
+	}
+	if _, err := g.getBest(); err == nil {
+		t.Fatal("getBest() error = nil, want non-nil")
 	}
 }
 
@@ -125,7 +170,10 @@ func TestGetBest_MinimizeScore(t *testing.T) {
 		MinimizeScore: true,
 	}
 
-	got := g.getBest()
+	got, err := g.getBest()
+	if err != nil {
+		t.Fatalf("getBest() error: %v", err)
+	}
 	if got != g2 {
 		t.Fatalf("getBest() = %p (score=%v), want %p (score=%v)", got, scores[got], g2, scores[g2])
 	}
@@ -143,7 +191,9 @@ func TestSingleCrossover_MismatchedGenesDoesNotMutate(t *testing.T) {
 			{Genes: []*gene.Gene{gene2}},
 		},
 	}
-	g.singleCrossover(0, 1)
+	if err := g.singleCrossover(0, 1); err == nil {
+		t.Fatal("singleCrossover() error = nil, want non-nil")
+	}
 	if got, want := g.Individuals[0].Genes[0].Symbols, []string{"d0"}; len(got) != len(want) || got[0] != want[0] {
 		t.Fatalf("genome[0] symbols changed: got %v, want %v", got, want)
 	}
@@ -152,16 +202,30 @@ func TestSingleCrossover_MismatchedGenesDoesNotMutate(t *testing.T) {
 	}
 }
 
+func TestSingleCrossover_MismatchedGenesReturnsError(t *testing.T) {
+	gene1 := &gene.Gene{Symbols: []string{"d0"}, HeadSize: 1}
+	gene2 := &gene.Gene{Symbols: []string{"d0", "d1"}, HeadSize: 2}
+	g := &Generation{
+		Individuals: []*genome.Genome{
+			{Genes: []*gene.Gene{gene1}},
+			{Genes: []*gene.Gene{gene2}},
+		},
+	}
+	if err := g.singleCrossover(0, 1); err == nil {
+		t.Fatal("singleCrossover() error = nil, want non-nil")
+	}
+}
+
 func TestSingleCrossover_InvalidatesGeneCaches(t *testing.T) {
-	gene1 := gene.New("d0", functions.Float64)
+	gene1 := mustGene(t, "d0", functions.Float64)
 	gene1.HeadSize = 1
-	gene2 := gene.New("d1", functions.Float64)
+	gene2 := mustGene(t, "d1", functions.Float64)
 	gene2.HeadSize = 1
 
-	if got := gene1.EvalMath([]float64{10, 20}); got != 10 {
+	if got, err := gene1.EvalMath([]float64{10, 20}); err != nil || got != 10 {
 		t.Fatalf("gene1.EvalMath(before) = %v, want 10", got)
 	}
-	if got := gene2.EvalMath([]float64{10, 20}); got != 20 {
+	if got, err := gene2.EvalMath([]float64{10, 20}); err != nil || got != 20 {
 		t.Fatalf("gene2.EvalMath(before) = %v, want 20", got)
 	}
 
@@ -171,12 +235,14 @@ func TestSingleCrossover_InvalidatesGeneCaches(t *testing.T) {
 			{Genes: []*gene.Gene{gene2}},
 		},
 	}
-	g.singleCrossover(0, 1)
+	if err := g.singleCrossover(0, 1); err != nil {
+		t.Fatalf("singleCrossover() error: %v", err)
+	}
 
-	if got := gene1.EvalMath([]float64{10, 20}); got != 20 {
+	if got, err := gene1.EvalMath([]float64{10, 20}); err != nil || got != 20 {
 		t.Fatalf("gene1.EvalMath(after) = %v, want 20", got)
 	}
-	if got := gene2.EvalMath([]float64{10, 20}); got != 10 {
+	if got, err := gene2.EvalMath([]float64{10, 20}); err != nil || got != 10 {
 		t.Fatalf("gene2.EvalMath(after) = %v, want 10", got)
 	}
 }
@@ -191,14 +257,19 @@ func TestEvolve_StopFuncHaltsBeforeMaxIterations(t *testing.T) {
 	}
 	stopAfter := 3
 	callCount := 0
-	g := New(funcs, functions.Float64, 10, 4, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
+	g, err := New(funcs, functions.Float64, 10, 4, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
 		return 0.5 // never reaches 1000
 	}, false)
+	if err != nil {
+		t.Fatalf("New(...) error: %v", err)
+	}
 	g.StopFunc = func(best *genome.Genome) bool {
 		callCount++
 		return callCount >= stopAfter
 	}
-	g.Evolve(1000)
+	if _, err := g.Evolve(1000); err != nil {
+		t.Fatalf("Evolve() error: %v", err)
+	}
 	if callCount != stopAfter {
 		t.Fatalf("StopFunc called %v times, want %v", callCount, stopAfter)
 	}
@@ -211,17 +282,58 @@ func TestEvolve_NilStopFuncUsesDefaultThreshold(t *testing.T) {
 		{Symbol: "+", Weight: 1},
 	}
 	var callCount atomic.Int64
-	g := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
+	g, err := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
 		n := callCount.Add(1)
 		if n >= 3 {
 			return 1000.0 // triggers default stop
 		}
 		return 0.0
 	}, false)
+	if err != nil {
+		t.Fatalf("New(...) error: %v", err)
+	}
 	// StopFunc is nil — default threshold of 1000 applies
-	best := g.Evolve(100)
+	best, err := g.Evolve(100)
+	if err != nil {
+		t.Fatalf("Evolve() error: %v", err)
+	}
 	if best.Score < 1000.0 {
 		t.Fatalf("expected best.Score >= 1000, got %v", best.Score)
+	}
+}
+
+func TestEvolve_DoesNotWriteStdoutOnStop(t *testing.T) {
+	funcs := []gene.FuncWeight{
+		{Symbol: "+", Weight: 1},
+	}
+	g, err := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(*genome.Genome) float64 {
+		return 1000.0
+	}, false)
+	if err != nil {
+		t.Fatalf("New(...) error: %v", err)
+	}
+
+	orig := os.Stdout
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("os.Pipe() error: %v", err)
+	}
+	os.Stdout = w
+	defer func() { os.Stdout = orig }()
+
+	if _, err := g.Evolve(10); err != nil {
+		t.Fatalf("Evolve() error: %v", err)
+	}
+
+	if err := w.Close(); err != nil {
+		t.Fatalf("stdout close error: %v", err)
+	}
+	out, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatalf("stdout read error: %v", err)
+	}
+	if len(out) != 0 {
+		t.Fatalf("Evolve() wrote to stdout: %q", string(out))
 	}
 }
 
@@ -234,8 +346,14 @@ func TestNewWithSeed_DeterministicPopulation(t *testing.T) {
 		{Symbol: "*", Weight: 1},
 	}
 	const seed = int64(42)
-	g1 := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
-	g2 := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	g1, err := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(seed, ...) error: %v", err)
+	}
+	g2, err := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(seed, ...) error: %v", err)
+	}
 
 	if len(g1.Individuals) != len(g2.Individuals) {
 		t.Fatalf("population sizes differ: %v vs %v", len(g1.Individuals), len(g2.Individuals))
@@ -264,8 +382,14 @@ func TestNewWithSeed_DifferentSeedsProduceDifferentPopulations(t *testing.T) {
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	g1 := NewWithSeed(1, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
-	g2 := NewWithSeed(2, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	g1, err := NewWithSeed(1, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(1, ...) error: %v", err)
+	}
+	g2, err := NewWithSeed(2, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(2, ...) error: %v", err)
+	}
 
 	different := false
 	for i, ind1 := range g1.Individuals {
@@ -302,17 +426,35 @@ func TestNewWithSeed_DeterministicEvolution(t *testing.T) {
 	const seed = int64(77)
 	scorer := func(gn *genome.Genome) float64 { return 0.0 }
 
-	g1 := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
-	g2 := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
+	g1, err := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(seed, ...) error: %v", err)
+	}
+	g2, err := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(seed, ...) error: %v", err)
+	}
 
 	// Run one step of evolution on each
-	g1.getBest()
-	g1.replication()
-	g1.mutation()
+	if _, err := g1.getBest(); err != nil {
+		t.Fatalf("g1.getBest() error: %v", err)
+	}
+	if err := g1.replication(); err != nil {
+		t.Fatalf("g1.replication() error: %v", err)
+	}
+	if err := g1.mutation(); err != nil {
+		t.Fatalf("g1.mutation() error: %v", err)
+	}
 
-	g2.getBest()
-	g2.replication()
-	g2.mutation()
+	if _, err := g2.getBest(); err != nil {
+		t.Fatalf("g2.getBest() error: %v", err)
+	}
+	if err := g2.replication(); err != nil {
+		t.Fatalf("g2.replication() error: %v", err)
+	}
+	if err := g2.mutation(); err != nil {
+		t.Fatalf("g2.mutation() error: %v", err)
+	}
 
 	// Populations should be identical after deterministic operations
 	for i, ind1 := range g1.Individuals {

@@ -26,7 +26,10 @@ var nandTests = []struct {
 func validateNand(g *genome.Genome) float64 {
 	correct := 0
 	for _, n := range nandTests {
-		r := g.EvalBool(n.in)
+		r, err := g.EvalBool(n.in)
+		if err != nil {
+			return 0
+		}
 		if r == n.out {
 			correct++
 		}
@@ -40,7 +43,13 @@ func main() {
 		{Symbol: "And", Weight: 5},
 		{Symbol: "Or", Weight: 5},
 	}
-	e := model.New(funcs, functions.Bool, 30, 7, 1, 2, 0, "Or", validateNand, false)
-	s := e.Evolve(1000)
+	e, err := model.New(funcs, functions.Bool, 30, 7, 1, 2, 0, "Or", validateNand, false)
+	if err != nil {
+		panic(err)
+	}
+	s, err := e.Evolve(1000)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Printf("nand solution: %v, score=%v\n", s, validateNand(s))
 }
