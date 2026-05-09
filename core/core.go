@@ -413,11 +413,17 @@ func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants 
 	// Build terminal choice slice: d0..d(numTerminals-1), c0..c(numConstants-1).
 	termChoices := make([]Symbol[T], 0, numTerminals+numConstants)
 	for i := 0; i < numTerminals; i++ {
-		sym, _ := NewTerminalSymbol[T](i)
+		sym, err := NewTerminalSymbol[T](i)
+		if err != nil {
+			return Gene[T]{}, err
+		}
 		termChoices = append(termChoices, sym)
 	}
 	for i := 0; i < numConstants; i++ {
-		sym, _ := NewConstantSymbol[T](i)
+		sym, err := NewConstantSymbol[T](i)
+		if err != nil {
+			return Gene[T]{}, err
+		}
 		termChoices = append(termChoices, sym)
 	}
 
@@ -430,8 +436,15 @@ func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants 
 	for i := 0; i < headSize; i++ {
 		choice := intn(headChoiceCount)
 		if choice < len(funcNames) {
-			node, _ := cat.Lookup(funcNames[choice])
-			sym, _ := NewFunctionSymbol[T](node)
+			name := funcNames[choice]
+			node, ok := cat.Lookup(name)
+			if !ok {
+				return Gene[T]{}, fmt.Errorf("core.NewRandomGene: function %q not found in catalog", name)
+			}
+			sym, err := NewFunctionSymbol[T](node)
+			if err != nil {
+				return Gene[T]{}, err
+			}
 			syms = append(syms, sym)
 		} else {
 			syms = append(syms, termChoices[choice-len(funcNames)])

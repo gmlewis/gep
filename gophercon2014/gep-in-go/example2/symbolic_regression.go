@@ -54,7 +54,10 @@ func main() {
 		{Symbol: "*", Weight: 1},
 		{Symbol: "/", Weight: 1},
 	}
-	e := model.New(funcs, functions.Float64, 30, 6, 1, 1, 0, "+", validateFunc, false)
+	e, err := model.New(funcs, functions.Float64, 30, 6, 1, 1, 0, "+", validateFunc, false)
+	if err != nil {
+		panic(err)
+	}
 	s, err := e.Evolve(10000)
 	if err != nil {
 		panic(err)

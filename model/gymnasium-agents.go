@@ -132,7 +132,7 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 		if ga.appendEpisodeSteps {
 			numTerminals++
 		}
-		gen := New(
+		gen, err := New(
 			funcWeights,
 			functions.Int,
 			ga.numIndividuals,
@@ -143,6 +143,9 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 			"tuple",
 			nil,
 			ga.debug)
+		if err != nil {
+			return nil, err
+		}
 		return gen.Individuals, nil
 
 	case "Tuple":
@@ -155,7 +158,7 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 		if ga.appendEpisodeSteps {
 			numTerminals++
 		}
-		gen := New(
+		gen, err := New(
 			funcWeights,
 			funcType,
 			ga.numIndividuals,
@@ -166,6 +169,9 @@ func (ga *GymnasiumAgents) newIndividuals() ([]*genome.Genome, error) {
 			"tuple",
 			nil,
 			ga.debug)
+		if err != nil {
+			return nil, err
+		}
 		return gen.Individuals, nil
 
 	// case "MultiBinary":

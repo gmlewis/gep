@@ -11,13 +11,14 @@ import (
 	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
 )
 
-func (g *Gene) generateMathFunc() {
+func (g *Gene) generateMathFunc() error {
 	argOrder, err := g.getArgOrder()
 	if err != nil {
-		return
+		return err
 	}
 	g.SymbolMap = make(map[string]int)
 	g.mf = g.buildMathTree(0, argOrder)
+	return nil
 }
 
 // EvalMath evaluates the gene as a floating-point expression and returns the result.
@@ -27,10 +28,9 @@ func (g *Gene) EvalMath(in []float64) (float64, error) {
 		return 0.0, err
 	}
 	if g.mf == nil {
-		if _, err := g.getArgOrder(); err != nil {
+		if err := g.generateMathFunc(); err != nil {
 			return 0.0, err
 		}
-		g.generateMathFunc()
 	}
 	if g.mf == nil {
 		return 0.0, fmt.Errorf("unable to generate math evaluator")

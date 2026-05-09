@@ -68,7 +68,10 @@ func main() {
 		{Symbol: "*", Weight: 1},
 	}
 	numIn := len(srTests[0].in)
-	population := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc, false)
+	population, err := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc, false)
+	if err != nil {
+		log.Fatalf("New failed: %v", err)
+	}
 	solution, err := population.Evolve(10000)
 	if err != nil {
 		log.Fatalf("Evolve failed: %v", err)

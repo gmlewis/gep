@@ -11,13 +11,14 @@ import (
 	in "github.com/gmlewis/gep/v2/functions/int_nodes"
 )
 
-func (g *Gene) generateIntFunc() {
+func (g *Gene) generateIntFunc() error {
 	argOrder, err := g.getArgOrder()
 	if err != nil {
-		return
+		return err
 	}
 	g.SymbolMap = make(map[string]int)
 	g.intF = g.buildIntTree(0, argOrder)
+	return nil
 }
 
 // EvalInt evaluates the gene as a floating-point expression and returns the result.
@@ -27,10 +28,9 @@ func (g *Gene) EvalInt(in []int) (int, error) {
 		return 0, err
 	}
 	if g.intF == nil {
-		if _, err := g.getArgOrder(); err != nil {
+		if err := g.generateIntFunc(); err != nil {
 			return 0, err
 		}
-		g.generateIntFunc()
 	}
 	if g.intF == nil {
 		return 0, fmt.Errorf("unable to generate int evaluator")

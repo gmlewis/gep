@@ -175,7 +175,10 @@ func main() {
 		{Symbol: "Or", Weight: 20},
 	}
 	numIn := len(parityTests[0].in)
-	population := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "Xor", validateParity, false)
+	population, err := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "Xor", validateParity, false)
+	if err != nil {
+		log.Fatalf("New failed: %v", err)
+	}
 	solution, err := population.Evolve(10000)
 	if err != nil {
 		log.Fatalf("Evolve failed: %v", err)

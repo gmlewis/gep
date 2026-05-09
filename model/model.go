@@ -87,7 +87,7 @@ func New(
 	numConstants int,
 	linkFunc string,
 	sf genome.ScoringFunc,
-	debug bool) *Generation {
+	debug bool) (*Generation, error) {
 	return newGeneration(nil, fs, funcType, numIndividuals, headSize, numGenesPerGenome, numTerminals, numConstants, linkFunc, sf, debug)
 }
 
@@ -105,7 +105,7 @@ func NewWithSeed(
 	numConstants int,
 	linkFunc string,
 	sf genome.ScoringFunc,
-	debug bool) *Generation {
+	debug bool) (*Generation, error) {
 	rng := rand.New(rand.NewSource(seed))
 	return newGeneration(rng, fs, funcType, numIndividuals, headSize, numGenesPerGenome, numTerminals, numConstants, linkFunc, sf, debug)
 }
@@ -122,7 +122,7 @@ func newGeneration(
 	numConstants int,
 	linkFunc string,
 	sf genome.ScoringFunc,
-	debug bool) *Generation {
+	debug bool) (*Generation, error) {
 	r := &Generation{
 		Individuals: make([]*genome.Genome, numIndividuals),
 		Funcs:       fs,
@@ -130,7 +130,10 @@ func newGeneration(
 		debug:       debug,
 		rng:         rng,
 	}
-	n, _ := maxArity(fs, funcType)
+	n, err := maxArity(fs, funcType)
+	if err != nil {
+		return nil, err
+	}
 	tailSize := headSize*(n-1) + 1
 	for i := range r.Individuals {
 		genes := make([]*gene.Gene, numGenesPerGenome)
@@ -139,7 +142,7 @@ func newGeneration(
 		}
 		r.Individuals[i] = genome.New(genes, linkFunc, rng)
 	}
-	return r
+	return r, nil
 }
 
 // Evolve runs the GEP algorithm for the given number of iterations.

@@ -20,17 +20,23 @@ func randIntn(n int, rng *rand.Rand) int {
 
 // buildTermChoices builds the terminal symbol slice (d0..d(numTerminals-1)
 // followed by c0..c(numConstants-1)) used by mutation operators.
-func buildTermChoices[T any](numTerminals, numConstants int) []Symbol[T] {
+func buildTermChoices[T any](numTerminals, numConstants int) ([]Symbol[T], error) {
 	choices := make([]Symbol[T], 0, numTerminals+numConstants)
 	for i := 0; i < numTerminals; i++ {
-		sym, _ := NewTerminalSymbol[T](i)
+		sym, err := NewTerminalSymbol[T](i)
+		if err != nil {
+			return nil, err
+		}
 		choices = append(choices, sym)
 	}
 	for i := 0; i < numConstants; i++ {
-		sym, _ := NewConstantSymbol[T](i)
+		sym, err := NewConstantSymbol[T](i)
+		if err != nil {
+			return nil, err
+		}
 		choices = append(choices, sym)
 	}
-	return choices
+	return choices, nil
 }
 
 // PointMutate performs a single point mutation on a copy of g.
@@ -62,7 +68,10 @@ func PointMutate[T any](g Gene[T], cat *Catalog[T], headSize, numTerminals, numC
 		return Gene[T]{}, fmt.Errorf("core.PointMutate: gene has no symbols")
 	}
 
-	termChoices := buildTermChoices[T](numTerminals, numConstants)
+	termChoices, err := buildTermChoices[T](numTerminals, numConstants)
+	if err != nil {
+		return Gene[T]{}, err
+	}
 	funcNames := cat.Symbols()
 
 	dst := g.Dup()
@@ -76,8 +85,15 @@ func PointMutate[T any](g Gene[T], cat *Catalog[T], headSize, numTerminals, numC
 		}
 		choice := randIntn(headChoiceCount, rng)
 		if choice < len(funcNames) {
-			node, _ := cat.Lookup(funcNames[choice])
-			sym, _ := NewFunctionSymbol[T](node)
+			name := funcNames[choice]
+			node, ok := cat.Lookup(name)
+			if !ok {
+				return Gene[T]{}, fmt.Errorf("core.PointMutate: function %q not found in catalog", name)
+			}
+			sym, err := NewFunctionSymbol[T](node)
+			if err != nil {
+				return Gene[T]{}, err
+			}
 			dst.Symbols[pos] = sym
 		} else {
 			dst.Symbols[pos] = termChoices[choice-len(funcNames)]

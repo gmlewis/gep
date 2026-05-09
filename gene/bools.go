@@ -11,13 +11,14 @@ import (
 	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
 
-func (g *Gene) generateBoolFunc() {
+func (g *Gene) generateBoolFunc() error {
 	argOrder, err := g.getArgOrder()
 	if err != nil {
-		return
+		return err
 	}
 	g.SymbolMap = make(map[string]int)
 	g.bf = g.buildBoolTree(0, argOrder)
+	return nil
 }
 
 // EvalBool evaluates the gene as a boolean expression and returns the result.
@@ -27,10 +28,9 @@ func (g *Gene) EvalBool(in []bool) (bool, error) {
 		return false, err
 	}
 	if g.bf == nil {
-		if _, err := g.getArgOrder(); err != nil {
+		if err := g.generateBoolFunc(); err != nil {
 			return false, err
 		}
-		g.generateBoolFunc()
 	}
 	if g.bf == nil {
 		return false, fmt.Errorf("unable to generate bool evaluator")

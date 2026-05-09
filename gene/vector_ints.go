@@ -14,13 +14,14 @@ import (
 
 type VectorInt = functions.VectorInt
 
-func (g *Gene) generateVectorIntFunc() {
+func (g *Gene) generateVectorIntFunc() error {
 	argOrder, err := g.getArgOrder()
 	if err != nil {
-		return
+		return err
 	}
 	g.SymbolMap = make(map[string]int)
 	g.vif = g.buildVectorIntTree(0, argOrder)
+	return nil
 }
 
 // EvalVectorInt evaluates the gene as a floating-point expression and returns the result.
@@ -30,10 +31,9 @@ func (g *Gene) EvalVectorInt(in []VectorInt) (VectorInt, error) {
 		return VectorInt{}, err
 	}
 	if g.vif == nil {
-		if _, err := g.getArgOrder(); err != nil {
+		if err := g.generateVectorIntFunc(); err != nil {
 			return VectorInt{}, err
 		}
-		g.generateVectorIntFunc()
 	}
 	if g.vif == nil {
 		return VectorInt{}, fmt.Errorf("unable to generate vector-int evaluator")

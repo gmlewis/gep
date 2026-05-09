@@ -208,13 +208,21 @@ func (g *Gene) SymbolCount(sym string) (int, error) {
 	if g.SymbolMap == nil {
 		switch g.funcType {
 		case functions.Bool:
-			g.generateBoolFunc()
+			if err := g.generateBoolFunc(); err != nil {
+				return 0, err
+			}
 		case functions.Int:
-			g.generateIntFunc()
+			if err := g.generateIntFunc(); err != nil {
+				return 0, err
+			}
 		case functions.Float64:
-			g.generateMathFunc()
+			if err := g.generateMathFunc(); err != nil {
+				return 0, err
+			}
 		case functions.VectorInts:
-			g.generateVectorIntFunc()
+			if err := g.generateVectorIntFunc(); err != nil {
+				return 0, err
+			}
 		default:
 			return 0, fmt.Errorf("unknown funcType: %v", g.funcType)
 		}

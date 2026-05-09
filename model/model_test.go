@@ -51,13 +51,23 @@ func TestMaxArity_UnknownFuncTypeReturnsError(t *testing.T) {
 	}
 }
 
+func TestNew_UnknownFunctionSymbolReturnsError(t *testing.T) {
+	funcs := []gene.FuncWeight{{Symbol: "unknown", Weight: 1}}
+	if _, err := New(funcs, functions.Float64, 1, 1, 1, 1, 0, "+", nil, false); err == nil {
+		t.Fatal("New(...) error = nil, want non-nil")
+	}
+}
+
 func BenchmarkReplication(b *testing.B) {
 	funcs := []gene.FuncWeight{
 		{Symbol: "+", Weight: 1},
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
+	e, err := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
+	if err != nil {
+		b.Fatalf("New(...) error: %v", err)
+	}
 	for i := 0; i < b.N; i++ {
 		if err := e.replication(); err != nil {
 			b.Fatalf("replication() error: %v", err)
@@ -71,7 +81,10 @@ func BenchmarkMutation(b *testing.B) {
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	e := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
+	e, err := New(funcs, functions.Float64, 30, 8, 4, 1, 0, "+", nil, false)
+	if err != nil {
+		b.Fatalf("New(...) error: %v", err)
+	}
 	for i := 0; i < b.N; i++ {
 		if err := e.mutation(); err != nil {
 			b.Fatalf("mutation() error: %v", err)
@@ -244,9 +257,12 @@ func TestEvolve_StopFuncHaltsBeforeMaxIterations(t *testing.T) {
 	}
 	stopAfter := 3
 	callCount := 0
-	g := New(funcs, functions.Float64, 10, 4, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
+	g, err := New(funcs, functions.Float64, 10, 4, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
 		return 0.5 // never reaches 1000
 	}, false)
+	if err != nil {
+		t.Fatalf("New(...) error: %v", err)
+	}
 	g.StopFunc = func(best *genome.Genome) bool {
 		callCount++
 		return callCount >= stopAfter
@@ -266,13 +282,16 @@ func TestEvolve_NilStopFuncUsesDefaultThreshold(t *testing.T) {
 		{Symbol: "+", Weight: 1},
 	}
 	var callCount atomic.Int64
-	g := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
+	g, err := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(gn *genome.Genome) float64 {
 		n := callCount.Add(1)
 		if n >= 3 {
 			return 1000.0 // triggers default stop
 		}
 		return 0.0
 	}, false)
+	if err != nil {
+		t.Fatalf("New(...) error: %v", err)
+	}
 	// StopFunc is nil — default threshold of 1000 applies
 	best, err := g.Evolve(100)
 	if err != nil {
@@ -287,9 +306,12 @@ func TestEvolve_DoesNotWriteStdoutOnStop(t *testing.T) {
 	funcs := []gene.FuncWeight{
 		{Symbol: "+", Weight: 1},
 	}
-	g := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(*genome.Genome) float64 {
+	g, err := New(funcs, functions.Float64, 5, 2, 1, 1, 0, "+", func(*genome.Genome) float64 {
 		return 1000.0
 	}, false)
+	if err != nil {
+		t.Fatalf("New(...) error: %v", err)
+	}
 
 	orig := os.Stdout
 	r, w, err := os.Pipe()
@@ -324,8 +346,14 @@ func TestNewWithSeed_DeterministicPopulation(t *testing.T) {
 		{Symbol: "*", Weight: 1},
 	}
 	const seed = int64(42)
-	g1 := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
-	g2 := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	g1, err := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(seed, ...) error: %v", err)
+	}
+	g2, err := NewWithSeed(seed, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(seed, ...) error: %v", err)
+	}
 
 	if len(g1.Individuals) != len(g2.Individuals) {
 		t.Fatalf("population sizes differ: %v vs %v", len(g1.Individuals), len(g2.Individuals))
@@ -354,8 +382,14 @@ func TestNewWithSeed_DifferentSeedsProduceDifferentPopulations(t *testing.T) {
 		{Symbol: "-", Weight: 1},
 		{Symbol: "*", Weight: 1},
 	}
-	g1 := NewWithSeed(1, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
-	g2 := NewWithSeed(2, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	g1, err := NewWithSeed(1, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(1, ...) error: %v", err)
+	}
+	g2, err := NewWithSeed(2, funcs, functions.Float64, 10, 4, 2, 2, 1, "+", nil, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(2, ...) error: %v", err)
+	}
 
 	different := false
 	for i, ind1 := range g1.Individuals {
@@ -392,8 +426,14 @@ func TestNewWithSeed_DeterministicEvolution(t *testing.T) {
 	const seed = int64(77)
 	scorer := func(gn *genome.Genome) float64 { return 0.0 }
 
-	g1 := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
-	g2 := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
+	g1, err := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(seed, ...) error: %v", err)
+	}
+	g2, err := NewWithSeed(seed, funcs, functions.Float64, 6, 3, 1, 1, 0, "+", scorer, false)
+	if err != nil {
+		t.Fatalf("NewWithSeed(seed, ...) error: %v", err)
+	}
 
 	// Run one step of evolution on each
 	if _, err := g1.getBest(); err != nil {

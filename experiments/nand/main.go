@@ -52,7 +52,10 @@ func main() {
 		{Symbol: "Or", Weight: 5},
 	}
 	numIn := len(nandTests[0].in)
-	population := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand, false)
+	population, err := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand, false)
+	if err != nil {
+		log.Fatalf("New failed: %v", err)
+	}
 	solution, err := population.Evolve(1000)
 	if err != nil {
 		log.Fatalf("Evolve failed: %v", err)
