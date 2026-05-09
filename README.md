@@ -21,6 +21,16 @@ This is not an official Google product.
 I've decided to update this repo using Go with generics (1.18+).
 It is still very experimental.
 
+## Phase 4 Package Map (Milestone 1)
+
+- `core`: typed expression engine primitives and operators
+- `evolution`: typed evolution engine (depends only on `core` + `evolution/*`)
+- `gymnasium`: environment provider surface
+- `functions`, `gene`, `genome`, `grammars`, `model`: legacy runtime path still used by older experiments
+- `experiments`, `examples`: runnable entry points
+
+The `evolution/package_map_test.go` test enforces the Milestone 1 internal import boundary for `core` and `evolution`.
+
 ----------------------------------------------------------------------
 
 # NAND Function Experiment
