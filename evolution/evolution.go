@@ -23,6 +23,8 @@
 //     IS/RIS transposition, gene transposition) to the population.
 //   - Evolve – runs the complete evolution loop (evaluate → stop-check → select →
 //     recombine → mutate → elitism) for a given number of iterations.
+//   - Statistics – optional per-generation statistics collection via a
+//     *statistics.Collector stored on Generation.
 //
 // Typical usage:
 //
@@ -53,6 +55,7 @@ import (
 	"github.com/gmlewis/gep/v2/evolution/mutation"
 	"github.com/gmlewis/gep/v2/evolution/recombination"
 	"github.com/gmlewis/gep/v2/evolution/selection"
+	"github.com/gmlewis/gep/v2/evolution/statistics"
 )
 
 // ScoringFunc computes a fitness score for a genome.
@@ -99,6 +102,12 @@ type Generation[T any] struct {
 	// RecombinationConfig controls one-point and two-point crossover rates
 	// applied after selection. Zero values disable recombination operators.
 	RecombinationConfig recombination.Config
+
+	// Statistics is an optional collector that accumulates per-generation
+	// statistics during Evolve. When non-nil, Evolve records Stats for every
+	// generation immediately after evaluation and before the stop-check.
+	// Set this field before calling Evolve to enable statistics collection.
+	Statistics *statistics.Collector
 
 	// cat is the typed function catalog used for point mutation.
 	cat *core.Catalog[T]
@@ -304,20 +313,23 @@ func (g *Generation[T]) Mutate() {
 //
 // Each iteration:
 //  1. Evaluates all individuals (calls Evaluate).
-//  2. Identifies the best individual (calls BestIndividual).
-//  3. Checks the stopping criterion (StopFunc or default Score >= 1000).
+//  2. Records per-generation statistics (if Statistics is non-nil).
+//  3. Identifies the best individual (calls BestIndividual).
+//  4. Checks the stopping criterion (StopFunc or default Score >= 1000).
 //     If met, returns the best individual immediately.
-//  4. Saves a deep copy of the best individual (elitism).
-//  5. Replaces the population via roulette-wheel selection (calls Select).
-//  6. Applies configured crossover operators to the population (calls Recombine).
-//  7. Applies configured genetic operators to the population (calls Mutate).
-//  8. Restores the saved best individual to position 0 (elitism guarantee).
+//  5. Saves a deep copy of the best individual (elitism).
+//  6. Replaces the population via roulette-wheel selection (calls Select).
+//  7. Applies configured crossover operators to the population (calls Recombine).
+//  8. Applies configured genetic operators to the population (calls Mutate).
+//  9. Restores the saved best individual to position 0 (elitism guarantee).
 //
 // If the loop completes without triggering the stopping criterion, Evolve
-// performs a final Evaluate and returns BestIndividual.
+// performs a final Evaluate (and a final statistics record) and returns
+// BestIndividual.
 func (g *Generation[T]) Evolve(iterations int) Individual[T] {
 	for i := 0; i < iterations; i++ {
 		g.Evaluate()
+		g.recordStats(i)
 		best := g.BestIndividual()
 
 		stop := false
@@ -338,5 +350,22 @@ func (g *Generation[T]) Evolve(iterations int) Individual[T] {
 		g.Individuals[0] = saveBest
 	}
 	g.Evaluate()
+	g.recordStats(iterations)
 	return g.BestIndividual()
+}
+
+// recordStats collects per-generation statistics into g.Statistics when the
+// collector is non-nil.
+func (g *Generation[T]) recordStats(generation int) {
+	if g.Statistics == nil {
+		return
+	}
+	scores := make([]float64, len(g.Individuals))
+	karvas := make([]string, len(g.Individuals))
+	for i, ind := range g.Individuals {
+		scores[i] = ind.Score
+		karvas[i] = ind.Genome.KarvaString()
+	}
+	s := statistics.Record(generation, scores, karvas, g.MinimizeScore)
+	g.Statistics.Append(s)
 }

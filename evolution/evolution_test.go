@@ -12,6 +12,7 @@ import (
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution/mutation"
 	"github.com/gmlewis/gep/v2/evolution/recombination"
+	"github.com/gmlewis/gep/v2/evolution/statistics"
 )
 
 // --- helpers ---
@@ -608,4 +609,115 @@ func TestEvolve_WithRecombination_StillConverges(t *testing.T) {
 	if best.Score < 1000.0 {
 		t.Fatalf("Evolve with recombination: best.Score=%v, want >= 1000", best.Score)
 	}
+}
+
+// --- Statistics integration tests ---
+
+func TestEvolve_Statistics_CollectedEachGeneration(t *testing.T) {
+// Statistics.History must have exactly one entry per evaluated generation.
+const iters = 5
+sf := func(core.Genome[int]) float64 { return 0.5 } // never triggers default stop
+g := newTestGeneration(t, 17, sf)
+col := &statistics.Collector{}
+g.Statistics = col
+g.Evolve(iters)
+// iters loop entries + 1 final evaluation = iters+1
+want := iters + 1
+if len(col.History) != want {
+t.Fatalf("Statistics.History len=%d, want %d", len(col.History), want)
+}
+}
+
+func TestEvolve_Statistics_NilCollector_NoChange(t *testing.T) {
+// When Statistics is nil, Evolve must not panic and must still converge.
+var callCount atomic.Int64
+sf := func(core.Genome[int]) float64 {
+n := callCount.Add(1)
+if n >= int64(3*10) {
+return 1000.0
+}
+return 0.0
+}
+g := newTestGeneration(t, 19, sf)
+g.Statistics = nil // explicit nil – default
+best := g.Evolve(100)
+if best.Score < 1000.0 {
+t.Fatalf("Evolve without Statistics: best.Score=%v, want >= 1000", best.Score)
+}
+}
+
+func TestEvolve_Statistics_GenerationIndicesAscending(t *testing.T) {
+// Generation indices in the history must increase monotonically.
+const iters = 8
+sf := func(core.Genome[int]) float64 { return 0.1 }
+g := newTestGeneration(t, 21, sf)
+col := &statistics.Collector{}
+g.Statistics = col
+g.Evolve(iters)
+
+for i := 1; i < len(col.History); i++ {
+if col.History[i].Generation <= col.History[i-1].Generation {
+t.Errorf("History[%d].Generation=%d not > History[%d].Generation=%d",
+i, col.History[i].Generation, i-1, col.History[i-1].Generation)
+}
+}
+}
+
+func TestEvolve_Statistics_BestScoreNonDecreasing(t *testing.T) {
+// With elitism, the best score must never decrease across generations
+// when maximizing.
+const iters = 10
+sf := func(g core.Genome[int]) float64 {
+return float64(len(g.KarvaString()))
+}
+gen := newTestGeneration(t, 23, sf)
+col := &statistics.Collector{}
+gen.Statistics = col
+gen.Evolve(iters)
+
+for i := 1; i < len(col.History); i++ {
+if col.History[i].BestScore < col.History[i-1].BestScore {
+t.Errorf("BestScore decreased at generation %d: %v < %v",
+col.History[i].Generation,
+col.History[i].BestScore,
+col.History[i-1].BestScore)
+}
+}
+}
+
+func TestEvolve_Statistics_DiversityInRange(t *testing.T) {
+// Diversity must always be in [0, 1].
+const iters = 10
+sf := func(core.Genome[int]) float64 { return 1.0 }
+g := newTestGeneration(t, 25, sf)
+col := &statistics.Collector{}
+g.Statistics = col
+g.Evolve(iters)
+
+for _, s := range col.History {
+if s.Diversity < 0 || s.Diversity > 1 {
+t.Errorf("Diversity=%v out of [0,1] at generation %d", s.Diversity, s.Generation)
+}
+}
+}
+
+func TestEvolve_Statistics_EarlyStop_HistoryStopsAtStop(t *testing.T) {
+// When Evolve stops early (StopFunc returns true), the history must contain
+// entries only up to and including the stopping generation.
+stopGen := 4
+callCount := 0
+sf := func(core.Genome[int]) float64 { return 0.5 }
+g := newTestGeneration(t, 27, sf)
+col := &statistics.Collector{}
+g.Statistics = col
+g.StopFunc = func(Individual[int]) bool {
+callCount++
+return callCount >= stopGen
+}
+g.Evolve(100)
+// StopFunc is called after statistics are recorded, so we expect exactly
+// stopGen entries (one per iteration until stop).
+if len(col.History) != stopGen {
+t.Fatalf("Statistics.History len=%d, want %d (stopGen)", len(col.History), stopGen)
+}
 }
