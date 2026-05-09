@@ -66,7 +66,10 @@ func main() {
 	}
 	numIn := len(srTests[0].in)
 	population := model.New(funcs, functions.Float64, 30, 8, 4, numIn, 0, "+", validateFunc, false)
-	solution := population.Evolve(10000)
+	solution, err := population.Evolve(10000)
+	if err != nil {
+		log.Fatalf("Evolve failed: %v", err)
+	}
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoMathGrammar()

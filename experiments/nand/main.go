@@ -50,7 +50,10 @@ func main() {
 	}
 	numIn := len(nandTests[0].in)
 	population := model.New(funcs, functions.Bool, 30, 7, 1, numIn, 0, "Or", validateNand, false)
-	solution := population.Evolve(1000)
+	solution, err := population.Evolve(1000)
+	if err != nil {
+		log.Fatalf("Evolve failed: %v", err)
+	}
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()

@@ -145,12 +145,8 @@ func newGeneration(
 // Evolve runs the GEP algorithm for the given number of iterations.
 // Evolution stops early when StopFunc (if set) returns true for the current best
 // genome. When StopFunc is nil, the default criterion of Score >= 1000 is used.
-func (g *Generation) Evolve(iterations int) *genome.Genome {
-	best, err := g.EvolveWithError(iterations)
-	if err != nil {
-		return g.getBest()
-	}
-	return best
+func (g *Generation) Evolve(iterations int) (*genome.Genome, error) {
+	return g.EvolveWithError(iterations)
 }
 
 // EvolveWithError runs the GEP algorithm for the given number of iterations and

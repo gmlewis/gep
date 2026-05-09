@@ -251,7 +251,10 @@ func TestEvolve_NilStopFuncUsesDefaultThreshold(t *testing.T) {
 		return 0.0
 	}, false)
 	// StopFunc is nil — default threshold of 1000 applies
-	best := g.Evolve(100)
+	best, err := g.Evolve(100)
+	if err != nil {
+		t.Fatalf("Evolve() error: %v", err)
+	}
 	if best.Score < 1000.0 {
 		t.Fatalf("expected best.Score >= 1000, got %v", best.Score)
 	}
@@ -273,7 +276,9 @@ func TestEvolve_DoesNotWriteStdoutOnStop(t *testing.T) {
 	os.Stdout = w
 	defer func() { os.Stdout = orig }()
 
-	_ = g.Evolve(10)
+	if _, err := g.Evolve(10); err != nil {
+		t.Fatalf("Evolve() error: %v", err)
+	}
 
 	if err := w.Close(); err != nil {
 		t.Fatalf("stdout close error: %v", err)

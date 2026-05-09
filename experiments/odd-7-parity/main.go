@@ -173,7 +173,10 @@ func main() {
 	}
 	numIn := len(parityTests[0].in)
 	population := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "Xor", validateParity, false)
-	solution := population.Evolve(10000)
+	solution, err := population.Evolve(10000)
+	if err != nil {
+		log.Fatalf("Evolve failed: %v", err)
+	}
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()

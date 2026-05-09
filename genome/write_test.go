@@ -173,7 +173,9 @@ func TestWrite_MissingLinkFunctionDoesNotWriteStdout(t *testing.T) {
 	defer func() { os.Stdout = orig }()
 
 	var b bytes.Buffer
-	gn.Write(&b, grammar)
+	if err := gn.Write(&b, grammar); err == nil {
+		t.Fatalf("Write() error = nil, want non-nil")
+	}
 
 	if err := w.Close(); err != nil {
 		t.Fatalf("stdout close error: %v", err)

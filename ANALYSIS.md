@@ -617,8 +617,7 @@ P1-A completion evidence:
   - `model`: `EvolveWithError`, `singleCrossoverWithError`,
     `maxArityWithError`
 - legacy codegen now has an explicit error-return surface:
-  `(*genome.Genome).WriteWithError(...) error`, while `Write(...)` remains as a
-  narrow compatibility wrapper
+  `(*genome.Genome).Write(...) error`
 - focused tests now prove no direct stdout/stderr emission on representative
   legacy error/stop paths:
   - `gene.TestNew_InvalidSymbolIndexesDoNotWriteStderr`
@@ -729,15 +728,16 @@ Completion proof:
   - `gene/*.go`
   - `genome/*.go`
   - `model/*.go`
-- `genome/write.go` now exposes `WriteWithError(...) error` as the explicit
-  codegen error surface, with `Write(...)` retained as compatibility wrapper
+- `genome/write.go` now exposes `Write(...) error` as the explicit
+  codegen error surface
 - explicit error-return APIs were added across legacy packages:
   - `gene`: `NewWithError`, `StringWithError`, `SymbolCountWithError`,
     `MutateWithError`, `DupWithError`, `Eval*WithError`,
     `AllSymbolsEqualWeightsWithError`
   - `genome`: `Eval*WithError`, `EvalIntTupleWithError`, `DupWithError`,
     `EvaluateWithScoreWithError`
-  - `model`: `EvolveWithError`, `singleCrossoverWithError`,
+  - `model`: `Evolve(...) (*genome.Genome, error)`, `EvolveWithError`,
+    `singleCrossoverWithError`,
     `maxArityWithError`
 - added regression tests:
   - `gene/gene_test.go`: `TestNew_InvalidSymbolIndexesDoNotWriteStderr`

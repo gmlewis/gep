@@ -111,7 +111,10 @@ func main() {
 	}
 	numIn := len(multiTests[0].in)
 	population := model.New(funcs, functions.Bool, 30, 8, 4, numIn, 0, "And", validateMulti, false)
-	solution := population.Evolve(20000)
+	solution, err := population.Evolve(20000)
+	if err != nil {
+		log.Fatalf("Evolve failed: %v", err)
+	}
 
 	// Write out the Go source code for the solution.
 	gr, err := grammars.LoadGoBooleanAllGatesGrammar()

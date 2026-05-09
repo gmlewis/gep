@@ -23,8 +23,8 @@ type dump struct {
 	subs   map[string]string
 }
 
-func (g *Genome) Write(w io.Writer, grammar *grammars.Grammar) {
-	_ = g.WriteWithError(w, grammar)
+func (g *Genome) Write(w io.Writer, grammar *grammars.Grammar) error {
+	return g.WriteWithError(w, grammar)
 }
 
 // WriteWithError writes generated code to w and returns generation errors.
