@@ -805,6 +805,7 @@ Required outcome:
 - move compatibility conversion code behind clearly named adapter surfaces
 - stop adding new workflow code that depends directly on `functions.FuncType`,
   legacy `gene`, legacy `genome`, or legacy `model`
+- mark any remaining legacy packages as `deprecated` to the package-level documentation and document how the new packages should be used in their places
 
 This milestone corrects the remaining Phase 2 deviation.
 
