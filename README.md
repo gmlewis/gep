@@ -1,124 +1,207 @@
 # Gene Expression Programming (GEP) in Go
 
-This is an independent implementation of the Gene Expression Programming (GEP)
-machine learning algorithm created by Dr. Cândida Ferreira.
-It was written in the Go programming language by Glenn Lewis (gmlewis@google.com).
+`github.com/gmlewis/gep/v2` is a typed Gene Expression Programming engine for
+scientific and engineering search in Go.
 
-For more information, please visit http://www.gepsoft.com/
+The repository now has a clear default architecture:
 
-Here is a concise summary of GEP:
-
-- http://www.gene-expression-programming.com/webpapers/GEP.pdf
-
-The definitive book about GEP is available here:
-
-- http://www.amazon.com/Gene-Expression-Programming-Mathematical-Computational/dp/3642069320
-
-This is not an official Google product.
+- `core` defines typed genes, genomes, symbols, catalogs, and link operators
+- `evolution` runs typed population search with configurable mutation,
+  recombination, transposition, selection, statistics, and termination
+- `problems` provides reusable typed scoring helpers for common boolean and
+  floating-point tasks
+- `codegen` renders evolved Karva programs through optional grammar backends
+- `env` and `gymnasium` provide an exploratory environment/agent layer for
+  discrete and tuple-space experimentation
 
 ## Status
 
-I've decided to update this repo using Go with generics (1.18+).
-It is still very experimental.
+The primary workflow is the typed stack:
 
-----------------------------------------------------------------------
+- `core`
+- `evolution`
+- `problems`
+- `codegen`
 
-# NAND Function Experiment
+The `env` subsystem is usable for discrete and tuple-space agent experiments,
+but it is still an exploratory RL adapter rather than a complete modern RL
+framework.
 
-To build and run this code, it may help to understand this presentation,
-specifically about Go workspaces: http://talks.golang.org/2012/tutorial.slide#9
+Legacy `gene` and `genome` packages remain only as compatibility/reference
+layers. New workflow code should not build on them.
 
-To run the NAND gate GEP experiment:
+## Package map
 
-```
-$ go run github.com/gmlewis/gep/v2/experiments/nand
-Stopping after generation #0
+| Package | Role | Use it when |
+| --- | --- | --- |
+| `core` | Typed GEP representation and random genome construction | You need `Node[T]`, `Genome[T]`, `Catalog[T]`, or direct genome evaluation |
+| `evolution` | Typed population search engine | You need seeded experiments, operators, stopping criteria, or per-generation statistics |
+| `evolution/*` | Operator and evaluation subsystems | You are tuning mutation, recombination, selection, transposition, termination, or statistics behavior |
+| `problems` | Reusable typed scoring seams | Your problem is a reusable boolean or regression task instead of a one-off experiment |
+| `codegen` | Grammar-backed code generation | You want Go (or other grammar-backed) source emitted from evolved Karva expressions |
+| `functions/*_nodes` | Ready-made node catalogs | You want to start from the built-in boolean, integer, float, or vector-int operators |
+| `grammars` | Code-generation grammars | You want to render evolved programs into source code |
+| `env` / `gymnasium` | Exploratory environment integration | You are experimenting with Gymnasium-style environments and discrete action/observation spaces |
+| `experiments/*` | End-to-end examples | You want concrete entrypoints that exercise the typed stack |
+| `gene`, `genome` | Legacy compatibility layers | You are maintaining compatibility code, not building new features |
 
-// gepModel is auto-generated Go source code for the
-// nand solution karva expression:
-// "Not.And.Or.And.Or.And.d1.d0.d1.d1.d0.d0.d1.d1.d0", score=1000
-package gepModel
+## Quick start
 
-func gepModel(d []bool) bool {
-	y := false
+The fastest path is:
 
-	y = (!(((d[1] || d[1]) || (d[0] && d[0])) && (d[1] && d[0])))
+1. build or reuse a typed catalog
+2. define a typed scoring function over `core.Genome[T]`
+3. create a seeded `evolution.Generation[T]`
+4. evolve until the stop condition is met
+5. optionally render the result with `codegen`
 
-	return y
-}
-```
-
-# Symbolic Regression Experiment
-
-To run the Symbolic Regression experiment:
-
-```
-$ go run github.com/gmlewis/gep/v2/experiments/symbolic_regression
-Stopping after generation #86
-
-// gepModel is auto-generated Go source code for the
-// (a^4 + a^3 + a^2 + a) solution karva expression:
-// "*.d0.d0.d0.d0.d0.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0|+|*.*.d0.d0.d0.d0.d0.*.d0.d0.d0.d0.d0.d0.d0.d0.d0|+|d0.d0.d0.*.*.d0.*.*.d0.d0.d0.d0.d0.d0.d0.d0.d0|+|*.*.*.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0.d0", score=11965.591435001414
-package gepModel
+```go
+package main
 
 import (
-	"math"
+	"fmt"
+	"log"
+
+	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/evolution"
+	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
 
-func gepModel(d []float64) float64 {
-	y := 0.0
+var nandCases = []struct {
+	in  []bool
+	out bool
+}{
+	{[]bool{false, false}, true},
+	{[]bool{false, true}, true},
+	{[]bool{true, false}, true},
+	{[]bool{true, true}, false},
+}
 
-	y = (d[0] * d[0])
-	y += ((d[0] * d[0]) * d[0])
-	y += d[0]
-	y += ((d[0] * d[0]) * (d[0] * d[0]))
+func scoreNAND(g core.Genome[bool]) float64 {
+	hits := 0
+	for _, tc := range nandCases {
+		got, err := g.Eval(tc.in)
+		if err != nil {
+			return 0
+		}
+		if got == tc.out {
+			hits++
+		}
+	}
+	return 1000.0 * float64(hits) / float64(len(nandCases))
+}
 
-	return y
+func main() {
+	cat, err := boolNodes.CatalogFromNames([]string{"Not", "And", "Or"})
+	if err != nil {
+		log.Fatal(err)
+	}
+	link, err := boolNodes.LinkFuncFrom("Or")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	gen, err := evolution.NewWithSeed(42, cat, 30, 7, 1, 2, 0, link, scoreNAND)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	best := gen.Evolve(250)
+	fmt.Println(best.Score)
+	fmt.Println(best.Genome.KarvaString())
 }
 ```
 
-----------------------------------------------------------------------
+## Optional code generation
 
-# Unit Tests
+If you want source code from an evolved genome, convert it to a `codegen.Program`
+and render it with a grammar:
 
-To run unit tests, type:
-
-```
-$ go test github.com/gmlewis/gep/v2/...
-```
-
-----------------------------------------------------------------------
-
-# Grammars
-
-While converting the C++ grammars to Go grammars, it was useful to load
-in the XML files, parse them, and then dump them out to compare input
-versus output.  This helped to weed out errors.
-
-For example:
-
-```
-$ go run github.com/gmlewis/gep/v2/experiments/load_grammars > grammars.xml
+```go
+prog := codegen.ProgramFromSymbols(
+	best.Genome.SymbolNamesPerGene(),
+	nil,
+	best.Genome.Link.Symbol(),
+)
+grammar, err := grammars.LoadGoBooleanAllGatesGrammar()
+if err != nil {
+	return err
+}
+return codegen.Write(os.Stdout, prog, grammar)
 ```
 
-----------------------------------------------------------------------
+See:
 
-Enjoy!
+- `experiments/nand`
+- `experiments/symbolic_regression`
 
-----------------------------------------------------------------------
+## Reproducible experiments
 
-# License
+Use `evolution.NewWithSeed` whenever you care about deterministic replay.
+For each run, record at least:
 
-Copyright 2014 Google Inc. All Rights Reserved.
+- seed
+- package version / commit SHA
+- catalog contents
+- link operator
+- population size and gene geometry
+- mutation, recombination, and transposition configs
+- stopping criteria
+- scoring function definition and dataset/problem snapshot
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+If you emit code or downstream artifacts, store the final `KarvaString`,
+`SymbolNamesPerGene`, constants, and rendered output together.
 
-    http://www.apache.org/licenses/LICENSE-2.0
+## Extending the engine
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+### Add a new typed domain
+
+1. Define a Go type for your terminals and gene outputs.
+2. Implement `core.Node[T]` for each function/operator in the domain.
+3. Register those nodes in a `core.Catalog[T]`.
+4. Define a typed link operator with `core.NewLinkFunc`.
+5. Write a scoring function over `core.Genome[T]`.
+6. Evolve with `evolution.New` or `evolution.NewWithSeed`.
+
+### Add reusable problems
+
+Put reusable scoring/problem definitions into `problems` or a sibling package
+with typed seams. Keep one-off experiment scoring logic close to the experiment
+entrypoint.
+
+### Add code generation
+
+If the output can be expressed through the grammar system, use `codegen` and
+`grammars`. If not, treat the evolved genome as an intermediate representation
+and write a domain-specific emitter.
+
+### Add RL or simulator-backed workflows
+
+Use `core` and `evolution` as the search engine, then place simulator calls,
+reward aggregation, train/validation splits, and artifact generation in a
+domain-specific package. The current `env` package is a useful reference for
+agent orchestration, but advanced RL work will often want a richer typed layer.
+
+## Included entrypoints
+
+- `go run ./experiments/nand`
+- `go run ./experiments/odd-3-parity`
+- `go run ./experiments/odd-7-parity`
+- `go run ./experiments/6-multiplexer`
+- `go run ./experiments/symbolic_regression`
+- `go run ./examples/gymnasium/toy_text/blackjack-go`
+
+## Quality gates
+
+Repo-level verification:
+
+- `./scripts/test-all.sh`
+- `./scripts/bench-all.sh`
+
+GitHub Actions runs CI and benchmark workflows from `.github/workflows/`.
+
+## License
+
+Copyright 2014-2026 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0. See `LICENSE`.
