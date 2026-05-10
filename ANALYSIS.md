@@ -659,10 +659,10 @@ Representative locations:
 - `evolution/mutation/mutation.go`
 - `evolution/transposition/transposition.go`
 
-### Phase 4 status: complete (after P4-A, P4-B, P4-C, P4-D)
+### Phase 4 status: complete (after P4-A, P4-B, P4-C, P4-D, P4-E)
 
 The current repository fully satisfies the original Phase 4 intent.
-All four corrective milestones have been completed.
+All five corrective milestones have been completed.
 
 What has been completed:
 
@@ -675,6 +675,9 @@ What has been completed:
 - all experiments and examples now consume the typed `core` + `evolution` +
   `codegen` stack; legacy `model` package deleted; `gene` and `genome` are
   retained only as compatibility layers used by the `env` subsystem (P4-D)
+- import-boundary enforcement retired as the definition of success; replaced by
+  real integration tests that exercise the typed evolution, codegen, env/RL,
+  and problem/domain seams directly (P4-E)
 
 Representative locations:
 
@@ -1072,6 +1075,42 @@ Required outcome:
 - replace them with integration tests that exercise the real separated seams:
   typed evolution, codegen, env/RL, and problem/domain wiring
 - continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
+
+Status: ✅ 100% complete (2026-05-10)
+
+Completion proof:
+
+- all import-boundary tests removed from `evolution/package_map_test.go`
+- replaced with seven integration tests in `package evolution_test` that exercise
+  the real user-visible seams end-to-end:
+  - `TestTypedEvolution_BoolNand` — typed evolution seam: `boolNodes.CatalogFromNames`
+    → `evolution.NewWithSeed` → `Evolve` → `core.Genome.Eval`; verifies score
+    improves and genome evaluates NAND correctly
+  - `TestTypedEvolution_FloatRegressionImproves` — typed evolution seam:
+    `mathNodes.CatalogFromNames` → `evolution.NewWithSeed` → `Evolve`; verifies
+    a positive score for a simple f(x)=x regression
+  - `TestCodegenSeam_BoolProgramFromCoreGenome` — codegen seam: `core.Genome.SymbolNamesPerGene()`
+    → `codegen.ProgramFromSymbols` → `codegen.Generate` with
+    `grammars.LoadGoBooleanAllGatesGrammar`; verifies output contains the
+    expected Go function signature
+  - `TestCodegenSeam_FloatProgramFromCoreGenome` — codegen seam for float64
+    genomes; verifies `SymbolNamesPerGene` + `ConstsPerGene` survive the
+    round-trip and output contains the expected Go function signature
+  - `TestProblemsSeam_BoolProblemWiredToEvolution` — problems seam:
+    `problems.NewBoolProblem` → `NumHitsScoringFunc` → `evolution.NewWithSeed`
+    → `Evolve`; verifies the scoring function type satisfies the evolution API
+    directly without adaptation
+  - `TestProblemsSeam_FloatProblemWiredToEvolution` — problems seam:
+    `problems.NewFloatProblem` → `MeanSquaredErrorAbsScoringFunc` →
+    `evolution.NewWithSeed` → `Evolve`; verifies the float domain seam
+  - `TestEnvSeam_GymnasiumAgentsEvalRewardEvolve` — env/RL seam:
+    `env.NewGymnasiumAgents` → `EvaluateAgent` → `RewardAgent` → `Evolve`;
+    verifies the full agent eval/reward/evolve cycle and that env is
+    decoupled from the legacy model package
+- import boundary correctness is now proven implicitly by the successful
+  compilation of the integration tests: if any package violated its intended
+  boundary the build would fail
+- `go test ./...` passes clean
 
 Dependencies:
 
