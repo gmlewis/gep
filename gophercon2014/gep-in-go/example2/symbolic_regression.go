@@ -6,12 +6,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math"
 
-	"github.com/gmlewis/gep/v2/functions"
-	"github.com/gmlewis/gep/v2/gene"
-	"github.com/gmlewis/gep/v2/genome"
-	"github.com/gmlewis/gep/v2/model"
+	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/evolution"
+	mathNodes "github.com/gmlewis/gep/v2/functions/math_nodes"
 )
 
 var srTests = []struct {
@@ -30,10 +30,10 @@ var srTests = []struct {
 	{[]float64{20}, 168420},
 }
 
-func validateFunc(g *genome.Genome) float64 {
+func validateFunc(g core.Genome[float64]) float64 {
 	result := 0.0
 	for _, n := range srTests {
-		r, err := g.EvalMath(n.in)
+		r, err := g.Eval(n.in)
 		if err != nil {
 			return 0
 		}
@@ -48,19 +48,19 @@ func validateFunc(g *genome.Genome) float64 {
 }
 
 func main() {
-	funcs := []gene.FuncWeight{
-		{Symbol: "+", Weight: 1},
-		{Symbol: "-", Weight: 1},
-		{Symbol: "*", Weight: 1},
-		{Symbol: "/", Weight: 1},
-	}
-	e, err := model.New(funcs, functions.Float64, 30, 6, 1, 1, 0, "+", validateFunc, false)
+	cat, err := mathNodes.CatalogFromNames([]string{"+", "-", "*", "/"})
 	if err != nil {
-		panic(err)
+		log.Fatalf("CatalogFromNames failed: %v", err)
 	}
-	s, err := e.Evolve(10000)
+	link, err := mathNodes.LinkFuncFrom("+")
 	if err != nil {
-		panic(err)
+		log.Fatalf("LinkFuncFrom failed: %v", err)
 	}
-	fmt.Printf("(a^4 + a^3 + a^2 + a) solution: %v, score=%v\n", s, validateFunc(s))
+
+	population, err := evolution.New(cat, 30, 6, 1, 1, 0, link, validateFunc)
+	if err != nil {
+		log.Fatalf("New failed: %v", err)
+	}
+	solution := population.Evolve(10000)
+	fmt.Printf("(a^4 + a^3 + a^2 + a) solution: %v, score=%v\n", solution.Genome.KarvaString(), solution.Score)
 }

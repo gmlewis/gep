@@ -5,6 +5,8 @@
 package mathNodes
 
 import (
+	"fmt"
+
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/functions"
 )
@@ -28,4 +30,29 @@ func CatalogFrom(fm functions.FuncMap) (*core.Catalog[float64], error) {
 		}
 	}
 	return cat, nil
+}
+
+// CatalogFromNames creates a typed core.Catalog[float64] containing only the
+// named functions from Math. An error is returned if any name is not found or
+// if any registration fails.
+func CatalogFromNames(names []string) (*core.Catalog[float64], error) {
+	fm := make(functions.FuncMap, len(names))
+	for _, sym := range names {
+		fn, ok := Math[sym]
+		if !ok {
+			return nil, fmt.Errorf("mathNodes.CatalogFromNames: unsupported math function %q", sym)
+		}
+		fm[sym] = fn
+	}
+	return CatalogFrom(fm)
+}
+
+// LinkFuncFrom returns a core.LinkFunc[float64] for the named function in Math.
+// An error is returned if the name is not found.
+func LinkFuncFrom(sym string) (core.LinkFunc[float64], error) {
+	fn, ok := Math[sym]
+	if !ok {
+		return core.LinkFunc[float64]{}, fmt.Errorf("mathNodes.LinkFuncFrom: unsupported math function %q", sym)
+	}
+	return core.NewLinkFunc[float64](sym, fn.Float64Function)
 }

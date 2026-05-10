@@ -659,11 +659,10 @@ Representative locations:
 - `evolution/mutation/mutation.go`
 - `evolution/transposition/transposition.go`
 
-### Phase 4 status: partially complete (after P4-A, P4-B, P4-C)
+### Phase 4 status: complete (after P4-A, P4-B, P4-C, P4-D)
 
-The current repository partially satisfies the original Phase 4 intent.
-The work completed under "Phase 4" has progressed from pure import-boundary
-enforcement to actual subsystem separation.
+The current repository fully satisfies the original Phase 4 intent.
+All four corrective milestones have been completed.
 
 What has been completed:
 
@@ -673,18 +672,16 @@ What has been completed:
   legacy `model` (P4-B)
 - dedicated `problems` subsystem promotes reusable fitness/problem definitions
   into typed seams over `core` + `evolution` (P4-C)
-
-What is still missing relative to the original plan:
-
-- experiments and examples still depend primarily on legacy representation and
-  legacy model packages rather than the typed `core` + `evolution` stack
-- legacy packages are still active workflow packages, not merely
-  compatibility/reference layers
+- all experiments and examples now consume the typed `core` + `evolution` +
+  `codegen` stack; legacy `model` package deleted; `gene` and `genome` are
+  retained only as compatibility layers used by the `env` subsystem (P4-D)
 
 Representative locations:
 
 - `experiments/*`
 - `examples/gymnasium/*`
+- `gophercon2014/*`
+- `codegen/codegen.go`
 - `evolution/package_map_test.go`
 
 ## Corrective milestone backlog for Phase 1-4 deviations
@@ -1025,6 +1022,38 @@ Required outcome:
 - stop using legacy `model`, `gene`, and `genome` as the default workflow
   path for new or migrated examples and completely delete all unused legacy packages
 - continue prioritizing excellent end-user godoc-style documentation for all exported structs and functions
+
+Status: ✅ 100% complete (2026-05-09)
+
+Completion proof:
+
+- added `KarvaExpressor` struct to `codegen` package so that any caller
+  holding a `core.Genome[T]` can drive `codegen.Write` without touching the
+  legacy `gene` or `genome` packages:
+  - `codegen/codegen.go` — `KarvaExpressor`, `buildArgOrderFromGrammar`,
+    `computeNumTerminals`
+- migrated all five experiment entry-points to use `core`, `evolution`,
+  `codegen`, and `grammars` directly — no more `genome.NewFromCoreBool` /
+  `genome.NewFromCoreFloat64` / `legacySolution.Write` round-trips:
+  - `experiments/nand/main.go`
+  - `experiments/odd-3-parity/main.go`
+  - `experiments/odd-7-parity/main.go`
+  - `experiments/6-multiplexer/main.go`
+  - `experiments/symbolic_regression/main.go`
+- migrated both `gophercon2014` example entry-points to use `core`,
+  `evolution`, and `functions/*` — fully replaced `model.New` / `gene.FuncWeight`
+  / `genome.EvalBool` / `genome.EvalMath`:
+  - `gophercon2014/gep-in-go/example1/nand.go`
+  - `gophercon2014/gep-in-go/example2/symbolic_regression.go`
+- deleted the `model` package entirely; it had no remaining callers after the
+  above migrations (`model/` directory removed)
+- package boundary enforcement added to `evolution/package_map_test.go`:
+  - `TestPhase4MilestoneD_ExperimentsAndExamplesPackageBoundaries` passes —
+    verifies that nothing under `experiments/`, `examples/`, or
+    `gophercon2014/` imports `gene`, `genome`, or `model`
+  - `TestPhase4Milestone3_LegacyModelPackageBoundaries` removed — `model`
+    package no longer exists
+- `gofmt` applied to all modified files; `go test ./...` passes clean
 
 Dependencies:
 

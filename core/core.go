@@ -470,6 +470,16 @@ func (g Gene[T]) KarvaString() string {
 	return strings.Join(names, ".")
 }
 
+// SymbolNames returns the Karva symbol name for each symbol in the gene.
+// The returned slice has the same length as g.Symbols.
+func (g Gene[T]) SymbolNames() []string {
+	names := make([]string, len(g.Symbols))
+	for i, sym := range g.Symbols {
+		names[i] = sym.Name
+	}
+	return names
+}
+
 // Dup returns a deep copy of the gene.
 func (g Gene[T]) Dup() Gene[T] {
 	syms := make([]Symbol[T], len(g.Symbols))
@@ -493,6 +503,28 @@ func (g Genome[T]) KarvaString() string {
 	}
 	sep := "|" + g.Link.Symbol() + "|"
 	return strings.Join(parts, sep)
+}
+
+// SymbolNamesPerGene returns the Karva symbol names for each gene in the genome.
+// The outer slice has the same length as g.Genes; each inner slice is produced
+// by Gene[T].SymbolNames().
+func (g Genome[T]) SymbolNamesPerGene() [][]string {
+	result := make([][]string, len(g.Genes))
+	for i, gene := range g.Genes {
+		result[i] = gene.SymbolNames()
+	}
+	return result
+}
+
+// ConstsPerGene returns the constants slice for each gene in the genome.
+// The outer slice has the same length as g.Genes; each inner slice is a
+// shallow copy of Gene[T].Constants for that gene.
+func (g Genome[T]) ConstsPerGene() [][]T {
+	result := make([][]T, len(g.Genes))
+	for i, gene := range g.Genes {
+		result[i] = gene.Constants
+	}
+	return result
 }
 
 // Dup returns a deep copy of the genome.  The link operator is shared (it is

@@ -5,6 +5,8 @@
 package intNodes
 
 import (
+	"fmt"
+
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/functions"
 )
@@ -28,4 +30,29 @@ func CatalogFrom(fm functions.FuncMap) (*core.Catalog[int], error) {
 		}
 	}
 	return cat, nil
+}
+
+// CatalogFromNames creates a typed core.Catalog[int] containing only the named
+// functions from Int. An error is returned if any name is not found or if any
+// registration fails.
+func CatalogFromNames(names []string) (*core.Catalog[int], error) {
+	fm := make(functions.FuncMap, len(names))
+	for _, sym := range names {
+		fn, ok := Int[sym]
+		if !ok {
+			return nil, fmt.Errorf("intNodes.CatalogFromNames: unsupported int function %q", sym)
+		}
+		fm[sym] = fn
+	}
+	return CatalogFrom(fm)
+}
+
+// LinkFuncFrom returns a core.LinkFunc[int] for the named function in Int.
+// An error is returned if the name is not found.
+func LinkFuncFrom(sym string) (core.LinkFunc[int], error) {
+	fn, ok := Int[sym]
+	if !ok {
+		return core.LinkFunc[int]{}, fmt.Errorf("intNodes.LinkFuncFrom: unsupported int function %q", sym)
+	}
+	return core.NewLinkFunc[int](sym, fn.IntFunction)
 }

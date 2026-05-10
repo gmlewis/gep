@@ -5,6 +5,8 @@
 package boolNodes
 
 import (
+	"fmt"
+
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/functions"
 )
@@ -28,4 +30,29 @@ func CatalogFrom(fm functions.FuncMap) (*core.Catalog[bool], error) {
 		}
 	}
 	return cat, nil
+}
+
+// CatalogFromNames creates a typed core.Catalog[bool] containing only the named
+// functions from BoolAllGates. An error is returned if any name is not found or
+// if any registration fails.
+func CatalogFromNames(names []string) (*core.Catalog[bool], error) {
+	fm := make(functions.FuncMap, len(names))
+	for _, sym := range names {
+		fn, ok := BoolAllGates[sym]
+		if !ok {
+			return nil, fmt.Errorf("boolNodes.CatalogFromNames: unsupported boolean function %q", sym)
+		}
+		fm[sym] = fn
+	}
+	return CatalogFrom(fm)
+}
+
+// LinkFuncFrom returns a core.LinkFunc[bool] for the named function in
+// BoolAllGates. An error is returned if the name is not found.
+func LinkFuncFrom(sym string) (core.LinkFunc[bool], error) {
+	fn, ok := BoolAllGates[sym]
+	if !ok {
+		return core.LinkFunc[bool]{}, fmt.Errorf("boolNodes.LinkFuncFrom: unsupported boolean function %q", sym)
+	}
+	return core.NewLinkFunc[bool](sym, fn.BoolFunction)
 }

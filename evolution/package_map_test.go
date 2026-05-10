@@ -128,38 +128,6 @@ func TestPhase4MilestoneB_EnvPackageBoundaries(t *testing.T) {
 	}
 }
 
-func TestPhase4Milestone3_LegacyModelPackageBoundaries(t *testing.T) {
-	metas := mustListPackages(t,
-		modulePath+"/model",
-		modulePath+"/model/...",
-	)
-
-	foundModel := false
-	for _, meta := range metas {
-		allowedPrefixes := allowedImportPrefixes(meta.ImportPath)
-		if len(allowedPrefixes) == 0 {
-			continue
-		}
-		if meta.ImportPath == modulePath+"/model" {
-			foundModel = true
-		}
-
-		for _, imported := range meta.Imports {
-			if !strings.HasPrefix(imported, modulePath+"/") {
-				continue // standard library or external dependency
-			}
-			if hasAllowedPrefix(imported, allowedPrefixes) {
-				continue
-			}
-			t.Errorf("%s imports %s; allowed internal prefixes are %v", meta.ImportPath, imported, allowedPrefixes)
-		}
-	}
-
-	if !foundModel {
-		t.Fatalf("expected to inspect %s/model", modulePath)
-	}
-}
-
 func TestPhase4Milestone4_FitnessPackageBoundaries(t *testing.T) {
 	metas := mustListPackages(t, modulePath+"/fitness/...")
 
@@ -285,6 +253,43 @@ func TestPhase4Milestone6_LegacyRepresentationPackageBoundaries(t *testing.T) {
 	}
 }
 
+// TestPhase4MilestoneD_ExperimentsAndExamplesPackageBoundaries verifies that
+// all packages under experiments/, examples/, and gophercon2014/ consume the
+// new separated subsystems (core, evolution, codegen, env, problems) rather
+// than the legacy workflow packages (model, gene, genome).
+func TestPhase4MilestoneD_ExperimentsAndExamplesPackageBoundaries(t *testing.T) {
+	metas := mustListPackages(t,
+		modulePath+"/experiments/...",
+		modulePath+"/examples/...",
+		modulePath+"/gophercon2014/...",
+	)
+
+	legacyPackages := []string{
+		modulePath + "/gene",
+		modulePath + "/genome",
+		modulePath + "/model",
+	}
+
+	foundAny := false
+	for _, meta := range metas {
+		foundAny = true
+		for _, imported := range meta.Imports {
+			if !strings.HasPrefix(imported, modulePath+"/") {
+				continue // standard library or external dependency
+			}
+			for _, legacy := range legacyPackages {
+				if strings.HasPrefix(imported, legacy) {
+					t.Errorf("%s imports legacy package %s; experiments and examples must use core/evolution/codegen/env/problems instead", meta.ImportPath, imported)
+				}
+			}
+		}
+	}
+
+	if !foundAny {
+		t.Fatalf("expected to inspect packages under %s/experiments, %s/examples, and %s/gophercon2014", modulePath, modulePath, modulePath)
+	}
+}
+
 func allowedImportPrefixes(importPath string) []string {
 	switch {
 	case importPath == modulePath+"/core":
@@ -301,14 +306,6 @@ func allowedImportPrefixes(importPath string) []string {
 		}
 	case strings.HasPrefix(importPath, modulePath+"/gymnasium"):
 		return []string{modulePath + "/common", modulePath + "/gymnasium"}
-	case strings.HasPrefix(importPath, modulePath+"/model"):
-		return []string{
-			modulePath + "/common",
-			modulePath + "/functions",
-			modulePath + "/gene",
-			modulePath + "/genome",
-			modulePath + "/model",
-		}
 	case strings.HasPrefix(importPath, modulePath+"/fitness"):
 		return []string{modulePath + "/fitness"}
 	case strings.HasPrefix(importPath, modulePath+"/problems"):
