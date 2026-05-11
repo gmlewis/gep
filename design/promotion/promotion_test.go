@@ -288,7 +288,7 @@ func TestDecideIsDeterministic(t *testing.T) {
 
 // --- Evaluate tests ---
 
-func TestEvaluateNocriteriaPromoted(t *testing.T) {
+func TestEvaluateNoCriteriaPromoted(t *testing.T) {
 	// Vacuously true: no criteria → promoted.
 	report := Evaluate("cand-1", nil, nil)
 	if !report.Promoted {
