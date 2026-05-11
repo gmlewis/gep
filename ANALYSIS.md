@@ -651,6 +651,31 @@ Mechanically verifiable completion:
 - tests prove artifact emitters are deterministic and scenario fixtures are
   valid
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- packages added:
+  `domains/circuit/artifacts` (`domains/circuit/artifacts/doc.go`,
+  `domains/circuit/artifacts/artifacts.go`), `domains/circuit/scenarios`
+  (`domains/circuit/scenarios/doc.go`, `domains/circuit/scenarios/scenarios.go`)
+- artifact emitters added:
+  `artifacts.JSON` (canonical indented JSON for `circuit.CircuitProgram`),
+  `artifacts.SPICE` (deterministic SPICE-style netlist text),
+  `artifacts.Verilog` (deterministic structural-Verilog-style text); all
+  validate the underlying graph before emission
+- reusable fixture set added:
+  `domains/circuit/scenarios/testdata/set_smoke.json` with deterministic
+  train/validation/test circuit scenarios, loaded through
+  `design/scenarios.LoadScenarioSet` by `scenarios.LoadFixtureSet`
+- deterministic tests added:
+  `domains/circuit/artifacts/artifacts_test.go` (exact JSON/SPICE/Verilog
+  golden output, repeated-call determinism, invalid-graph rejection),
+  `domains/circuit/scenarios/scenarios_test.go` (fixture load, validation via
+  `design/scenarios`, split counts, repeated-load determinism)
+- command proof:
+  `go test ./domains/circuit/... ./design/scenarios/...`
+
 #### `PB-05`: Define the voxel domain core model in `domains/voxel`
 
 Goal:
