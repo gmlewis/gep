@@ -63,101 +63,102 @@ func TestJSON(t *testing.T) {
 	if err != nil {
 		t.Fatalf("JSON() error = %v", err)
 	}
-	const want = "{\n" +
-		"  \"candidate_id\": \"cand-voxel-01\",\n" +
-		"  \"design\": {\n" +
-		"    \"volume\": {\n" +
-		"      \"size_x\": 4,\n" +
-		"      \"size_y\": 3,\n" +
-		"      \"size_z\": 2,\n" +
-		"      \"forbidden_regions\": [\n" +
-		"        {\n" +
-		"          \"name\": \"keepout-core\",\n" +
-		"          \"min\": {\n" +
-		"            \"x\": 1,\n" +
-		"            \"y\": 1,\n" +
-		"            \"z\": 0\n" +
-		"          },\n" +
-		"          \"max\": {\n" +
-		"            \"x\": 1,\n" +
-		"            \"y\": 1,\n" +
-		"            \"z\": 1\n" +
-		"          },\n" +
-		"          \"kind\": \"forbidden\"\n" +
-		"        }\n" +
-		"      ],\n" +
-		"      \"interface_regions\": [\n" +
-		"        {\n" +
-		"          \"name\": \"mount-left\",\n" +
-		"          \"min\": {\n" +
-		"            \"x\": 0,\n" +
-		"            \"y\": 0,\n" +
-		"            \"z\": 0\n" +
-		"          },\n" +
-		"          \"max\": {\n" +
-		"            \"x\": 0,\n" +
-		"            \"y\": 2,\n" +
-		"            \"z\": 1\n" +
-		"          },\n" +
-		"          \"material\": \"aluminum\",\n" +
-		"          \"kind\": \"interface\"\n" +
-		"        }\n" +
-		"      ]\n" +
-		"    },\n" +
-		"    \"occupied\": [\n" +
-		"      {\n" +
-		"        \"coord\": {\n" +
-		"          \"x\": 2,\n" +
-		"          \"y\": 0,\n" +
-		"          \"z\": 0\n" +
-		"        },\n" +
-		"        \"material\": \"aluminum\"\n" +
-		"      },\n" +
-		"      {\n" +
-		"        \"coord\": {\n" +
-		"          \"x\": 3,\n" +
-		"          \"y\": 2,\n" +
-		"          \"z\": 1\n" +
-		"        },\n" +
-		"        \"material\": \"polymer\"\n" +
-		"      }\n" +
-		"    ]\n" +
-		"  },\n" +
-		"  \"spec\": {\n" +
-		"    \"name\": \"cantilever-bracket\",\n" +
-		"    \"domain\": \"voxel\",\n" +
-		"    \"revision\": \"v1\",\n" +
-		"    \"materials\": [\n" +
-		"      {\n" +
-		"        \"id\": \"aluminum\",\n" +
-		"        \"name\": \"Aluminum\",\n" +
-		"        \"properties\": {\n" +
-		"          \"density\": 2700\n" +
-		"        }\n" +
-		"      },\n" +
-		"      {\n" +
-		"        \"id\": \"polymer\",\n" +
-		"        \"name\": \"Polymer\",\n" +
-		"        \"properties\": {\n" +
-		"          \"density\": 1200\n" +
-		"        }\n" +
-		"      }\n" +
-		"    ],\n" +
-		"    \"load_cases\": [\n" +
-		"      {\n" +
-		"        \"name\": \"pull-z\",\n" +
-		"        \"kind\": \"force\",\n" +
-		"        \"params\": {\n" +
-		"          \"newtons\": 42\n" +
-		"        }\n" +
-		"      }\n" +
-		"    ],\n" +
-		"    \"metadata\": {\n" +
-		"      \"fixture\": \"pb-06\",\n" +
-		"      \"train_ready\": true\n" +
-		"    }\n" +
-		"  }\n" +
-		"}\n"
+	const want = `{
+  "candidate_id": "cand-voxel-01",
+  "design": {
+    "volume": {
+      "size_x": 4,
+      "size_y": 3,
+      "size_z": 2,
+      "forbidden_regions": [
+        {
+          "name": "keepout-core",
+          "min": {
+            "x": 1,
+            "y": 1,
+            "z": 0
+          },
+          "max": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          },
+          "kind": "forbidden"
+        }
+      ],
+      "interface_regions": [
+        {
+          "name": "mount-left",
+          "min": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 0,
+            "y": 2,
+            "z": 1
+          },
+          "material": "aluminum",
+          "kind": "interface"
+        }
+      ]
+    },
+    "occupied": [
+      {
+        "coord": {
+          "x": 2,
+          "y": 0,
+          "z": 0
+        },
+        "material": "aluminum"
+      },
+      {
+        "coord": {
+          "x": 3,
+          "y": 2,
+          "z": 1
+        },
+        "material": "polymer"
+      }
+    ]
+  },
+  "spec": {
+    "name": "cantilever-bracket",
+    "domain": "voxel",
+    "revision": "v1",
+    "materials": [
+      {
+        "id": "aluminum",
+        "name": "Aluminum",
+        "properties": {
+          "density": 2700
+        }
+      },
+      {
+        "id": "polymer",
+        "name": "Polymer",
+        "properties": {
+          "density": 1200
+        }
+      }
+    ],
+    "load_cases": [
+      {
+        "name": "pull-z",
+        "kind": "force",
+        "params": {
+          "newtons": 42
+        }
+      }
+    ],
+    "metadata": {
+      "fixture": "pb-06",
+      "train_ready": true
+    }
+  }
+}
+`
 	if string(got) != want {
 		t.Fatalf("JSON() mismatch:\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
@@ -168,40 +169,40 @@ func TestOBJ(t *testing.T) {
 	if err != nil {
 		t.Fatalf("OBJ() error = %v", err)
 	}
-	const want = "" +
-		"# voxel candidate: cand-voxel-01\n" +
-		"# spec: cantilever-bracket\n" +
-		"o cantilever_bracket\n" +
-		"v 2 0 0\n" +
-		"v 3 0 0\n" +
-		"v 3 1 0\n" +
-		"v 2 1 0\n" +
-		"v 2 0 1\n" +
-		"v 3 0 1\n" +
-		"v 3 1 1\n" +
-		"v 2 1 1\n" +
-		"# material: aluminum\n" +
-		"f 1 4 3 2\n" +
-		"f 5 6 7 8\n" +
-		"f 1 2 6 5\n" +
-		"f 3 4 8 7\n" +
-		"f 1 5 8 4\n" +
-		"f 2 3 7 6\n" +
-		"v 3 2 1\n" +
-		"v 4 2 1\n" +
-		"v 4 3 1\n" +
-		"v 3 3 1\n" +
-		"v 3 2 2\n" +
-		"v 4 2 2\n" +
-		"v 4 3 2\n" +
-		"v 3 3 2\n" +
-		"# material: polymer\n" +
-		"f 9 12 11 10\n" +
-		"f 13 14 15 16\n" +
-		"f 9 10 14 13\n" +
-		"f 11 12 16 15\n" +
-		"f 9 13 16 12\n" +
-		"f 10 11 15 14\n"
+	const want = `# voxel candidate: cand-voxel-01
+# spec: cantilever-bracket
+o cantilever_bracket
+v 2 0 0
+v 3 0 0
+v 3 1 0
+v 2 1 0
+v 2 0 1
+v 3 0 1
+v 3 1 1
+v 2 1 1
+# material: aluminum
+f 1 4 3 2
+f 5 6 7 8
+f 1 2 6 5
+f 3 4 8 7
+f 1 5 8 4
+f 2 3 7 6
+v 3 2 1
+v 4 2 1
+v 4 3 1
+v 3 3 1
+v 3 2 2
+v 4 2 2
+v 4 3 2
+v 3 3 2
+# material: polymer
+f 9 12 11 10
+f 13 14 15 16
+f 9 10 14 13
+f 11 12 16 15
+f 9 13 16 12
+f 10 11 15 14
+`
 	if got != want {
 		t.Fatalf("OBJ() mismatch:\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
@@ -212,15 +213,15 @@ func TestSummary(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Summary() error = %v", err)
 	}
-	const want = "" +
-		"candidate:  cand-voxel-01\n" +
-		"spec:       cantilever-bracket (v1)\n" +
-		"volume:     4x3x2  (24 cells total)\n" +
-		"occupied:   2 cell(s)\n" +
-		"forbidden:  1 region(s)\n" +
-		"interface:  1 region(s)\n" +
-		"materials:  2\n" +
-		"load cases: 1\n"
+	const want = `candidate:  cand-voxel-01
+spec:       cantilever-bracket (v1)
+volume:     4x3x2  (24 cells total)
+occupied:   2 cell(s)
+forbidden:  1 region(s)
+interface:  1 region(s)
+materials:  2
+load cases: 1
+`
 	if got != want {
 		t.Fatalf("Summary() mismatch:\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
