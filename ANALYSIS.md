@@ -711,6 +711,27 @@ Mechanically verifiable completion:
 - tests prove invalid voxel designs fail validation and valid designs round-trip
   through JSON
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `domains/voxel` (`domains/voxel/doc.go`,
+  `domains/voxel/voxel.go`)
+- required serializable core types added:
+  `VoxelProgram`, `VoxelDesign`, `DesignVolume`, `Material`, `LoadCase`,
+  `InterfaceRegion`, and `VoxelSpec`
+- deterministic validation helpers added:
+  `DesignVolume.Validate` rejects empty/malformed volumes, malformed or
+  out-of-bounds forbidden/interface regions, and overlap between forbidden and
+  interface regions; `VoxelDesign.Validate` rejects occupied cells outside the
+  design volume; `VoxelProgram.Validate` delegates to design validation
+- deterministic tests added: `domains/voxel/voxel_test.go`
+  (valid volume/program validation, empty/malformed volume rejection,
+  overlapping forbidden/interface region rejection, out-of-bounds occupied cell
+  rejection, repeated-call determinism, and JSON round-trip validation)
+- command proof:
+  `go test ./domains/voxel/...`
+
 #### `PB-06`: Add voxel artifact emitters and reusable voxel scenario fixtures
 
 Goal:
