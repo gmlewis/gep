@@ -5,6 +5,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -12,6 +13,9 @@ import (
 	"testing"
 
 	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/design"
+	"github.com/gmlewis/gep/v2/design/checkpoint"
+	"github.com/gmlewis/gep/v2/design/promotion"
 	designscenarios "github.com/gmlewis/gep/v2/design/scenarios"
 	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
 )
@@ -36,8 +40,12 @@ func TestBracketPipelineEvaluatorDecoderAndArtifacts(t *testing.T) {
 	}
 
 	outDir := t.TempDir()
-	if err := exportArtifacts(program, outDir); err != nil {
+	artifactRefs, err := exportArtifacts(program, outDir)
+	if err != nil {
 		t.Fatalf("exportArtifacts() error = %v", err)
+	}
+	if got, want := len(artifactRefs), 3; got != want {
+		t.Fatalf("len(artifactRefs) = %d, want %d", got, want)
 	}
 
 	jsonData := readFile(t, filepath.Join(outDir, candidateJSONArtifactName))
@@ -54,7 +62,7 @@ func TestBracketPipelineEvaluatorDecoderAndArtifacts(t *testing.T) {
 		t.Fatalf("candidate.txt missing occupancy summary: %q", summaryData)
 	}
 
-	if err := exportArtifacts(program, outDir); err != nil {
+	if _, err := exportArtifacts(program, outDir); err != nil {
 		t.Fatalf("exportArtifacts() second call error = %v", err)
 	}
 	if got := readFile(t, filepath.Join(outDir, candidateJSONArtifactName)); got != jsonData {
@@ -122,6 +130,77 @@ func TestRunPilotDeterministicFixedSeed(t *testing.T) {
 		if got, want := readFile(t, p1), readFile(t, p2); got != want {
 			t.Fatalf("%s differs across deterministic runs", name)
 		}
+	}
+}
+
+func TestRunPilotPromotionCheckpointAndManifest(t *testing.T) {
+	outDir := t.TempDir()
+	result, err := runPilot(runConfig{
+		Seed:           20260511,
+		PopulationSize: 64,
+		Generations:    100,
+		OutputDir:      outDir,
+	})
+	if err != nil {
+		t.Fatalf("runPilot() error = %v", err)
+	}
+	if !result.Promoted {
+		t.Fatalf("runPilot() promoted = false, want true")
+	}
+
+	reportPath := filepath.Join(outDir, promotionReportArtifactName)
+	reportData := readFile(t, reportPath)
+	var report promotion.PromotionReport
+	if err := json.Unmarshal([]byte(reportData), &report); err != nil {
+		t.Fatalf("json.Unmarshal(promotion report) error = %v", err)
+	}
+	if !report.Promoted {
+		t.Fatalf("promotion report promoted = false, want true")
+	}
+	if got, want := report.CandidateID, result.CandidateID; got != want {
+		t.Fatalf("promotion report candidate_id = %q, want %q", got, want)
+	}
+	if got, want := len(report.Decisions), 2; got != want {
+		t.Fatalf("promotion report decisions len = %d, want %d", got, want)
+	}
+	for _, d := range report.Decisions {
+		if !d.Passed {
+			t.Fatalf("promotion decision for split %q failed: %s", d.Split, d.Reason)
+		}
+	}
+
+	manifest, err := design.LoadRunManifestFile(filepath.Join(outDir, runManifestArtifactName))
+	if err != nil {
+		t.Fatalf("LoadRunManifestFile() error = %v", err)
+	}
+	if got, want := len(manifest.Artifacts), 5; got != want {
+		t.Fatalf("manifest artifacts len = %d, want %d", got, want)
+	}
+	for _, ref := range manifest.Artifacts {
+		if ref.Path == "" {
+			t.Fatalf("manifest artifact %q has empty path", ref.Name)
+		}
+		if _, err := os.Stat(ref.Path); err != nil {
+			t.Fatalf("os.Stat(%q) error = %v", ref.Path, err)
+		}
+	}
+
+	snap, err := checkpoint.LoadFile(filepath.Join(outDir, checkpointArtifactName))
+	if err != nil {
+		t.Fatalf("checkpoint.LoadFile() error = %v", err)
+	}
+	replayedManifest, err := checkpoint.ReplayManifest(snap)
+	if err != nil {
+		t.Fatalf("checkpoint.ReplayManifest() error = %v", err)
+	}
+	if !reflect.DeepEqual(replayedManifest, *manifest) {
+		t.Fatalf("checkpoint manifest mismatch:\n got=%#v\nwant=%#v", replayedManifest, *manifest)
+	}
+	if len(snap.ArtifactRefs) < len(manifest.Artifacts) {
+		t.Fatalf("checkpoint artifact refs len = %d, want at least %d", len(snap.ArtifactRefs), len(manifest.Artifacts))
+	}
+	if !reflect.DeepEqual(snap.ArtifactRefs[:len(manifest.Artifacts)], manifest.Artifacts) {
+		t.Fatalf("checkpoint artifact refs do not preserve manifest artifact refs")
 	}
 }
 

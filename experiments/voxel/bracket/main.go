@@ -6,6 +6,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -14,6 +15,10 @@ import (
 	"path/filepath"
 
 	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/design"
+	"github.com/gmlewis/gep/v2/design/checkpoint"
+	"github.com/gmlewis/gep/v2/design/objectives"
+	"github.com/gmlewis/gep/v2/design/promotion"
 	designscenarios "github.com/gmlewis/gep/v2/design/scenarios"
 	"github.com/gmlewis/gep/v2/domains/voxel"
 	voxelartifacts "github.com/gmlewis/gep/v2/domains/voxel/artifacts"
@@ -34,13 +39,23 @@ type runResult struct {
 	Score         float64
 	Karva         string
 	OccupiedCells int
+	Promoted      bool
 }
 
 const (
 	candidateJSONArtifactName    = "candidate.json"
 	candidateOBJArtifactName     = "candidate.obj"
 	candidateSummaryArtifactName = "candidate.txt"
+	promotionReportArtifactName  = "promotion_report.json"
+	runManifestArtifactName      = "run_manifest.json"
+	checkpointArtifactName       = "checkpoint.json"
 )
+
+var voxelObjectiveDefs = []objectives.ObjectiveDef{{
+	Name:   "voxel_structural_score",
+	Weight: 1,
+	Kind:   objectives.Soft,
+}}
 
 func main() {
 	cfg := runConfig{}
@@ -55,7 +70,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "bracket: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("bracket complete: candidate=%s score=%.2f occupied=%d karva=%s\n", result.CandidateID, result.Score, result.OccupiedCells, result.Karva)
+	fmt.Printf("bracket complete: candidate=%s score=%.2f occupied=%d promoted=%t karva=%s\n", result.CandidateID, result.Score, result.OccupiedCells, result.Promoted, result.Karva)
 	fmt.Printf("artifacts written to %s\n", cfg.OutputDir)
 }
 
@@ -67,9 +82,17 @@ func runPilot(cfg runConfig) (runResult, error) {
 		return runResult{}, errors.New("generations must be > 0")
 	}
 
-	trainScenarios, err := loadTrainScenarios()
+	set, registry, err := loadScenarioRegistry()
 	if err != nil {
 		return runResult{}, err
+	}
+	trainScenarios := registry.BySplit(designscenarios.Train)
+	validationScenarios := registry.BySplit(designscenarios.Validation)
+	if len(trainScenarios) == 0 {
+		return runResult{}, errors.New("voxel fixture scenarios contain no train split")
+	}
+	if len(validationScenarios) == 0 {
+		return runResult{}, errors.New("voxel fixture scenarios contain no validation split")
 	}
 
 	catalog, err := boolNodes.CatalogFromNames([]string{"Not", "And", "Or", "Xor"})
@@ -91,14 +114,107 @@ func runPilot(cfg runConfig) (runResult, error) {
 		return best.Score >= 950
 	}
 
-	best := population.Evolve(cfg.Generations)
 	candidateID := fmt.Sprintf("voxel-bracket-seed-%d", cfg.Seed)
+	manifest := design.RunManifest{
+		RunID: candidateID,
+		RunConfig: design.RunConfig{
+			Domain:         "voxel",
+			Experiment:     "bracket",
+			PopulationSize: cfg.PopulationSize,
+			NumGenerations: cfg.Generations,
+		},
+		Seeds: []design.SeedRecord{{
+			Name:    "evolution_seed",
+			Value:   cfg.Seed,
+			Purpose: "deterministic evolution seed",
+		}},
+		ScenarioSplits: []design.ScenarioSplitSummary{
+			{SplitName: string(designscenarios.Train), ScenarioCount: len(trainScenarios), Source: set.Source},
+			{SplitName: string(designscenarios.Validation), ScenarioCount: len(validationScenarios), Source: set.Source},
+		},
+	}
+
+	best := population.Evolve(cfg.Generations)
 	program, err := decodeVoxelProgram(candidateID, best.Genome, trainScenarios[0])
 	if err != nil {
 		return runResult{}, err
 	}
-	if err := exportArtifacts(program, cfg.OutputDir); err != nil {
+	artifactRefs, err := exportArtifacts(program, cfg.OutputDir)
+	if err != nil {
 		return runResult{}, err
+	}
+	manifest.Artifacts = append(manifest.Artifacts, artifactRefs...)
+
+	trainResults, err := evaluateScenarios(best.Genome, trainScenarios)
+	if err != nil {
+		return runResult{}, err
+	}
+	validationResults, err := evaluateScenarios(best.Genome, validationScenarios)
+	if err != nil {
+		return runResult{}, err
+	}
+	report := promotion.Evaluate(candidateID, []promotion.AcceptanceCriterion{
+		{Split: designscenarios.Train, MinAggregateScore: 700},
+		{Split: designscenarios.Validation, MinAggregateScore: 700},
+	}, []promotion.SplitEvalSummary{
+		promotion.SummarizeSplit(designscenarios.Train, trainResults),
+		promotion.SummarizeSplit(designscenarios.Validation, validationResults),
+	})
+
+	promotionReportPath := filepath.Join(cfg.OutputDir, promotionReportArtifactName)
+	if err := writeJSONFile(promotionReportPath, report); err != nil {
+		return runResult{}, fmt.Errorf("write promotion report: %w", err)
+	}
+	manifest.Artifacts = append(manifest.Artifacts, design.ArtifactRef{
+		Name:   "promotion_report",
+		Path:   promotionReportPath,
+		Format: "json",
+		Kind:   "promotion.report",
+	})
+
+	manifestPath := filepath.Join(cfg.OutputDir, runManifestArtifactName)
+	if err := design.WriteRunManifestFile(manifestPath, &manifest); err != nil {
+		return runResult{}, fmt.Errorf("write run manifest: %w", err)
+	}
+	manifest.Artifacts = append(manifest.Artifacts, design.ArtifactRef{
+		Name:   "run_manifest",
+		Path:   manifestPath,
+		Format: "json",
+		Kind:   "run.manifest",
+	})
+	if err := design.WriteRunManifestFile(manifestPath, &manifest); err != nil {
+		return runResult{}, fmt.Errorf("rewrite run manifest with full artifact refs: %w", err)
+	}
+
+	validationSummary := promotion.SummarizeSplit(designscenarios.Validation, validationResults)
+	checkpointPath := filepath.Join(cfg.OutputDir, checkpointArtifactName)
+	checkpointRefs := append([]design.ArtifactRef(nil), manifest.Artifacts...)
+	checkpointRefs = append(checkpointRefs, design.ArtifactRef{
+		Name:   "checkpoint",
+		Path:   checkpointPath,
+		Format: "json",
+		Kind:   "run.checkpoint",
+	})
+	snapshot := &checkpoint.Snapshot{
+		Manifest: manifest,
+		Elites: []checkpoint.EliteRecord{{
+			CandidateID:    candidateID,
+			Generation:     cfg.Generations,
+			AggregateScore: validationSummary.MeanAggregateScore,
+			Breakdown:      validationResults[0].Breakdown,
+		}},
+		Aggregate: checkpoint.AggregateSnapshot{
+			BestScore:                best.Score,
+			MeanScore:                validationSummary.MeanAggregateScore,
+			TotalCandidatesEvaluated: cfg.PopulationSize * cfg.Generations,
+		},
+		ArtifactRefs: checkpointRefs,
+	}
+	if err := checkpoint.SaveFile(checkpointPath, snapshot); err != nil {
+		return runResult{}, fmt.Errorf("write checkpoint snapshot: %w", err)
+	}
+	if _, err := checkpoint.LoadFile(checkpointPath); err != nil {
+		return runResult{}, fmt.Errorf("reload checkpoint snapshot: %w", err)
 	}
 
 	return runResult{
@@ -106,6 +222,7 @@ func runPilot(cfg runConfig) (runResult, error) {
 		Score:         best.Score,
 		Karva:         best.Genome.KarvaString(),
 		OccupiedCells: len(program.Design.Occupied),
+		Promoted:      report.Promoted,
 	}, nil
 }
 
@@ -145,14 +262,30 @@ func scoreCandidate(genome core.Genome[bool], scenarios []designscenarios.Scenar
 }
 
 func scoreScenario(genome core.Genome[bool], scenario designscenarios.Scenario) float64 {
+	score, _ := scoreScenarioAggregate(genome, scenario)
+	return score
+}
+
+func evaluateScenarios(genome core.Genome[bool], scenarios []designscenarios.Scenario) ([]objectives.AggregateResult, error) {
+	results := make([]objectives.AggregateResult, 0, len(scenarios))
+	for _, sc := range scenarios {
+		score, rejected := scoreScenarioAggregate(genome, sc)
+		results = append(results, objectives.Score(voxelObjectiveDefs, map[string]float64{
+			"voxel_structural_score": score,
+		}, rejected, 0))
+	}
+	return results, nil
+}
+
+func scoreScenarioAggregate(genome core.Genome[bool], scenario designscenarios.Scenario) (score float64, hardFailed bool) {
 	program, err := decodeVoxelProgram("score", genome, scenario)
 	if err != nil {
-		return 0
+		return 0, true
 	}
 	occupied := len(program.Design.Occupied)
 	maxCells := scenarioMaxCells(scenario)
 	if maxCells > 0 && occupied > maxCells {
-		return 0
+		return 0, true
 	}
 
 	leftCoverage := interfaceCoverage(program.Design, "anchor_left")
@@ -172,7 +305,7 @@ func scoreScenario(genome core.Genome[bool], scenario designscenarios.Scenario) 
 		densityFit = 0
 	}
 
-	return 500*connectivity + 150*leftCoverage + 150*rightCoverage + 200*densityFit
+	return 500*connectivity + 150*leftCoverage + 150*rightCoverage + 200*densityFit, false
 }
 
 func decodeVoxelProgram(candidateID string, genome core.Genome[bool], scenario designscenarios.Scenario) (voxel.VoxelProgram, error) {
@@ -438,38 +571,57 @@ func inRegion(coord voxel.VoxelIndex, region voxel.InterfaceRegion) bool {
 		coord.Z >= region.Min.Z && coord.Z <= region.Max.Z
 }
 
-func exportArtifacts(program voxel.VoxelProgram, outputDir string) error {
+func exportArtifacts(program voxel.VoxelProgram, outputDir string) ([]design.ArtifactRef, error) {
 	if err := os.MkdirAll(outputDir, 0o755); err != nil {
-		return fmt.Errorf("create output directory %q: %w", outputDir, err)
+		return nil, fmt.Errorf("create output directory %q: %w", outputDir, err)
 	}
 
 	jsonBytes, err := voxelartifacts.JSON(program)
 	if err != nil {
-		return fmt.Errorf("emit JSON artifact: %w", err)
+		return nil, fmt.Errorf("emit JSON artifact: %w", err)
 	}
 	jsonPath := filepath.Join(outputDir, candidateJSONArtifactName)
 	if err := os.WriteFile(jsonPath, jsonBytes, 0o644); err != nil {
-		return fmt.Errorf("write JSON artifact: %w", err)
+		return nil, fmt.Errorf("write JSON artifact: %w", err)
 	}
 
 	objText, err := voxelartifacts.OBJ(program)
 	if err != nil {
-		return fmt.Errorf("emit OBJ artifact: %w", err)
+		return nil, fmt.Errorf("emit OBJ artifact: %w", err)
 	}
 	objPath := filepath.Join(outputDir, candidateOBJArtifactName)
 	if err := os.WriteFile(objPath, []byte(objText), 0o644); err != nil {
-		return fmt.Errorf("write OBJ artifact: %w", err)
+		return nil, fmt.Errorf("write OBJ artifact: %w", err)
 	}
 
 	summaryText, err := voxelartifacts.Summary(program)
 	if err != nil {
-		return fmt.Errorf("emit summary artifact: %w", err)
+		return nil, fmt.Errorf("emit summary artifact: %w", err)
 	}
 	summaryPath := filepath.Join(outputDir, candidateSummaryArtifactName)
 	if err := os.WriteFile(summaryPath, []byte(summaryText), 0o644); err != nil {
-		return fmt.Errorf("write summary artifact: %w", err)
+		return nil, fmt.Errorf("write summary artifact: %w", err)
 	}
 
+	return []design.ArtifactRef{
+		{Name: "promoted_voxel_json", Path: jsonPath, Format: "json", Kind: "voxel.program"},
+		{Name: "promoted_voxel_obj", Path: objPath, Format: "obj", Kind: "voxel.mesh"},
+		{Name: "promoted_voxel_summary", Path: summaryPath, Format: "txt", Kind: "voxel.summary"},
+	}, nil
+}
+
+func writeJSONFile(filename string, value any) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("create %q: %w", filename, err)
+	}
+	defer f.Close()
+
+	enc := json.NewEncoder(f)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(value); err != nil {
+		return fmt.Errorf("encode %q: %w", filename, err)
+	}
 	return nil
 }
 

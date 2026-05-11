@@ -1000,6 +1000,35 @@ Mechanically verifiable completion:
 - integration tests prove the promoted candidate survives held-out validation
   and round-trips through checkpoint restore
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- voxel bracket pilot loop in `experiments/voxel/bracket/main.go` now executes:
+  evolve -> decode -> constrain -> validate -> promote -> export -> checkpoint
+- train/validation split wiring added via shared voxel fixture registry
+  (`loadScenarioRegistry`), with deterministic split summaries recorded in
+  `design.RunManifest`
+- promotion wiring added with `design/promotion`:
+  per-split aggregate results are summarized using
+  `promotion.SummarizeSplit` and evaluated by `promotion.Evaluate` against
+  explicit train/validation acceptance thresholds
+- run-manifest and checkpoint wiring added:
+  `run_manifest.json` is emitted with deterministic run configuration, seed
+  records, scenario split metadata, and artifact references; `checkpoint.json`
+  is saved and immediately reloaded with `design/checkpoint`
+- promoted-output artifact metadata added:
+  `exportArtifacts` now returns `[]design.ArtifactRef` for emitted voxel JSON,
+  OBJ, and summary artifacts (`promoted_voxel_*`) and they are attached to the
+  manifest/checkpoint refs
+- deterministic integration proof added:
+  `TestRunPilotPromotionCheckpointAndManifest` verifies fixed-seed promotion,
+  promotion report creation, run-manifest artifact references, checkpoint
+  reload, and checkpoint manifest replay equivalence
+- command proof:
+  `go test ./experiments/voxel/bracket/... ./design/...`
+  `go run ./experiments/voxel/bracket --seed 20260511 --out /tmp/bracket_pc04_artifacts`
+
 #### `PC-05`: Add a third pilot in `experiments/control/mass_spring_damper`
 
 Goal:
