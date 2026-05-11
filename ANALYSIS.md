@@ -92,38 +92,600 @@ and treat `codegen` as optional.
 
 Before tackling any one scientific domain, add these platform pieces.
 
+Each milestone below is intentionally written so it can be used as the source
+prompt for a standalone `/delegate` PR. The milestones are designed for
+**sequential execution only**. Do not run them in parallel.
+
 ### Phase A: Build the applied-design substrate
 
-Add a new package tree, likely something like `design`, `design/eval`, or
-`domains/shared`, with:
+#### `PA-01`: Create the shared `design` package and run-manifest schema
 
-- a run manifest that records seed, config, simulator version, and artifact IDs
-- evaluator workers for batched parallel simulation
-- a constraint interface that can reject, repair, or penalize candidates
-- multi-objective score aggregation
-- novelty archive support
-- checkpointing and replay support
+Goal:
+
+- establish the package tree and durable metadata model that all later applied
+  design milestones will build on
+
+Dependencies:
+
+- none
+
+Required outcome:
+
+- add a new top-level `design` package with package-level godoc explaining its
+  role as the shared applied-design substrate
+- define serializable types for at least:
+  - `RunManifest`
+  - `RunConfig`
+  - `ArtifactRef`
+  - `ScenarioSplitSummary`
+  - `SeedRecord`
+- add helpers for JSON round-trip loading/writing of run manifests
+- add `testdata/` manifest fixtures that exercise both minimal and populated
+  manifests
+- do **not** add evaluator, constraint, novelty, or checkpoint logic yet
+
+Mechanically verifiable completion:
+
+- `go test ./design/...` passes
+- tests prove manifest JSON round-trips without losing seed, config, artifact,
+  or scenario-split metadata
+
+#### `PA-02`: Add batched evaluation worker abstractions in `design/eval`
+
+Goal:
+
+- create the concurrency-safe evaluation substrate used by future circuit,
+  voxel, and control pilots
+
+Dependencies:
+
+- depends on `PA-01`
+
+Required outcome:
+
+- add a new `design/eval` package with package-level godoc
+- define typed request/result abstractions for batched evaluation, including at
+  least:
+  - candidate identity
+  - scenario identity
+  - batch request
+  - batch result
+  - evaluator interface
+  - runner/dispatcher abstraction
+- support context cancellation and bounded worker counts
+- include a deterministic fake evaluator in tests so concurrency behavior is
+  verifiable without external simulators
+- do **not** integrate with `core`/`evolution` yet beyond generic type-safe
+  request/result plumbing
+
+Mechanically verifiable completion:
+
+- `go test ./design/eval/...` passes
+- tests prove batched execution preserves all requests, respects worker-count
+  limits, and returns deterministic results for a seeded fake evaluator
+
+#### `PA-03`: Add constraint and validation reporting in `design/constraints`
+
+Goal:
+
+- make constraints explicit, composable, and testable before any domain pilots
+  are introduced
+
+Dependencies:
+
+- depends on `PA-01`
+
+Required outcome:
+
+- add a new `design/constraints` package with package-level godoc
+- define typed constraint interfaces and result types that support the three
+  required behaviors from this roadmap:
+  - reject a candidate
+  - repair a candidate
+  - penalize a candidate
+- define a `ValidationReport`-style aggregate that records:
+  - which constraints ran
+  - what decisions they made
+  - what repairs or penalties were applied
+- add deterministic tests for:
+  - stop-on-reject behavior
+  - repair chaining
+  - penalty accumulation
+
+Mechanically verifiable completion:
+
+- `go test ./design/constraints/...` passes
+- tests prove the aggregate report is stable and deterministic for a fixed input
+
+#### `PA-04`: Add shared multi-objective scoring in `design/objectives`
+
+Goal:
+
+- provide a reusable way to combine hard constraints and soft objectives into a
+  single score breakdown that later pilots can share
+
+Dependencies:
+
+- depends on `PA-03`
+
+Required outcome:
+
+- add a new `design/objectives` package with package-level godoc
+- define serializable types for at least:
+  - objective definition
+  - weighted score contribution
+  - score breakdown
+  - aggregate score result
+- support at least:
+  - weighted aggregation for soft objectives
+  - explicit hard-fail gating from validation results
+  - deterministic score ordering for ties
+- add tests that show a candidate with the same raw objective values always gets
+  the same aggregate score and breakdown ordering
+
+Mechanically verifiable completion:
+
+- `go test ./design/objectives/...` passes
+- tests prove hard failures dominate soft-objective aggregation
+
+#### `PA-05`: Add novelty archive support in `design/novelty`
+
+Goal:
+
+- introduce reusable novelty/diversity infrastructure before domain pilots start
+  optimizing toward a single objective
+
+Dependencies:
+
+- depends on `PA-04`
+
+Required outcome:
+
+- add a new `design/novelty` package with package-level godoc
+- define types for at least:
+  - behavior vector
+  - novelty archive entry
+  - distance function contract
+  - archive configuration
+  - novelty score result
+- implement a deterministic k-nearest-neighbor novelty calculation over stored
+  behavior vectors
+- include tests covering:
+  - empty archive behavior
+  - archive insertion
+  - stable novelty scores for a fixed archive and fixed query vector
+
+Mechanically verifiable completion:
+
+- `go test ./design/novelty/...` passes
+- tests prove novelty scores are deterministic and archive growth is correct
+
+#### `PA-06`: Add checkpoint and replay support in `design/checkpoint`
+
+Goal:
+
+- persist enough state to pause, inspect, and replay applied-design runs without
+  re-inventing ad hoc storage in each future domain
+
+Dependencies:
+
+- depends on `PA-01`
+- depends on `PA-02`
+- depends on `PA-04`
+- depends on `PA-05`
+
+Required outcome:
+
+- add a new `design/checkpoint` package with package-level godoc
+- define serializable snapshot types that combine:
+  - the `RunManifest`
+  - elite candidate metadata
+  - aggregate scores and breakdowns
+  - novelty/archive state
+  - artifact references
+- implement save/load helpers with versioned on-disk JSON snapshots
+- add replay helpers that can restore checkpoint metadata for a later run even
+  if the evaluator itself is stubbed or fake in tests
+- add integration tests that save a checkpoint, reload it, and compare the
+  restored snapshot to the original
+
+Mechanically verifiable completion:
+
+- `go test ./design/checkpoint/... ./design/...` passes
+- tests prove checkpoint round-trips preserve manifest, elite metadata, scores,
+  and novelty state
 
 ### Phase B: Add artifact emitters and scenario sets
 
-For each domain, define:
+#### `PB-01`: Add shared scenario-set support in `design/scenarios`
 
-- the candidate representation used during evolution
-- the emitted artifact format used by downstream tools
-- the scenario set used for train/validation/test evaluation
-- the acceptance criteria that must be satisfied before a design is considered
-  real
+Goal:
+
+- standardize train/validation/test scenario handling before any domain pilot
+  invents its own incompatible scenario format
+
+Dependencies:
+
+- depends on `PA-01`
+
+Required outcome:
+
+- add a new `design/scenarios` package with package-level godoc
+- define serializable types for:
+  - `ScenarioID`
+  - `ScenarioSet`
+  - `ScenarioSplit`
+  - `ScenarioRegistry`
+- support fixture loading from `testdata/`
+- validate that a scenario cannot belong to multiple splits at once
+- add deterministic tests for fixture loading, split validation, and ordering
+
+Mechanically verifiable completion:
+
+- `go test ./design/scenarios/...` passes
+- tests prove train/validation/test fixtures load and validate deterministically
+
+#### `PB-02`: Add shared promotion and acceptance criteria in `design/promotion`
+
+Goal:
+
+- formalize what it means for a candidate to be "good enough" to promote after
+  train/validation evaluation
+
+Dependencies:
+
+- depends on `PA-04`
+- depends on `PB-01`
+
+Required outcome:
+
+- add a new `design/promotion` package with package-level godoc
+- define serializable types for:
+  - acceptance criterion
+  - promotion decision
+  - promotion report
+  - per-split evaluation summary
+- implement helpers that decide promotion eligibility from:
+  - aggregate score breakdowns
+  - validation results
+  - split-specific thresholds
+- add tests for pass, fail, and edge-threshold cases
+
+Mechanically verifiable completion:
+
+- `go test ./design/promotion/...` passes
+- tests prove promotion decisions are deterministic and threshold-driven
+
+#### `PB-03`: Define the circuit domain core model in `domains/circuit`
+
+Goal:
+
+- create the reusable circuit candidate representation that future pilots and
+  emitters will target
+
+Dependencies:
+
+- depends on `PA-01`
+
+Required outcome:
+
+- add a new `domains/circuit` package with package-level godoc
+- define serializable types for at least:
+  - `NodeID`
+  - `Port`
+  - `Component`
+  - `CircuitGraph`
+  - `CircuitProgram`
+  - `CircuitSpec`
+  - `CircuitConstraint`
+- add validation helpers for:
+  - duplicate node IDs
+  - illegal port references
+  - missing component names/types
+- add JSON round-trip tests and validation tests
+- do **not** add simulator execution or full pilot logic yet
+
+Mechanically verifiable completion:
+
+- `go test ./domains/circuit/...` passes
+- tests prove invalid graphs fail validation and valid graphs round-trip through
+  JSON
+
+#### `PB-04`: Add circuit artifact emitters and reusable circuit scenario fixtures
+
+Goal:
+
+- make the circuit domain capable of producing durable artifacts and reusable
+  train/validation/test fixtures before the first circuit pilot is attempted
+
+Dependencies:
+
+- depends on `PB-01`
+- depends on `PB-03`
+
+Required outcome:
+
+- add a `domains/circuit/artifacts` package with emitters for at least:
+  - canonical JSON graph output
+  - SPICE-style netlist text
+  - structural-Verilog-style text
+- add a `domains/circuit/scenarios` package or `testdata/` fixture set with:
+  - a training split
+  - a validation split
+  - a test split
+- keep the scenarios small and deterministic; they should be reusable by later
+  pilots without requiring external tools
+- add tests that verify emitted artifacts are stable for a fixed graph and that
+  scenario fixtures load via `design/scenarios`
+
+Mechanically verifiable completion:
+
+- `go test ./domains/circuit/... ./design/scenarios/...` passes
+- tests prove artifact emitters are deterministic and scenario fixtures are
+  valid
+
+#### `PB-05`: Define the voxel domain core model in `domains/voxel`
+
+Goal:
+
+- create the reusable voxel/implicit-geometry candidate representation that
+  future engineering pilots will target
+
+Dependencies:
+
+- depends on `PA-01`
+
+Required outcome:
+
+- add a new `domains/voxel` package with package-level godoc
+- define serializable types for at least:
+  - `VoxelProgram`
+  - `VoxelDesign`
+  - `DesignVolume`
+  - `Material`
+  - `LoadCase`
+  - `InterfaceRegion`
+  - `VoxelSpec`
+- add validation helpers for:
+  - out-of-bounds occupied cells
+  - overlapping forbidden/interface regions
+  - empty or malformed design volumes
+- add JSON round-trip tests and validation tests
+- do **not** add external geometry kernels or pilot-specific evaluation logic yet
+
+Mechanically verifiable completion:
+
+- `go test ./domains/voxel/...` passes
+- tests prove invalid voxel designs fail validation and valid designs round-trip
+  through JSON
+
+#### `PB-06`: Add voxel artifact emitters and reusable voxel scenario fixtures
+
+Goal:
+
+- make the voxel domain capable of producing durable artifacts and reusable
+  engineering scenario fixtures before the first voxel pilot is attempted
+
+Dependencies:
+
+- depends on `PB-01`
+- depends on `PB-05`
+
+Required outcome:
+
+- add a `domains/voxel/artifacts` package with emitters for at least:
+  - canonical JSON design output
+  - one mesh-like export format (`.obj` or `.stl`)
+  - one simple human-readable summary format
+- add a `domains/voxel/scenarios` package or `testdata/` fixture set with:
+  - a training split
+  - a validation split
+  - a test split
+- keep the scenarios deterministic and pure-Go; do not require an external
+  geometry kernel at this stage
+- add tests that verify stable artifact output and valid scenario loading
+
+Mechanically verifiable completion:
+
+- `go test ./domains/voxel/... ./design/scenarios/...` passes
+- tests prove artifact emitters are deterministic and scenario fixtures are
+  valid
 
 ### Phase C: Add domain pilot projects
 
-Start with one pilot in each major domain:
+#### `PC-01`: Add the first circuit pilot in `experiments/circuit/half_adder`
 
-- one analog or digital circuit problem
-- one voxel or implicit-geometry structural problem
-- one additional domain where simulator-backed search is clearly valuable
+Goal:
 
-The goal is not to "cover everything" immediately. The goal is to prove the
-full pipeline: evolve -> decode -> simulate -> constrain -> validate -> export.
+- prove the end-to-end circuit path on a small, fully deterministic, pure-Go
+  pilot before introducing external circuit simulators
+
+Dependencies:
+
+- depends on `PA-02`
+- depends on `PA-03`
+- depends on `PA-04`
+- depends on `PB-04`
+
+Required outcome:
+
+- add a new pilot entrypoint at `experiments/circuit/half_adder`
+- use the shared circuit domain types and reusable scenario fixtures
+- implement a pure-Go truth-table evaluator for a bounded half-adder search
+  problem
+- evolve candidates, decode them to `CircuitGraph`, validate constraints, and
+  emit artifacts using the shared circuit emitters
+- add tests that prove the evaluator, decoder, and exported artifacts are wired
+  together correctly
+- do **not** require ngspice, Xyce, or any other external simulator yet
+
+Mechanically verifiable completion:
+
+- `go test ./experiments/circuit/half_adder/... ./domains/circuit/...` passes
+- `go run ./experiments/circuit/half_adder` completes and emits deterministic
+  artifacts for a fixed seed
+
+#### `PC-02`: Add circuit promotion, checkpoint, and held-out validation wiring
+
+Goal:
+
+- finish the full circuit pilot loop so it proves
+  evolve -> decode -> constrain -> validate -> promote -> export -> checkpoint
+
+Dependencies:
+
+- depends on `PA-06`
+- depends on `PB-02`
+- depends on `PC-01`
+
+Required outcome:
+
+- wire the half-adder pilot through:
+  - train/validation split handling
+  - promotion decisions
+  - checkpoint save/load
+  - run-manifest generation
+- add an integration test that runs the pilot with a fixed seed and verifies the
+  promotion report plus checkpoint artifacts are created and reloadable
+- ensure promoted outputs reference their emitted circuit artifacts through
+  `ArtifactRef` metadata
+
+Mechanically verifiable completion:
+
+- `go test ./experiments/circuit/half_adder/... ./design/...` passes
+- integration tests prove the promoted candidate survives held-out validation
+  and round-trips through checkpoint restore
+
+#### `PC-03`: Add the first voxel pilot in `experiments/voxel/bracket`
+
+Goal:
+
+- prove the end-to-end voxel path on a deterministic, pure-Go structural pilot
+  before any external geometry or FEA integration is attempted
+
+Dependencies:
+
+- depends on `PA-02`
+- depends on `PA-03`
+- depends on `PA-04`
+- depends on `PB-06`
+
+Required outcome:
+
+- add a new pilot entrypoint at `experiments/voxel/bracket`
+- use the shared voxel domain types and reusable scenario fixtures
+- implement a pure-Go occupancy-grid or lattice-style bracket evaluator with a
+  deterministic heuristic score
+- evolve candidates, decode them to `VoxelDesign`, validate constraints, and
+  emit JSON plus mesh-like artifacts through the shared voxel emitters
+- add tests that prove the evaluator, decoder, and artifact emitters are wired
+  together correctly
+- do **not** require PicoGK, noroyon, or external FEA tooling yet
+
+Mechanically verifiable completion:
+
+- `go test ./experiments/voxel/bracket/... ./domains/voxel/...` passes
+- `go run ./experiments/voxel/bracket` completes and emits deterministic
+  artifacts for a fixed seed
+
+#### `PC-04`: Add voxel promotion, checkpoint, and held-out validation wiring
+
+Goal:
+
+- finish the full voxel pilot loop so it proves
+  evolve -> decode -> constrain -> validate -> promote -> export -> checkpoint
+
+Dependencies:
+
+- depends on `PA-06`
+- depends on `PB-02`
+- depends on `PC-03`
+
+Required outcome:
+
+- wire the bracket pilot through:
+  - train/validation split handling
+  - promotion decisions
+  - checkpoint save/load
+  - run-manifest generation
+- add an integration test that runs the pilot with a fixed seed and verifies the
+  promotion report plus checkpoint artifacts are created and reloadable
+- ensure promoted outputs reference their emitted voxel artifacts through
+  `ArtifactRef` metadata
+
+Mechanically verifiable completion:
+
+- `go test ./experiments/voxel/bracket/... ./design/...` passes
+- integration tests prove the promoted candidate survives held-out validation
+  and round-trips through checkpoint restore
+
+#### `PC-05`: Add a third pilot in `experiments/control/mass_spring_damper`
+
+Goal:
+
+- demonstrate that the applied-design substrate is not limited to circuits and
+  geometry by shipping one additional pure-Go simulator-backed discovery domain
+
+Dependencies:
+
+- depends on `PA-02`
+- depends on `PA-03`
+- depends on `PA-04`
+- depends on `PA-06`
+- depends on `PB-01`
+- depends on `PB-02`
+
+Required outcome:
+
+- add a new pilot entrypoint at `experiments/control/mass_spring_damper`
+- implement a pure-Go plant simulator with:
+  - train/validation/test disturbance or initial-condition splits
+  - deterministic seeded evaluation
+  - exported controller/policy artifact output
+- use the shared manifest, promotion, and checkpoint infrastructure
+- add tests proving the pilot can evolve, validate, promote, and export a
+  controller artifact without external dependencies
+
+Mechanically verifiable completion:
+
+- `go test ./experiments/control/mass_spring_damper/... ./design/...` passes
+- `go run ./experiments/control/mass_spring_damper` completes and emits a
+  deterministic promoted controller artifact for a fixed seed
+
+#### `PC-06`: Add a cross-domain discovery regression suite and update docs
+
+Goal:
+
+- make the new applied-design pipeline a stable, repo-visible contract rather
+  than a set of isolated experiments
+
+Dependencies:
+
+- depends on `PC-02`
+- depends on `PC-04`
+- depends on `PC-05`
+
+Required outcome:
+
+- add cross-domain regression coverage that exercises the promoted pipeline for:
+  - the circuit pilot
+  - the voxel pilot
+  - the control pilot
+- ensure the regression suite verifies the full flow:
+  evolve -> decode -> constrain -> validate -> promote -> export -> checkpoint
+- update the root docs to list the new pilot entrypoints and the applied-design
+  package map once the regression suite is in place
+- keep the regression suite pure-Go and CI-friendly
+
+Mechanically verifiable completion:
+
+- `go test ./...` passes with the new pilots and regression suite included
+- docs reference the new applied-design packages and pilot entrypoints
+
+The goal is still not to "cover everything" immediately. The goal is to prove
+the full pipeline repeatedly and mechanically:
+
+> **evolve -> decode -> simulate -> constrain -> validate -> promote -> export -> checkpoint**
 
 ## 1. Novel electronic circuit design
 
