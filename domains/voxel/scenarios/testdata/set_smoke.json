@@ -1,0 +1,46 @@
+{
+  "name": "voxel-smoke",
+  "source": "domains/voxel/scenarios/testdata/set_smoke.json",
+  "scenarios": [
+    {
+      "id": "voxel-train-01",
+      "split": "train",
+      "tags": ["smoke", "cantilever", "bracket"],
+      "params": {
+        "volume": {"size_x": 4, "size_y": 3, "size_z": 2},
+        "target": "max_stiffness",
+        "max_cells": 12
+      }
+    },
+    {
+      "id": "voxel-train-02",
+      "split": "train",
+      "tags": ["smoke", "beam"],
+      "params": {
+        "volume": {"size_x": 6, "size_y": 2, "size_z": 2},
+        "target": "min_compliance",
+        "max_cells": 16
+      }
+    },
+    {
+      "id": "voxel-validation-01",
+      "split": "validation",
+      "tags": ["holdout", "bias-check"],
+      "params": {
+        "volume": {"size_x": 4, "size_y": 4, "size_z": 2},
+        "target": "max_stiffness",
+        "max_cells": 14
+      }
+    },
+    {
+      "id": "voxel-test-01",
+      "split": "test",
+      "tags": ["held-out", "final-check"],
+      "params": {
+        "volume": {"size_x": 5, "size_y": 3, "size_z": 3},
+        "target": "min_compliance",
+        "max_cells": 20
+      }
+    }
+  ]
+}

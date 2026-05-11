@@ -63,64 +63,65 @@ func TestJSON(t *testing.T) {
 	if err != nil {
 		t.Fatalf("JSON() error = %v", err)
 	}
-	const want = "{\n" +
-		"  \"candidate_id\": \"cand-circuit-01\",\n" +
-		"  \"graph\": {\n" +
-		"    \"components\": [\n" +
-		"      {\n" +
-		"        \"node_id\": \"vin\",\n" +
-		"        \"name\": \"vin\",\n" +
-		"        \"type\": \"source.dc\",\n" +
-		"        \"outputs\": [\n" +
-		"          {\n" +
-		"            \"node\": \"vin\",\n" +
-		"            \"name\": \"out\"\n" +
-		"          }\n" +
-		"        ],\n" +
-		"        \"params\": {\n" +
-		"          \"volts\": 5\n" +
-		"        }\n" +
-		"      },\n" +
-		"      {\n" +
-		"        \"node_id\": \"r1\",\n" +
-		"        \"name\": \"r1\",\n" +
-		"        \"type\": \"resistor\",\n" +
-		"        \"inputs\": [\n" +
-		"          {\n" +
-		"            \"node\": \"vin\",\n" +
-		"            \"name\": \"out\"\n" +
-		"          }\n" +
-		"        ],\n" +
-		"        \"outputs\": [\n" +
-		"          {\n" +
-		"            \"node\": \"r1\",\n" +
-		"            \"name\": \"out\"\n" +
-		"          }\n" +
-		"        ],\n" +
-		"        \"params\": {\n" +
-		"          \"ohms\": 1000,\n" +
-		"          \"tolerance\": \"5%\"\n" +
-		"        }\n" +
-		"      },\n" +
-		"      {\n" +
-		"        \"node_id\": \"gnd\",\n" +
-		"        \"name\": \"gnd\",\n" +
-		"        \"type\": \"ground\",\n" +
-		"        \"inputs\": [\n" +
-		"          {\n" +
-		"            \"node\": \"r1\",\n" +
-		"            \"name\": \"out\"\n" +
-		"          }\n" +
-		"        ]\n" +
-		"      }\n" +
-		"    ]\n" +
-		"  },\n" +
-		"  \"spec\": {\n" +
-		"    \"name\": \"smoke-rc\",\n" +
-		"    \"domain\": \"circuit\",\n" +
-		"    \"revision\": \"v1\"\n" +
-		"  }\n" +
-		"}\n"
+	const want = `{
+  "candidate_id": "cand-circuit-01",
+  "graph": {
+    "components": [
+      {
+        "node_id": "vin",
+        "name": "vin",
+        "type": "source.dc",
+        "outputs": [
+          {
+            "node": "vin",
+            "name": "out"
+          }
+        ],
+        "params": {
+          "volts": 5
+        }
+      },
+      {
+        "node_id": "r1",
+        "name": "r1",
+        "type": "resistor",
+        "inputs": [
+          {
+            "node": "vin",
+            "name": "out"
+          }
+        ],
+        "outputs": [
+          {
+            "node": "r1",
+            "name": "out"
+          }
+        ],
+        "params": {
+          "ohms": 1000,
+          "tolerance": "5%"
+        }
+      },
+      {
+        "node_id": "gnd",
+        "name": "gnd",
+        "type": "ground",
+        "inputs": [
+          {
+            "node": "r1",
+            "name": "out"
+          }
+        ]
+      }
+    ]
+  },
+  "spec": {
+    "name": "smoke-rc",
+    "domain": "circuit",
+    "revision": "v1"
+  }
+}
+`
 	if string(got) != want {
 		t.Fatalf("JSON() mismatch:\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
@@ -131,14 +132,14 @@ func TestSPICE(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SPICE() error = %v", err)
 	}
-	const want = "" +
-		"* circuit candidate: cand-circuit-01\n" +
-		"* spec: smoke-rc\n" +
-		".TITLE smoke-rc\n" +
-		"Xvin vin.out source.dc name=\"vin\" volts=5\n" +
-		"Xr1 vin.out r1.out resistor name=\"r1\" ohms=1000 tolerance=\"5%\"\n" +
-		"Xgnd r1.out ground name=\"gnd\"\n" +
-		".END\n"
+	const want = `* circuit candidate: cand-circuit-01
+* spec: smoke-rc
+.TITLE smoke-rc
+Xvin vin.out source.dc name="vin" volts=5
+Xr1 vin.out r1.out resistor name="r1" ohms=1000 tolerance="5%"
+Xgnd r1.out ground name="gnd"
+.END
+`
 	if got != want {
 		t.Fatalf("SPICE() mismatch:\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
@@ -149,13 +150,13 @@ func TestVerilog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Verilog() error = %v", err)
 	}
-	const want = "" +
-		"module smoke_rc;\n" +
-		"  // candidate_id: cand-circuit-01\n" +
-		"  source_dc #(.volts(5)) vin (.out(vin_out));\n" +
-		"  resistor #(.ohms(1000), .tolerance(\"5%\")) r1 (.in(vin_out), .out(r1_out));\n" +
-		"  ground gnd (.in(r1_out));\n" +
-		"endmodule\n"
+	const want = `module smoke_rc;
+  // candidate_id: cand-circuit-01
+  source_dc #(.volts(5)) vin (.out(vin_out));
+  resistor #(.ohms(1000), .tolerance("5%")) r1 (.in(vin_out), .out(r1_out));
+  ground gnd (.in(r1_out));
+endmodule
+`
 	if got != want {
 		t.Fatalf("Verilog() mismatch:\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
