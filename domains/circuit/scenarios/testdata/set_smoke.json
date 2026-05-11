@@ -1,0 +1,46 @@
+{
+  "name": "circuit-smoke",
+  "source": "domains/circuit/scenarios/testdata/set_smoke.json",
+  "scenarios": [
+    {
+      "id": "circuit-train-01",
+      "split": "train",
+      "tags": ["smoke", "rc", "dc"],
+      "params": {
+        "target_response": "monotonic_low_pass",
+        "max_components": 3,
+        "required_types": ["source.dc", "resistor", "ground"]
+      }
+    },
+    {
+      "id": "circuit-train-02",
+      "split": "train",
+      "tags": ["smoke", "divider"],
+      "params": {
+        "target_response": "voltage_divider",
+        "max_components": 4,
+        "required_types": ["source.dc", "resistor", "ground"]
+      }
+    },
+    {
+      "id": "circuit-validation-01",
+      "split": "validation",
+      "tags": ["holdout", "bias-check"],
+      "params": {
+        "target_response": "stable_bias",
+        "max_components": 4,
+        "required_types": ["source.dc", "resistor", "ground"]
+      }
+    },
+    {
+      "id": "circuit-test-01",
+      "split": "test",
+      "tags": ["held-out", "final-check"],
+      "params": {
+        "target_response": "no_oscillation",
+        "max_components": 5,
+        "required_types": ["source.dc", "resistor", "ground"]
+      }
+    }
+  ]
+}
