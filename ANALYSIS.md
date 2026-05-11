@@ -598,6 +598,26 @@ Mechanically verifiable completion:
 - tests prove invalid graphs fail validation and valid graphs round-trip through
   JSON
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `domains/circuit` (`domains/circuit/doc.go`,
+  `domains/circuit/circuit.go`)
+- required serializable types added:
+  `NodeID`, `Port`, `Component`, `CircuitGraph`, `CircuitProgram`,
+  `CircuitSpec`, `CircuitConstraint`
+- validation helpers added:
+  `CircuitGraph.Validate` (duplicate `node_id` detection, missing component
+  name/type checks, illegal port-reference checks against known nodes),
+  `CircuitProgram.Validate` (delegates to graph validation)
+- deterministic tests added: `domains/circuit/circuit_test.go`
+  (valid graph passes; duplicate node ID fails; missing component name/type
+  fail; illegal port reference fails; validation determinism; program validate
+  delegation; CircuitProgram JSON round-trip + post-round-trip validation)
+- command proof:
+  `go test ./domains/circuit/...`
+
 #### `PB-04`: Add circuit artifact emitters and reusable circuit scenario fixtures
 
 Goal:
