@@ -1,0 +1,7 @@
+{
+  "run_id": "pa01-minimal",
+  "run_config": {
+    "domain": "smoke",
+    "experiment": "manifest-minimal"
+  }
+}
