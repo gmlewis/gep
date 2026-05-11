@@ -764,6 +764,29 @@ Mechanically verifiable completion:
 - tests prove artifact emitters are deterministic and scenario fixtures are
   valid
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `domains/voxel/artifacts` (`domains/voxel/artifacts/doc.go`,
+  `domains/voxel/artifacts/artifacts.go`)
+- emitters added:
+  - `JSON`: canonical indented JSON output for `VoxelProgram`
+  - `OBJ`: Wavefront OBJ mesh with one unit cube per occupied voxel cell
+  - `Summary`: concise human-readable plain-text overview
+- package added: `domains/voxel/scenarios` (`domains/voxel/scenarios/doc.go`,
+  `domains/voxel/scenarios/scenarios.go`)
+- embedded fixture set added:
+  `domains/voxel/scenarios/testdata/set_smoke.json` with 4 scenarios:
+  2 training splits, 1 validation split, 1 test split
+- deterministic tests added:
+  `domains/voxel/artifacts/artifacts_test.go` (exact JSON/OBJ/Summary
+  output verification, determinism across two calls, rejection of invalid
+  programs) and `domains/voxel/scenarios/scenarios_test.go` (fixture
+  loading, split counts, determinism across two loads)
+- command proof:
+  `go test ./domains/voxel/... ./design/scenarios/...`
+
 ### Phase C: Add domain pilot projects
 
 #### `PC-01`: Add the first circuit pilot in `experiments/circuit/half_adder`
