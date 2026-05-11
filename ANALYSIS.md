@@ -185,6 +185,26 @@ Mechanically verifiable completion:
 - tests prove batched execution preserves all requests, respects worker-count
   limits, and returns deterministic results for a seeded fake evaluator
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `design/eval` (`design/eval/doc.go`, `design/eval/eval.go`)
+- required abstractions added:
+  `CandidateID`, `ScenarioID`, `BatchRequestItem`, `BatchResultItem`,
+  `BatchRequest`, `BatchResult`, `Evaluator`, `Runner`, `WorkerRunner`
+- dispatcher behavior implemented:
+  context cancellation support, bounded worker pool execution, request/result
+  identity propagation
+- deterministic fake evaluator coverage added:
+  `design/eval/eval_test.go`
+- verification tests added:
+  request preservation and deterministic results for seeded fake evaluator,
+  worker-limit enforcement, context-cancellation handling, and worker-count
+  validation
+- command proof:
+  `go test ./design/eval/...`
+
 #### `PA-03`: Add constraint and validation reporting in `design/constraints`
 
 Goal:
