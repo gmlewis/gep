@@ -941,6 +941,34 @@ Mechanically verifiable completion:
 - `go run ./experiments/voxel/bracket` completes and emits deterministic
   artifacts for a fixed seed
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `experiments/voxel/bracket`
+  (`experiments/voxel/bracket/main.go`,
+  `experiments/voxel/bracket/main_test.go`)
+- pilot entrypoint implemented:
+  deterministic pure-Go voxel bracket loop evolves boolean genomes, decodes
+  candidates into `domains/voxel.VoxelDesign`, validates constraints, and emits
+  shared voxel artifacts (`candidate.json`, `candidate.obj`, `candidate.txt`)
+- shared domain wiring implemented:
+  fixture scenarios are loaded from `domains/voxel/scenarios` and parsed into
+  bounded design volumes plus max-cell constraints for deterministic
+  train-split evaluation
+- evaluator and decoder wiring implemented:
+  occupancy-grid decoding uses deterministic lattice features and pure-Go
+  structural heuristics (left/right interface coverage, path connectivity, and
+  bounded density fit) with deterministic scoring for fixed seeds
+- deterministic tests added:
+  `TestBracketPipelineEvaluatorDecoderAndArtifacts`,
+  `TestScoreScenarioRejectsOverMaxCells`, and
+  `TestRunPilotDeterministicFixedSeed` prove evaluator, decoder, artifact
+  emitters, and fixed-seed run determinism are wired together correctly
+- command proof:
+  `go test ./experiments/voxel/bracket/... ./domains/voxel/...`
+  `go run ./experiments/voxel/bracket --seed 20260511 --out /tmp/bracket_pc03_artifacts`
+
 #### `PC-04`: Add voxel promotion, checkpoint, and held-out validation wiring
 
 Goal:
