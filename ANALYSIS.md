@@ -463,6 +463,40 @@ Mechanically verifiable completion:
 - `go test ./design/scenarios/...` passes
 - tests prove train/validation/test fixtures load and validate deterministically
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `design/scenarios` (`design/scenarios/doc.go`,
+  `design/scenarios/scenarios.go`)
+- required serializable types added:
+  `ScenarioID`, `ScenarioSplit` (with `Train`/`Validation`/`Test` constants),
+  `Scenario` (ID + split + optional tags + optional params), `ScenarioSet`
+  (named ordered collection with optional source), `ScenarioRegistry`
+  (aggregates one or more sets)
+- fixture loading helpers added:
+  `LoadScenarioSet` (JSON reader), `LoadScenarioSetFile` (file path); both
+  use `DisallowUnknownFields` and reject multi-object streams
+- split validation added: `ScenarioRegistry.Validate` returns a descriptive
+  error for the first conflict — cross-split duplicate ID or same-split
+  repeated ID — scanning in declaration order for determinism
+- query helpers added: `ScenarioRegistry.ByID` (first match in declaration
+  order, bool ok), `ScenarioRegistry.BySplit` (ordered slice, new allocation)
+- testdata fixtures added:
+  `design/scenarios/testdata/set_smoke.json` (2 train + 1 validation + 2 test
+  scenarios, tags exercised), `design/scenarios/testdata/set_params.json`
+  (3 scenarios with JSON params map)
+- deterministic tests added: `design/scenarios/scenarios_test.go`
+  (nil reader, malformed JSON, two-object stream, unknown field, empty set,
+  missing file, smoke fixture load, params fixture load + params round-trip,
+  smoke split assignments, smoke ordering, smoke validates clean, empty
+  registry, valid registry, cross-split duplicate, same-split duplicate,
+  duplicate across sets, Validate determinism, ByID found/missing/first-wins,
+  BySplit empty/returns-copy/declaration-order, multi-set registry, fixture
+  loading determinism, BySplit determinism)
+- command proof:
+  `go test ./design/scenarios/...`
+
 #### `PB-02`: Add shared promotion and acceptance criteria in `design/promotion`
 
 Goal:

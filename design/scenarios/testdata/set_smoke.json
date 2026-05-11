@@ -1,0 +1,11 @@
+{
+  "name": "smoke",
+  "source": "testdata/set_smoke.json",
+  "scenarios": [
+    {"id": "s-train-01", "split": "train", "tags": ["basic"]},
+    {"id": "s-train-02", "split": "train"},
+    {"id": "s-val-01",   "split": "validation", "tags": ["basic"]},
+    {"id": "s-test-01",  "split": "test", "tags": ["final"]},
+    {"id": "s-test-02",  "split": "test"}
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "params",
+  "source": "testdata/set_params.json",
+  "scenarios": [
+    {
+      "id": "p-train-01",
+      "split": "train",
+      "params": {"load": 1.5, "label": "light"}
+    },
+    {
+      "id": "p-train-02",
+      "split": "train",
+      "params": {"load": 3.0, "label": "heavy"}
+    },
+    {
+      "id": "p-val-01",
+      "split": "validation",
+      "params": {"load": 2.0, "label": "medium"}
+    }
+  ]
+}
