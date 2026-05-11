@@ -6,6 +6,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -15,6 +16,10 @@ import (
 	"strings"
 
 	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v2/design"
+	"github.com/gmlewis/gep/v2/design/checkpoint"
+	"github.com/gmlewis/gep/v2/design/objectives"
+	"github.com/gmlewis/gep/v2/design/promotion"
 	designscenarios "github.com/gmlewis/gep/v2/design/scenarios"
 	"github.com/gmlewis/gep/v2/domains/circuit"
 	circuitartifacts "github.com/gmlewis/gep/v2/domains/circuit/artifacts"
@@ -46,7 +51,23 @@ type runResult struct {
 	Score       float64
 	Karva       string
 	GateCount   int
+	Promoted    bool
 }
+
+const (
+	candidateJSONArtifactName    = "candidate.json"
+	candidateSPICEArtifactName   = "candidate.spice"
+	candidateVerilogArtifactName = "candidate.v"
+	promotionReportArtifactName  = "promotion_report.json"
+	runManifestArtifactName      = "run_manifest.json"
+	checkpointArtifactName       = "checkpoint.json"
+)
+
+var halfAdderObjectiveDefs = []objectives.ObjectiveDef{{
+	Name:   "truth_table_accuracy",
+	Weight: 1,
+	Kind:   objectives.Soft,
+}}
 
 func main() {
 	cfg := runConfig{}
@@ -61,7 +82,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "half_adder: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("half_adder complete: candidate=%s score=%.2f gates=%d karva=%s\n", result.CandidateID, result.Score, result.GateCount, result.Karva)
+	fmt.Printf("half_adder complete: candidate=%s score=%.2f gates=%d promoted=%t karva=%s\n", result.CandidateID, result.Score, result.GateCount, result.Promoted, result.Karva)
 	fmt.Printf("artifacts written to %s\n", cfg.OutputDir)
 }
 
@@ -73,9 +94,37 @@ func runPilot(cfg runConfig) (runResult, error) {
 		return runResult{}, errors.New("generations must be > 0")
 	}
 
-	trainScenarios, err := loadTrainScenarios()
+	set, registry, err := loadScenarioRegistry()
 	if err != nil {
 		return runResult{}, err
+	}
+	trainScenarios := registry.BySplit(designscenarios.Train)
+	validationScenarios := registry.BySplit(designscenarios.Validation)
+	if len(trainScenarios) == 0 {
+		return runResult{}, errors.New("circuit fixture scenarios contain no train split")
+	}
+	if len(validationScenarios) == 0 {
+		return runResult{}, errors.New("circuit fixture scenarios contain no validation split")
+	}
+
+	candidateID := fmt.Sprintf("half-adder-seed-%d", cfg.Seed)
+	manifest := design.RunManifest{
+		RunID: candidateID,
+		RunConfig: design.RunConfig{
+			Domain:         "circuit",
+			Experiment:     "half_adder",
+			PopulationSize: cfg.PopulationSize,
+			NumGenerations: cfg.Generations,
+		},
+		Seeds: []design.SeedRecord{{
+			Name:    "evolution_seed",
+			Value:   cfg.Seed,
+			Purpose: "deterministic evolution seed",
+		}},
+		ScenarioSplits: []design.ScenarioSplitSummary{
+			{SplitName: string(designscenarios.Train), ScenarioCount: len(trainScenarios), Source: set.Source},
+			{SplitName: string(designscenarios.Validation), ScenarioCount: len(validationScenarios), Source: set.Source},
+		},
 	}
 
 	catalog, err := boolNodes.CatalogFromNames([]string{"Not", "And", "Or", "Xor"})
@@ -98,13 +147,85 @@ func runPilot(cfg runConfig) (runResult, error) {
 	}
 
 	best := population.Evolve(cfg.Generations)
-	candidateID := fmt.Sprintf("half-adder-seed-%d", cfg.Seed)
 	program, gateCount, err := decodeCircuitProgram(candidateID, best.Genome)
 	if err != nil {
 		return runResult{}, err
 	}
-	if err := exportArtifacts(program, cfg.OutputDir); err != nil {
+	artifactRefs, err := exportArtifacts(program, cfg.OutputDir)
+	if err != nil {
 		return runResult{}, err
+	}
+	manifest.Artifacts = append(manifest.Artifacts, artifactRefs...)
+
+	trainResults, err := evaluateScenarios(best.Genome, gateCount, trainScenarios)
+	if err != nil {
+		return runResult{}, err
+	}
+	validationResults, err := evaluateScenarios(best.Genome, gateCount, validationScenarios)
+	if err != nil {
+		return runResult{}, err
+	}
+	report := promotion.Evaluate(candidateID, []promotion.AcceptanceCriterion{
+		{Split: designscenarios.Train, MinAggregateScore: 400},
+		{Split: designscenarios.Validation, MinAggregateScore: 400},
+	}, []promotion.SplitEvalSummary{
+		promotion.SummarizeSplit(designscenarios.Train, trainResults),
+		promotion.SummarizeSplit(designscenarios.Validation, validationResults),
+	})
+
+	promotionReportPath := filepath.Join(cfg.OutputDir, promotionReportArtifactName)
+	if err := writeJSONFile(promotionReportPath, report); err != nil {
+		return runResult{}, fmt.Errorf("write promotion report: %w", err)
+	}
+	manifest.Artifacts = append(manifest.Artifacts, design.ArtifactRef{
+		Name:   "promotion_report",
+		Path:   promotionReportPath,
+		Format: "json",
+		Kind:   "promotion.report",
+	})
+
+	manifestPath := filepath.Join(cfg.OutputDir, runManifestArtifactName)
+	if err := design.WriteRunManifestFile(manifestPath, &manifest); err != nil {
+		return runResult{}, fmt.Errorf("write run manifest: %w", err)
+	}
+	manifest.Artifacts = append(manifest.Artifacts, design.ArtifactRef{
+		Name:   "run_manifest",
+		Path:   manifestPath,
+		Format: "json",
+		Kind:   "run.manifest",
+	})
+	if err := design.WriteRunManifestFile(manifestPath, &manifest); err != nil {
+		return runResult{}, fmt.Errorf("rewrite run manifest with full artifact refs: %w", err)
+	}
+
+	checkpointPath := filepath.Join(cfg.OutputDir, checkpointArtifactName)
+	checkpointRefs := append([]design.ArtifactRef(nil), manifest.Artifacts...)
+	checkpointRefs = append(checkpointRefs, design.ArtifactRef{
+		Name:   "checkpoint",
+		Path:   checkpointPath,
+		Format: "json",
+		Kind:   "run.checkpoint",
+	})
+	snapshot := &checkpoint.Snapshot{
+		Manifest: manifest,
+		Elites: []checkpoint.EliteRecord{{
+			CandidateID:    candidateID,
+			Generation:     cfg.Generations,
+			AggregateScore: report.Summaries[len(report.Summaries)-1].MeanAggregateScore,
+			Breakdown:      validationResults[0].Breakdown,
+		}},
+		Aggregate: checkpoint.AggregateSnapshot{
+			BestScore:                best.Score,
+			MeanScore:                report.Summaries[len(report.Summaries)-1].MeanAggregateScore,
+			TotalCandidatesEvaluated: cfg.PopulationSize * cfg.Generations,
+		},
+		ArtifactRefs: checkpointRefs,
+	}
+	if err := checkpoint.SaveFile(checkpointPath, snapshot); err != nil {
+		return runResult{}, fmt.Errorf("write checkpoint snapshot: %w", err)
+	}
+	if _, err := checkpoint.LoadFile(checkpointPath); err != nil {
+		return runResult{}, fmt.Errorf("reload checkpoint snapshot: %w", err)
 	}
 
 	return runResult{
@@ -112,17 +233,26 @@ func runPilot(cfg runConfig) (runResult, error) {
 		Score:       best.Score,
 		Karva:       best.Genome.KarvaString(),
 		GateCount:   gateCount,
+		Promoted:    report.Promoted,
 	}, nil
 }
 
-func loadTrainScenarios() ([]designscenarios.Scenario, error) {
+func loadScenarioRegistry() (*designscenarios.ScenarioSet, *designscenarios.ScenarioRegistry, error) {
 	set, err := circuitscenarios.LoadFixtureSet()
 	if err != nil {
-		return nil, fmt.Errorf("load circuit fixture scenarios: %w", err)
+		return nil, nil, fmt.Errorf("load circuit fixture scenarios: %w", err)
 	}
 	registry := &designscenarios.ScenarioRegistry{Sets: []designscenarios.ScenarioSet{*set}}
 	if err := registry.Validate(); err != nil {
-		return nil, fmt.Errorf("validate circuit fixture scenarios: %w", err)
+		return nil, nil, fmt.Errorf("validate circuit fixture scenarios: %w", err)
+	}
+	return set, registry, nil
+}
+
+func loadTrainScenarios() ([]designscenarios.Scenario, error) {
+	_, registry, err := loadScenarioRegistry()
+	if err != nil {
+		return nil, err
 	}
 	train := registry.BySplit(designscenarios.Train)
 	if len(train) == 0 {
@@ -136,11 +266,10 @@ func scoreCandidate(genome core.Genome[bool], scenarios []designscenarios.Scenar
 		return 0
 	}
 
-	correct, total, evalErr := evaluateHalfAdder(genome)
-	if evalErr != nil || total == 0 {
+	baseScore, evalErr := halfAdderAccuracyScore(genome)
+	if evalErr != nil {
 		return 0
 	}
-	baseScore := 1000.0 * float64(correct) / float64(total)
 
 	_, gateCount, err := decodeCircuitProgram("score", genome)
 	if err != nil {
@@ -160,6 +289,33 @@ func scoreCandidate(genome core.Genome[bool], scenarios []designscenarios.Scenar
 		totalScore += baseScore
 	}
 	return totalScore / float64(len(scenarios))
+}
+
+func halfAdderAccuracyScore(genome core.Genome[bool]) (float64, error) {
+	correct, total, evalErr := evaluateHalfAdder(genome)
+	if evalErr != nil {
+		return 0, evalErr
+	}
+	if total == 0 {
+		return 0, errors.New("evaluate half adder: no outputs produced")
+	}
+	return 1000.0 * float64(correct) / float64(total), nil
+}
+
+func evaluateScenarios(genome core.Genome[bool], gateCount int, scenarios []designscenarios.Scenario) ([]objectives.AggregateResult, error) {
+	baseScore, err := halfAdderAccuracyScore(genome)
+	if err != nil {
+		return nil, fmt.Errorf("evaluate truth-table score: %w", err)
+	}
+	results := make([]objectives.AggregateResult, 0, len(scenarios))
+	for _, sc := range scenarios {
+		maxComponents := scenarioMaxComponents(sc)
+		rejected := maxComponents > 0 && gateCount > maxComponents
+		results = append(results, objectives.Score(halfAdderObjectiveDefs, map[string]float64{
+			"truth_table_accuracy": baseScore,
+		}, rejected, 0))
+	}
+	return results, nil
 }
 
 func evaluateHalfAdder(genome core.Genome[bool]) (correct int, total int, err error) {
@@ -382,34 +538,56 @@ func scenarioMaxComponents(sc designscenarios.Scenario) int {
 	}
 }
 
-func exportArtifacts(program circuit.CircuitProgram, outputDir string) error {
+func exportArtifacts(program circuit.CircuitProgram, outputDir string) ([]design.ArtifactRef, error) {
 	if err := os.MkdirAll(outputDir, 0o755); err != nil {
-		return fmt.Errorf("create output directory %q: %w", outputDir, err)
+		return nil, fmt.Errorf("create output directory %q: %w", outputDir, err)
 	}
 
 	jsonBytes, err := circuitartifacts.JSON(program)
 	if err != nil {
-		return fmt.Errorf("emit JSON artifact: %w", err)
+		return nil, fmt.Errorf("emit JSON artifact: %w", err)
 	}
-	if err := os.WriteFile(filepath.Join(outputDir, "candidate.json"), jsonBytes, 0o644); err != nil {
-		return fmt.Errorf("write JSON artifact: %w", err)
+	jsonPath := filepath.Join(outputDir, candidateJSONArtifactName)
+	if err := os.WriteFile(jsonPath, jsonBytes, 0o644); err != nil {
+		return nil, fmt.Errorf("write JSON artifact: %w", err)
 	}
 
 	spiceText, err := circuitartifacts.SPICE(program)
 	if err != nil {
-		return fmt.Errorf("emit SPICE artifact: %w", err)
+		return nil, fmt.Errorf("emit SPICE artifact: %w", err)
 	}
-	if err := os.WriteFile(filepath.Join(outputDir, "candidate.spice"), []byte(spiceText), 0o644); err != nil {
-		return fmt.Errorf("write SPICE artifact: %w", err)
+	spicePath := filepath.Join(outputDir, candidateSPICEArtifactName)
+	if err := os.WriteFile(spicePath, []byte(spiceText), 0o644); err != nil {
+		return nil, fmt.Errorf("write SPICE artifact: %w", err)
 	}
 
 	verilogText, err := circuitartifacts.Verilog(program)
 	if err != nil {
-		return fmt.Errorf("emit Verilog artifact: %w", err)
+		return nil, fmt.Errorf("emit Verilog artifact: %w", err)
 	}
-	if err := os.WriteFile(filepath.Join(outputDir, "candidate.v"), []byte(verilogText), 0o644); err != nil {
-		return fmt.Errorf("write Verilog artifact: %w", err)
+	verilogPath := filepath.Join(outputDir, candidateVerilogArtifactName)
+	if err := os.WriteFile(verilogPath, []byte(verilogText), 0o644); err != nil {
+		return nil, fmt.Errorf("write Verilog artifact: %w", err)
 	}
 
+	return []design.ArtifactRef{
+		{Name: "promoted_circuit_json", Path: jsonPath, Format: "json", Kind: "circuit.program"},
+		{Name: "promoted_circuit_spice", Path: spicePath, Format: "spice", Kind: "circuit.netlist"},
+		{Name: "promoted_circuit_verilog", Path: verilogPath, Format: "verilog", Kind: "circuit.verilog"},
+	}, nil
+}
+
+func writeJSONFile(filename string, value any) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("create %q: %w", filename, err)
+	}
+	defer f.Close()
+
+	enc := json.NewEncoder(f)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(value); err != nil {
+		return fmt.Errorf("encode %q: %w", filename, err)
+	}
 	return nil
 }

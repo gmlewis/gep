@@ -879,6 +879,36 @@ Mechanically verifiable completion:
 - integration tests prove the promoted candidate survives held-out validation
   and round-trips through checkpoint restore
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- pilot loop extended in `experiments/circuit/half_adder/main.go` to execute:
+  evolve -> decode -> constrain -> validate -> promote -> export -> checkpoint
+- train/validation split wiring added via shared circuit fixture registry
+  (`loadScenarioRegistry`) and deterministic split summaries recorded in
+  `design.RunManifest`
+- promotion wiring added using `design/promotion`:
+  per-split aggregate results are summarized with
+  `promotion.SummarizeSplit` and evaluated by `promotion.Evaluate` against
+  explicit train/validation acceptance criteria
+- run-manifest and checkpoint wiring added:
+  `run_manifest.json` is emitted with deterministic run config, seed records,
+  scenario-split metadata, and artifact references; `checkpoint.json` is saved
+  and immediately reloaded with `design/checkpoint` to prove replayability
+- promoted-output artifact metadata added:
+  emitted circuit artifacts (`candidate.json`, `candidate.spice`, `candidate.v`)
+  are recorded as `design.ArtifactRef` entries and propagated through manifest
+  and checkpoint metadata
+- deterministic integration test added:
+  `TestRunPilotPromotionCheckpointAndManifest` in
+  `experiments/circuit/half_adder/main_test.go` runs the fixed-seed pilot and
+  verifies promotion success, manifest artifact references, and checkpoint
+  manifest round-trip parity
+- command proof:
+  `go test ./experiments/circuit/half_adder/... ./design/...`
+  `go run ./experiments/circuit/half_adder --seed 20260511 --out /tmp/half_adder_pc02_artifacts`
+
 #### `PC-03`: Add the first voxel pilot in `experiments/voxel/bracket`
 
 Goal:
