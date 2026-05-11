@@ -32,6 +32,8 @@ layers. New workflow code should not build on them.
 
 ## Package map
 
+### Core engine
+
 | Package | Role | Use it when |
 | --- | --- | --- |
 | `core` | Typed GEP representation and random genome construction | You need `Node[T]`, `Genome[T]`, `Catalog[T]`, or direct genome evaluation |
@@ -44,6 +46,26 @@ layers. New workflow code should not build on them.
 | `env` / `gymnasium` | Exploratory environment integration | You are experimenting with Gymnasium-style environments and discrete action/observation spaces |
 | `experiments/*` | End-to-end examples | You want concrete entrypoints that exercise the typed stack |
 | `gene`, `genome` | Legacy compatibility layers | You are maintaining compatibility code, not building new features |
+
+### Applied-design substrate
+
+The applied-design packages provide a shared pipeline contract for
+multi-domain discovery experiments:
+`evolve → decode → constrain → validate → promote → export → checkpoint`
+
+| Package | Role |
+| --- | --- |
+| `design` | `RunManifest` schema, `ArtifactRef`, JSON helpers |
+| `design/scenarios` | `ScenarioSet`, `ScenarioRegistry`, train/validation/test splits |
+| `design/promotion` | `PromotionReport`, `AcceptanceCriterion`, threshold-driven promotion |
+| `design/checkpoint` | `Snapshot` save/load, manifest replay |
+| `design/objectives` | `ObjectiveDef`, `AggregateResult`, multi-objective scoring |
+| `domains/circuit` | Serializable circuit model, structural validation |
+| `domains/circuit/artifacts` | JSON, SPICE-netlist, and structural-Verilog emitters |
+| `domains/circuit/scenarios` | Embedded half-adder circuit scenario fixtures |
+| `domains/voxel` | Serializable voxel design types, occupancy validation |
+| `domains/voxel/artifacts` | JSON, OBJ (Wavefront mesh), and summary emitters |
+| `domains/voxel/scenarios` | Embedded bracket voxel scenario fixtures |
 
 ## Quick start
 
@@ -184,12 +206,26 @@ agent orchestration, but advanced RL work will often want a richer typed layer.
 
 ## Included entrypoints
 
+### Classic GEP experiments
+
 - `go run ./experiments/nand`
 - `go run ./experiments/odd-3-parity`
 - `go run ./experiments/odd-7-parity`
 - `go run ./experiments/6-multiplexer`
 - `go run ./experiments/symbolic_regression`
 - `go run ./examples/gymnasium/toy_text/blackjack-go`
+
+### Applied-design pilots
+
+These pilots demonstrate the full applied-design pipeline across three domains:
+
+- `go run ./experiments/circuit/half_adder` — evolves a boolean half-adder and exports SPICE/Verilog artifacts
+- `go run ./experiments/voxel/bracket` — evolves a voxel bracket geometry and exports JSON/OBJ artifacts
+- `go run ./experiments/control/mass_spring_damper` — evolves a controller policy and exports a controller JSON artifact
+
+Cross-domain regression suite (runs all three full pipelines as a single gate):
+
+- `go test ./experiments/regression/...`
 
 ## Quality gates
 

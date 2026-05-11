@@ -1121,6 +1121,30 @@ Mechanically verifiable completion:
 - `go test ./...` passes with the new pilots and regression suite included
 - docs reference the new applied-design packages and pilot entrypoints
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `experiments/regression`
+  (`experiments/regression/doc.go`,
+  `experiments/regression/regression_test.go`)
+- cross-domain regression gate added:
+  `TestCrossDomainPipelines` runs the full
+  `TestRunPilotPromotionCheckpointAndManifest` test for each of the three
+  applied-design pilots (circuit/half_adder, voxel/bracket,
+  control/mass_spring_damper) in parallel via subprocess, validating the shared
+  infrastructure (design.RunManifest, promotion.PromotionReport,
+  checkpoint.Snapshot) across all three domains
+- root docs updated:
+  `README.md` now lists the applied-design package map (design,
+  design/scenarios, design/promotion, design/checkpoint, design/objectives,
+  domains/circuit, domains/circuit/artifacts, domains/circuit/scenarios,
+  domains/voxel, domains/voxel/artifacts, domains/voxel/scenarios) and the
+  three pilot entrypoints plus the regression suite entry point
+- command proof:
+  `go test ./experiments/regression/...`
+  `go test ./...`
+
 The goal is still not to "cover everything" immediately. The goal is to prove
 the full pipeline repeatedly and mechanically:
 
