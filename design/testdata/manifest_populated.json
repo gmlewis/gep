@@ -1,0 +1,47 @@
+{
+  "run_id": "run-2026-05-11",
+  "run_config": {
+    "domain": "circuit",
+    "experiment": "nand-search",
+    "population_size": 500,
+    "num_generations": 250
+  },
+  "seeds": [
+    {
+      "name": "population-init",
+      "value": 101,
+      "purpose": "initial population generation"
+    },
+    {
+      "name": "evaluation-order",
+      "value": 202,
+      "purpose": "deterministic batched evaluator ordering"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "best-program-go",
+      "path": "artifacts/run-2026-05-11/best_program.go",
+      "format": "go",
+      "kind": "program"
+    },
+    {
+      "name": "run-summary",
+      "path": "artifacts/run-2026-05-11/summary.json",
+      "format": "json",
+      "kind": "report"
+    }
+  ],
+  "scenario_splits": [
+    {
+      "split_name": "train",
+      "scenario_count": 64,
+      "source": "fixtures/circuit/nand/train.json"
+    },
+    {
+      "split_name": "validation",
+      "scenario_count": 16,
+      "source": "fixtures/circuit/nand/validation.json"
+    }
+  ]
+}

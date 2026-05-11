@@ -130,6 +130,27 @@ Mechanically verifiable completion:
 - tests prove manifest JSON round-trips without losing seed, config, artifact,
   or scenario-split metadata
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `design` (`design/doc.go`, `design/manifest.go`)
+- required schema types added:
+  `RunManifest`, `RunConfig`, `ArtifactRef`, `ScenarioSplitSummary`,
+  `SeedRecord`
+- JSON manifest helpers added:
+  `LoadRunManifest`, `LoadRunManifestFile`, `WriteRunManifest`,
+  `WriteRunManifestFile`
+- fixtures added:
+  `design/testdata/manifest_minimal.json`,
+  `design/testdata/manifest_populated.json`
+- verification tests added:
+  `design/manifest_test.go` (in-memory and file round-trip coverage for
+  minimal and populated manifests, including seed/config/artifact/scenario
+  metadata retention)
+- command proof:
+  `go test ./design/...`
+
 #### `PA-02`: Add batched evaluation worker abstractions in `design/eval`
 
 Goal:
