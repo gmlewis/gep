@@ -406,6 +406,33 @@ Mechanically verifiable completion:
 - tests prove checkpoint round-trips preserve manifest, elite metadata, scores,
   and novelty state
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `design/checkpoint` (`design/checkpoint/doc.go`,
+  `design/checkpoint/checkpoint.go`)
+- required types added:
+  `EliteRecord`, `AggregateSnapshot`, `NoveltySnapshot`, `Snapshot`
+- `Snapshot` combines: `design.RunManifest`, `[]EliteRecord`,
+  `AggregateSnapshot`, `NoveltySnapshot`, `[]design.ArtifactRef`
+- save/load helpers added: `Save`/`SaveFile` (write versioned indented JSON),
+  `Load`/`LoadFile` (decode and validate schema version)
+- schema versioning: `SchemaVersion` field stamped on every save; unknown
+  versions are rejected with a descriptive error
+- replay helpers added: `ReplayManifest`, `ReplayElites`,
+  `ReplayNoveltyEntries`; each returns a defensive copy and accepts a nil
+  snapshot with a clear error
+- integration tests added: `design/checkpoint/checkpoint_test.go`
+  (Save/Load buffer round-trip, schema version stamped on Save,
+  nil-writer / nil-snapshot / nil-reader error cases, unknown version error,
+  two-object stream rejection, file round-trip, invalid file path errors,
+  ReplayManifest / ReplayElites / ReplayNoveltyEntries with nil and copy
+  checks, novelty archive re-seeding from replay, deterministic Save output,
+  empty-elites and empty-novelty round-trip)
+- command proof:
+  `go test ./design/checkpoint/... ./design/...`
+
 ### Phase B: Add artifact emitters and scenario sets
 
 #### `PB-01`: Add shared scenario-set support in `design/scenarios`
