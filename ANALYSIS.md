@@ -344,6 +344,33 @@ Mechanically verifiable completion:
 - `go test ./design/novelty/...` passes
 - tests prove novelty scores are deterministic and archive growth is correct
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `design/novelty` (`design/novelty/doc.go`,
+  `design/novelty/novelty.go`)
+- required types added:
+  `BehaviorVector`, `ArchiveEntry`, `DistanceFunc`, `ArchiveConfig`,
+  `NoveltyResult`, `Archive`
+- built-in distance functions added: `SquaredEuclidean` (default),
+  `EuclideanDistance`; `ArchiveConfig.Distance` accepts any custom
+  `DistanceFunc`
+- `Archive` implements `Add` (with optional `MaxSize` cap), `Len`, `Entries`
+  (returns a defensive copy), and `Score` (pure k-NN mean-distance function)
+- `Score` is deterministic: same archive contents + same query always produce
+  identical `NoveltyResult`; neighbor distances are returned in ascending order
+- tests added: `design/novelty/novelty_test.go`
+  (SquaredEuclidean same vector / known value / symmetric / mismatched lengths,
+  EuclideanDistance, NewArchive defaults / default K, empty archive score,
+  Add increases Len, Add respects MaxSize, MaxSize zero means unbounded,
+  Entries returns copy, k=1 score, k-nearest mean, fewer-than-K entries,
+  neighbor distances ascending, deterministic for fixed archive, Score does not
+  mutate archive, repeated Score calls stable, custom distance func, archive
+  growth correctness)
+- command proof:
+  `go test ./design/novelty/...`
+
 #### `PA-06`: Add checkpoint and replay support in `design/checkpoint`
 
 Goal:
