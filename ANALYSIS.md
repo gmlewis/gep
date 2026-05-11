@@ -798,6 +798,33 @@ Mechanically verifiable completion:
 - `go run ./experiments/circuit/half_adder` completes and emits deterministic
   artifacts for a fixed seed
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added:
+  `experiments/circuit/half_adder` (`experiments/circuit/half_adder/main.go`)
+- deterministic pilot entrypoint added:
+  `runPilot` loads shared circuit fixture scenarios, performs seeded typed
+  evolution for a bounded two-gene half-adder search, decodes the best genome
+  to `domains/circuit.CircuitProgram`, validates the graph, and exports JSON,
+  SPICE-style, and Verilog artifacts via `domains/circuit/artifacts`
+- pure-Go bounded evaluator added:
+  `evaluateHalfAdder` scores SUM/CARRY truth-table correctness without external
+  simulators; `scoreCandidate` enforces fixture-provided `max_components`
+  limits for deterministic bounded search behavior
+- decoder + exporter wiring added:
+  `decodeCircuitProgram` / `decodeGeneToComponents` map active Karva symbols to
+  a structural `CircuitGraph`; `exportArtifacts` writes deterministic
+  `candidate.json`, `candidate.spice`, and `candidate.v`
+- deterministic integration-style tests added:
+  `experiments/circuit/half_adder/main_test.go` proves evaluator + decoder +
+  artifact export wiring, validates deterministic re-export stability, and
+  verifies scenario component-bound enforcement
+- command proof:
+  `go test ./experiments/circuit/half_adder/... ./domains/circuit/...`
+  `go run ./experiments/circuit/half_adder --seed 20260511 --out /tmp/half_adder_artifacts`
+
 #### `PC-02`: Add circuit promotion, checkpoint, and held-out validation wiring
 
 Goal:
