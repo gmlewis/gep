@@ -48,11 +48,29 @@ func CatalogFromNames(names []string) (*core.Catalog[float64], error) {
 }
 
 // LinkFuncFrom returns a core.LinkFunc[float64] for the named function in Math.
-// An error is returned if the name is not found.
+// The returned link operator folds the named binary float64 operator across any
+// number of gene outputs, so 1-gene and multi-gene genomes are both handled
+// safely. An error is returned if the name is not found or if the named node is
+// not binary.
 func LinkFuncFrom(sym string) (core.LinkFunc[float64], error) {
 	fn, ok := Math[sym]
 	if !ok {
 		return core.LinkFunc[float64]{}, fmt.Errorf("mathNodes.LinkFuncFrom: unsupported math function %q", sym)
 	}
-	return core.NewLinkFunc[float64](sym, fn.Float64Function)
+	if fn.Terminals() != 2 {
+		return core.LinkFunc[float64]{}, fmt.Errorf("mathNodes.LinkFuncFrom: function %q has arity %d, want binary operator", sym, fn.Terminals())
+	}
+	return core.NewLinkFunc[float64](sym, func(v []float64) float64 {
+		switch len(v) {
+		case 0:
+			return 0
+		case 1:
+			return v[0]
+		}
+		result := v[0]
+		for _, next := range v[1:] {
+			result = fn.Float64Function([]float64{result, next})
+		}
+		return result
+	})
 }

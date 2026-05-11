@@ -122,3 +122,18 @@ func TestCatalogFrom_EmptyFuncMap(t *testing.T) {
 		t.Error("Lookup on empty catalog returned true, want false")
 	}
 }
+
+func TestLinkFuncFrom_FoldsSingleAndMultiGeneOutputs(t *testing.T) {
+	link, err := LinkFuncFrom("+")
+	if err != nil {
+		t.Fatalf("LinkFuncFrom(\"+\"): %v", err)
+	}
+
+	if got := link.Eval([]int{7}); got != 7 {
+		t.Errorf("link.Eval([7])=%v, want 7", got)
+	}
+
+	if got := link.Eval([]int{3, 4, 5}); got != 12 {
+		t.Errorf("link.Eval([3 4 5])=%v, want 12", got)
+	}
+}

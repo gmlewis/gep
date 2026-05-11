@@ -47,12 +47,30 @@ func CatalogFromNames(names []string) (*core.Catalog[int], error) {
 	return CatalogFrom(fm)
 }
 
-// LinkFuncFrom returns a core.LinkFunc[int] for the named function in Int.
-// An error is returned if the name is not found.
+// LinkFuncFrom returns a core.LinkFunc[int] for the named function in Int. The
+// returned link operator folds the named binary integer operator across any
+// number of gene outputs, so 1-gene and multi-gene genomes are both handled
+// safely. An error is returned if the name is not found or if the named node is
+// not binary.
 func LinkFuncFrom(sym string) (core.LinkFunc[int], error) {
 	fn, ok := Int[sym]
 	if !ok {
 		return core.LinkFunc[int]{}, fmt.Errorf("intNodes.LinkFuncFrom: unsupported int function %q", sym)
 	}
-	return core.NewLinkFunc[int](sym, fn.IntFunction)
+	if fn.Terminals() != 2 {
+		return core.LinkFunc[int]{}, fmt.Errorf("intNodes.LinkFuncFrom: function %q has arity %d, want binary operator", sym, fn.Terminals())
+	}
+	return core.NewLinkFunc[int](sym, func(v []int) int {
+		switch len(v) {
+		case 0:
+			return 0
+		case 1:
+			return v[0]
+		}
+		result := v[0]
+		for _, next := range v[1:] {
+			result = fn.IntFunction([]int{result, next})
+		}
+		return result
+	})
 }

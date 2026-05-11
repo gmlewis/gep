@@ -48,11 +48,29 @@ func CatalogFromNames(names []string) (*core.Catalog[bool], error) {
 }
 
 // LinkFuncFrom returns a core.LinkFunc[bool] for the named function in
-// BoolAllGates. An error is returned if the name is not found.
+// BoolAllGates. The returned link operator folds the named binary boolean
+// operator across any number of gene outputs, so 1-gene and multi-gene genomes
+// are both handled safely. An error is returned if the name is not found or if
+// the named node is not binary.
 func LinkFuncFrom(sym string) (core.LinkFunc[bool], error) {
 	fn, ok := BoolAllGates[sym]
 	if !ok {
 		return core.LinkFunc[bool]{}, fmt.Errorf("boolNodes.LinkFuncFrom: unsupported boolean function %q", sym)
 	}
-	return core.NewLinkFunc[bool](sym, fn.BoolFunction)
+	if fn.Terminals() != 2 {
+		return core.LinkFunc[bool]{}, fmt.Errorf("boolNodes.LinkFuncFrom: function %q has arity %d, want binary operator", sym, fn.Terminals())
+	}
+	return core.NewLinkFunc[bool](sym, func(v []bool) bool {
+		switch len(v) {
+		case 0:
+			return false
+		case 1:
+			return v[0]
+		}
+		result := v[0]
+		for _, next := range v[1:] {
+			result = fn.BoolFunction([]bool{result, next})
+		}
+		return result
+	})
 }

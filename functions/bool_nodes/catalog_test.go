@@ -91,3 +91,24 @@ func TestCatalogFrom_EmptyFuncMap(t *testing.T) {
 		t.Error("Lookup on empty catalog returned true, want false")
 	}
 }
+
+func TestLinkFuncFrom_FoldsSingleAndMultiGeneOutputs(t *testing.T) {
+	link, err := LinkFuncFrom("Or")
+	if err != nil {
+		t.Fatalf("LinkFuncFrom(\"Or\"): %v", err)
+	}
+
+	if got := link.Eval([]bool{true}); got != true {
+		t.Errorf("link.Eval([true])=%v, want true", got)
+	}
+
+	if got := link.Eval([]bool{false, false, true}); got != true {
+		t.Errorf("link.Eval([false false true])=%v, want true", got)
+	}
+}
+
+func TestLinkFuncFrom_RejectsNonBinaryOperator(t *testing.T) {
+	if _, err := LinkFuncFrom("And3"); err == nil {
+		t.Fatal("LinkFuncFrom(\"And3\") error=nil, want non-binary error")
+	}
+}
