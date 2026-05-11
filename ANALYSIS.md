@@ -287,6 +287,31 @@ Mechanically verifiable completion:
 - `go test ./design/objectives/...` passes
 - tests prove hard failures dominate soft-objective aggregation
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `design/objectives` (`design/objectives/doc.go`,
+  `design/objectives/objectives.go`)
+- required types added:
+  `ObjectiveKind` (Soft/Hard), `ObjectiveDef`, `WeightedContribution`,
+  `ScoreBreakdown`, `AggregateResult`
+- `Score` function implements weighted soft aggregation, hard-fail gating from
+  `rejected` flag (e.g. `constraints.ValidationReport.Rejected`), and
+  hard-fail gating from Hard-kind objectives with zero/negative raw scores
+- `Less` helper provides deterministic tie-breaking comparator for sorting
+  slices of `AggregateResult`; contributions are recorded in definition order
+  so identical inputs always yield identical breakdowns
+- deterministic tests added:
+  `design/objectives/objectives_test.go` (weighted aggregation, hard-fail from
+  rejected, hard-fail from zero/negative Hard objective, hard-fail dominates
+  soft objectives, penalty reduces aggregate, determinism for fixed input,
+  contributions in definition order, empty defs, missing raw score defaults to
+  zero, Less ordering, Less tie-breaking, Less equal candidates, Less usable
+  for sort, ObjectiveKind.String coverage)
+- command proof:
+  `go test ./design/objectives/...`
+
 #### `PA-05`: Add novelty archive support in `design/novelty`
 
 Goal:
