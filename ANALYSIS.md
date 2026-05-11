@@ -528,6 +528,41 @@ Mechanically verifiable completion:
 - `go test ./design/promotion/...` passes
 - tests prove promotion decisions are deterministic and threshold-driven
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `design/promotion` (`design/promotion/doc.go`,
+  `design/promotion/promotion.go`)
+- required serializable types added:
+  `AcceptanceCriterion` (split + MinAggregateScore threshold +
+  RequireNoHardFail gate), `SplitEvalSummary` (split + count + mean/min/max
+  aggregate score + hard-fail count), `PromotionDecision` (split + passed flag
+  + reason string), `PromotionReport` (candidateID + summaries + decisions +
+  promoted flag)
+- helpers added:
+  `SummarizeSplit` (computes SplitEvalSummary from a slice of
+  objectives.AggregateResult values), `Decide` (evaluates one
+  AcceptanceCriterion against a set of summaries, returning a
+  PromotionDecision with a human-readable reason), `Evaluate` (runs all
+  criteria, records decisions in criteria order, sets Promoted only when every
+  criterion passes)
+- promotion eligibility rules implemented:
+  threshold-driven (MeanAggregateScore >= MinAggregateScore), hard-fail
+  gating (RequireNoHardFail + HardFailCount > 0), missing-summary failure,
+  empty-count failure
+- deterministic tests added: `design/promotion/promotion_test.go`
+  (SummarizeSplit: empty/single/multiple/hard-fail count/determinism/no-inf,
+  Decide: pass above threshold/pass at exact threshold/fail below
+  threshold/fail no matching summary/fail empty count/fail hard-fail
+  required/pass hard-fail not required/determinism, Evaluate: no
+  criteria/all pass/one fails/decisions in criteria order/summaries
+  preserved/determinism/hard-fail blocks promotion/edge threshold at
+  boundary/just below boundary, JSON round-trips for AcceptanceCriterion,
+  PromotionReport, SplitEvalSummary)
+- command proof:
+  `go test ./design/promotion/...`
+
 #### `PB-03`: Define the circuit domain core model in `domains/circuit`
 
 Goal:
