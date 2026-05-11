@@ -238,6 +238,24 @@ Mechanically verifiable completion:
 - `go test ./design/constraints/...` passes
 - tests prove the aggregate report is stable and deterministic for a fixed input
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added: `design/constraints` (`design/constraints/doc.go`,
+  `design/constraints/constraints.go`)
+- required types and interfaces added:
+  `Decision` (Pass/Repair/Penalize/Reject), `ConstraintResult`,
+  `Constraint[T]` interface, `ValidationReport[T]`
+- `Validate[T]` function implements stop-on-reject, repair chaining, and
+  penalty accumulation
+- deterministic tests added:
+  `design/constraints/constraints_test.go` (stop-on-reject, repair chaining,
+  penalty accumulation, reject-skips-pending-penalties, repair-then-reject,
+  empty constraints, determinism for fixed input, Decision.String coverage)
+- command proof:
+  `go test ./design/constraints/...`
+
 #### `PA-04`: Add shared multi-objective scoring in `design/objectives`
 
 Goal:
