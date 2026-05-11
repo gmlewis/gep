@@ -1062,6 +1062,35 @@ Mechanically verifiable completion:
 - `go run ./experiments/control/mass_spring_damper` completes and emits a
   deterministic promoted controller artifact for a fixed seed
 
+Status: ✅ Completed (2026-05-11)
+
+Completion evidence:
+
+- package added:
+  `experiments/control/mass_spring_damper`
+  (`experiments/control/mass_spring_damper/main.go`)
+- deterministic control pilot entrypoint added:
+  `runPilot` loads deterministic embedded train/validation/test control
+  scenarios, performs seeded typed evolution, evaluates candidates with a
+  pure-Go mass-spring-damper simulator, runs split-based promotion, exports
+  controller artifacts, emits a run manifest, and saves/reloads a checkpoint
+- pure-Go simulator-backed evaluation added:
+  `simulateController` integrates plant dynamics with deterministic fixed-step
+  Euler updates; `scoreScenarioAggregate` scores tracking quality, terminal
+  error, and control effort while hard-failing unstable trajectories
+- promoted controller artifact wiring added:
+  `decodeControllerPolicy`/`exportArtifacts` emit deterministic
+  `controller_policy.json` and `controller_summary.txt` artifacts, then attach
+  artifact refs to manifest/checkpoint metadata
+- deterministic integration proof added:
+  `experiments/control/mass_spring_damper/main_test.go` verifies simulator and
+  artifact export wiring, fixed-seed deterministic runs, promotion report
+  creation across train/validation/test splits, run-manifest artifact refs, and
+  checkpoint replay equivalence
+- command proof:
+  `go test ./experiments/control/mass_spring_damper/... ./design/...`
+  `go run ./experiments/control/mass_spring_damper --seed 20260511 --out /tmp/mass_spring_damper_pc05_artifacts`
+
 #### `PC-06`: Add a cross-domain discovery regression suite and update docs
 
 Goal:
