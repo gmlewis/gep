@@ -82,7 +82,7 @@ func TestRoulette_ReturnsDeepCopies(t *testing.T) {
 	for i := range pop {
 		pop[i].Score = float64(i + 1)
 	}
-	origPtrs := make([]interface{}, len(pop))
+	origPtrs := make([]any, len(pop))
 	for i := range pop {
 		origPtrs[i] = &pop[i].Genome.Genes[0].Symbols[0]
 	}
@@ -167,7 +167,7 @@ func TestTournament_ReturnsDeepCopies(t *testing.T) {
 	for i := range pop {
 		pop[i].Score = float64(i + 1)
 	}
-	origPtrs := make([]interface{}, len(pop))
+	origPtrs := make([]any, len(pop))
 	for i := range pop {
 		origPtrs[i] = &pop[i].Genome.Genes[0].Symbols[0]
 	}
@@ -185,7 +185,7 @@ func TestTournament_ReturnsDeepCopies(t *testing.T) {
 
 func TestTournament_FavorsHigherScores(t *testing.T) {
 	pop := newPopulation(t, 20)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		pop[i].Score = 1000
 	}
 	for i := 5; i < len(pop); i++ {
@@ -206,7 +206,7 @@ func TestTournament_FavorsHigherScores(t *testing.T) {
 
 func TestTournament_FavorsLowerScoresWhenMinimizing(t *testing.T) {
 	pop := newPopulation(t, 20)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		pop[i].Score = 1
 	}
 	for i := 5; i < len(pop); i++ {

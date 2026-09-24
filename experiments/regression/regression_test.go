@@ -45,7 +45,6 @@ var pilots = []struct {
 func TestCrossDomainPipelines(t *testing.T) {
 	moduleRoot := findModuleRoot(t)
 	for _, p := range pilots {
-		p := p
 		t.Run(p.domain, func(t *testing.T) {
 			t.Parallel()
 			cmd := exec.Command("go", "test",

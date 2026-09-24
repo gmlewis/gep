@@ -7,7 +7,7 @@ type Obs interface {
 	// Unmarshal unmarshals the observation into the given object.
 	//
 	// This works the same way as json.Unmarshal.
-	Unmarshal(dst interface{}) error
+	Unmarshal(dst any) error
 }
 
 // Space defines an action or observation space.

@@ -10,6 +10,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -67,8 +68,7 @@ func main() {
 
 	result, err := runPilot(cfg)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "bracket: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("bracket: %v\n", err)
 	}
 	fmt.Printf("bracket complete: candidate=%s score=%.2f occupied=%d promoted=%t karva=%s\n", result.CandidateID, result.Score, result.OccupiedCells, result.Promoted, result.Karva)
 	fmt.Printf("artifacts written to %s\n", cfg.OutputDir)
@@ -610,12 +610,16 @@ func exportArtifacts(program voxel.VoxelProgram, outputDir string) ([]design.Art
 	}, nil
 }
 
-func writeJSONFile(filename string, value any) error {
+func writeJSONFile(filename string, value any) (err error) {
 	f, err := os.Create(filename)
 	if err != nil {
 		return fmt.Errorf("create %q: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); err == nil {
+			err = cerr
+		}
+	}()
 
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")

@@ -136,6 +136,6 @@ func LoadScenarioSetFile(filename string) (*ScenarioSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open scenario set file %q: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	return LoadScenarioSet(f)
 }

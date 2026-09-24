@@ -33,10 +33,7 @@ type DistanceFunc func(a, b BehaviorVector) float64
 // zero-padded conceptually: missing dimensions contribute their full squared
 // value from the longer vector.
 func SquaredEuclidean(a, b BehaviorVector) float64 {
-	n := len(a)
-	if len(b) > n {
-		n = len(b)
-	}
+	n := max(len(b), len(a))
 	var sum float64
 	for i := range n {
 		var ai, bi float64
@@ -153,10 +150,7 @@ func (a *Archive) Score(query BehaviorVector) NoveltyResult {
 	// Sort distances to find the K nearest.
 	sort.Float64s(dists)
 
-	k := a.cfg.K
-	if k > len(dists) {
-		k = len(dists)
-	}
+	k := min(a.cfg.K, len(dists))
 
 	neighbors := dists[:k]
 	var total float64

@@ -292,8 +292,8 @@ func getPath(filename string) string {
 	grammarPath := filepath.Dir(packageFile)
 
 	// Support Travis CI automated builds by searching for files
-	dirs := strings.Split(os.Getenv("GOPATH"), ":")
-	for _, dir := range dirs {
+	dirs := strings.SplitSeq(os.Getenv("GOPATH"), ":")
+	for dir := range dirs {
 		name := filepath.Join(dir, "src", grammarPath, filename)
 		if _, err := os.Stat(name); err == nil {
 			return name

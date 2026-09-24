@@ -142,7 +142,7 @@ func main() {
 		}
 
 		if i < *numSteps {
-			agents.Evolve()
+			check("Evolve: %v", agents.Evolve())
 		}
 	}
 

@@ -57,16 +57,16 @@ func TestNewGymnasiumAgents(t *testing.T) {
 			step := func() common.Obs {
 				n := len(tt.obsSpace.Subspaces)
 				lastObs := make(obsT, n)
-				for i := 0; i < n; i++ {
+				for i := range n {
 					lastObs[i] = rand.Intn(tt.obsSpace.Subspaces[i].N)
 				}
 				return lastObs
 			}
 
-			for agentNum := 0; agentNum < defaultNumIndividuals; agentNum++ {
+			for agentNum := range defaultNumIndividuals {
 				for episode := 1; episode <= 10; episode++ {
 					var action int
-					for episodeStep := 0; episodeStep < 10; episodeStep++ {
+					for episodeStep := range 10 {
 						lastObs := step()
 						if err := agents.EvaluateAgent(agentNum, episodeStep, lastObs, &action); err != nil {
 							t.Fatal(err)
@@ -141,7 +141,7 @@ func TestProcessObservations(t *testing.T) {
 			step := func() common.Obs {
 				n := len(tt.obsSpace.Subspaces)
 				lastObs := make(obsT, n)
-				for i := 0; i < n; i++ {
+				for i := range n {
 					lastObs[i] = i
 				}
 				return lastObs

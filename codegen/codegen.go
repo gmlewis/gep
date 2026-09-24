@@ -257,7 +257,7 @@ func (g *generator) generate() ([]byte, error) {
 	}
 
 	exps = append(exps, "")
-	fmt.Fprintln(g.w, strings.Join(exps, "\n"))
+	_, _ = fmt.Fprintln(g.w, strings.Join(exps, "\n"))
 
 	for _, f := range g.grammar.Footers {
 		if f.Type != "default" {
@@ -292,5 +292,5 @@ func (g *generator) write(s string) {
 	for k, v := range g.subs {
 		s = strings.Replace(s, fmt.Sprintf("{%v}", k), v, -1)
 	}
-	fmt.Fprint(g.w, s)
+	_, _ = fmt.Fprint(g.w, s)
 }

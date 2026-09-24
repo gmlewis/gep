@@ -81,7 +81,7 @@ func LoadRunManifestFile(filename string) (*RunManifest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open run manifest file %q: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	return LoadRunManifest(f)
 }
@@ -104,12 +104,16 @@ func WriteRunManifest(w io.Writer, m *RunManifest) error {
 }
 
 // WriteRunManifestFile writes one run manifest as indented JSON to a file.
-func WriteRunManifestFile(filename string, m *RunManifest) error {
+func WriteRunManifestFile(filename string, m *RunManifest) (err error) {
 	f, err := os.Create(filename)
 	if err != nil {
 		return fmt.Errorf("create run manifest file %q: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); err == nil {
+			err = cerr
+		}
+	}()
 
 	if err := WriteRunManifest(f, m); err != nil {
 		return fmt.Errorf("write run manifest file %q: %w", filename, err)

@@ -10,6 +10,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -79,8 +80,7 @@ func main() {
 
 	result, err := runPilot(cfg)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "half_adder: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("half_adder: %v\n", err)
 	}
 	fmt.Printf("half_adder complete: candidate=%s score=%.2f gates=%d promoted=%t karva=%s\n", result.CandidateID, result.Score, result.GateCount, result.Promoted, result.Karva)
 	fmt.Printf("artifacts written to %s\n", cfg.OutputDir)
@@ -374,7 +374,7 @@ func decodeCircuitProgram(candidateID string, genome core.Genome[bool]) (circuit
 	}
 
 	gateCount := 0
-	for geneIndex := 0; geneIndex < 2; geneIndex++ {
+	for geneIndex := range 2 {
 		geneComponents, rootPort, count, err := decodeGeneToComponents(geneIndex, genome.Genes[geneIndex])
 		if err != nil {
 			return circuit.CircuitProgram{}, 0, err
@@ -486,7 +486,7 @@ func buildArgOrder(symbols []core.Symbol[bool]) ([][]int, error) {
 			continue
 		}
 		args := make([]int, arity)
-		for j := 0; j < arity; j++ {
+		for j := range arity {
 			argIndex++
 			if argIndex >= len(symbols) {
 				return nil, errors.New("invalid karva expression: missing symbol arguments")
@@ -577,12 +577,16 @@ func exportArtifacts(program circuit.CircuitProgram, outputDir string) ([]design
 	}, nil
 }
 
-func writeJSONFile(filename string, value any) error {
+func writeJSONFile(filename string, value any) (err error) {
 	f, err := os.Create(filename)
 	if err != nil {
 		return fmt.Errorf("create %q: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); err == nil {
+			err = cerr
+		}
+	}()
 
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")

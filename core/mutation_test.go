@@ -139,7 +139,7 @@ func TestPointMutate_ValidGene(t *testing.T) {
 	cat := newIntCatalog(t)
 	g := makeGene(t, "+.d0.d1", cat, nil)
 	rng := rand.New(rand.NewSource(1))
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		mut, err := PointMutate(g, cat, 1, 2, 0, rng)
 		if err != nil {
 			t.Fatalf("PointMutate: %v", err)
@@ -165,7 +165,7 @@ func TestPointMutate_TailRemainsTerminal(t *testing.T) {
 	}
 	headSize := 5
 	rng := rand.New(rand.NewSource(42))
-	for i := 0; i < 50; i++ {
+	for range 50 {
 		mut, err := PointMutate(g, cat, headSize, 3, 0, rng)
 		if err != nil {
 			t.Fatalf("PointMutate: %v", err)
@@ -208,7 +208,7 @@ func TestInversion_ValidGene(t *testing.T) {
 	cat := newIntCatalog(t)
 	g := makeGene(t, "+.*.-.d0.d1.d0.d1", cat, nil)
 	rng := rand.New(rand.NewSource(5))
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		inv, err := Inversion(g, 3, rng)
 		if err != nil {
 			t.Fatalf("Inversion: %v", err)
@@ -269,7 +269,7 @@ func TestISTransposition_TailUnchanged(t *testing.T) {
 	}
 	tailStart := headSize
 	rng := rand.New(rand.NewSource(7))
-	for i := 0; i < 30; i++ {
+	for range 30 {
 		dst, err := ISTransposition(g, headSize, 3, rng)
 		if err != nil {
 			t.Fatalf("ISTransposition: %v", err)
@@ -322,7 +322,7 @@ func TestRISTransposition_StartsWithFunction(t *testing.T) {
 	// Force at least one function in the head by constructing a known gene.
 	g2 := makeGene(t, "+.*.d0.d1.d0.d1.d0", cat, nil)
 	rng := rand.New(rand.NewSource(99))
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		dst, err := RISTransposition(g2, headSize, 2, rng)
 		if err != nil {
 			t.Fatalf("RISTransposition: %v", err)
@@ -372,7 +372,7 @@ func TestOnePointRecombine_ValidGenes(t *testing.T) {
 	g1 := makeGene(t, "+.d0.d1", cat, nil)
 	g2 := makeGene(t, "*.d0.d1", cat, nil)
 	rng := rand.New(rand.NewSource(11))
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		c1, c2, err := OnePointRecombine(g1, g2, rng)
 		if err != nil {
 			t.Fatalf("OnePointRecombine: %v", err)
@@ -418,7 +418,7 @@ func TestTwoPointRecombine_ValidGenes(t *testing.T) {
 	g1 := makeGene(t, "+.*.-.d0.d1.d0.d1", cat, nil)
 	g2 := makeGene(t, "-.+.*.d1.d0.d1.d0", cat, nil)
 	rng := rand.New(rand.NewSource(77))
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		c1, c2, err := TwoPointRecombine(g1, g2, rng)
 		if err != nil {
 			t.Fatalf("TwoPointRecombine: %v", err)
@@ -485,7 +485,7 @@ func TestGeneTranspose_MultiGene(t *testing.T) {
 	genome := Genome[int]{Genes: []Gene[int]{g0, g1, g2}, Link: link}
 
 	rng := rand.New(rand.NewSource(13))
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		dst, err := GeneTranspose(genome, rng)
 		if err != nil {
 			t.Fatalf("GeneTranspose: %v", err)
@@ -538,7 +538,7 @@ func TestPointMutate_EvalAfterMutation(t *testing.T) {
 		t.Fatalf("NewRandomGene: %v", err)
 	}
 	rng := rand.New(rand.NewSource(55))
-	for i := 0; i < 30; i++ {
+	for range 30 {
 		mut, err := PointMutate(g, cat, 5, 2, 0, rng)
 		if err != nil {
 			t.Fatalf("PointMutate: %v", err)

@@ -62,14 +62,8 @@ func Apply[T any](genomes []core.Genome[T], cfg Config, rng *rand.Rand) []core.G
 		return nil
 	}
 
-	maxISLen := cfg.MaxISLen
-	if maxISLen < 1 {
-		maxISLen = 1
-	}
-	maxRISLen := cfg.MaxRISLen
-	if maxRISLen < 1 {
-		maxRISLen = 1
-	}
+	maxISLen := max(cfg.MaxISLen, 1)
+	maxRISLen := max(cfg.MaxRISLen, 1)
 
 	randFloat64 := func() float64 {
 		if rng != nil {

@@ -315,7 +315,7 @@ func buildArgOrder[T any](symbols []Symbol[T]) [][]int {
 			continue
 		}
 		args := make([]int, n)
-		for j := 0; j < n; j++ {
+		for j := range n {
 			argCount++
 			args[j] = argCount
 		}
@@ -435,14 +435,14 @@ func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants 
 
 	// Build terminal choice slice: d0..d(numTerminals-1), c0..c(numConstants-1).
 	termChoices := make([]Symbol[T], 0, numTerminals+numConstants)
-	for i := 0; i < numTerminals; i++ {
+	for i := range numTerminals {
 		sym, err := NewTerminalSymbol[T](i)
 		if err != nil {
 			return Gene[T]{}, err
 		}
 		termChoices = append(termChoices, sym)
 	}
-	for i := 0; i < numConstants; i++ {
+	for i := range numConstants {
 		sym, err := NewConstantSymbol[T](i)
 		if err != nil {
 			return Gene[T]{}, err
@@ -456,7 +456,7 @@ func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants 
 	// Head: any function or terminal.
 	headChoiceCount := len(funcNames) + len(termChoices)
 	syms := make([]Symbol[T], 0, headSize+tailSize)
-	for i := 0; i < headSize; i++ {
+	for range headSize {
 		choice := intn(headChoiceCount)
 		if choice < len(funcNames) {
 			name := funcNames[choice]
@@ -483,7 +483,7 @@ func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants 
 	if numConstants > 0 {
 		consts = make([]T, numConstants)
 		if cat != nil && cat.constGen != nil {
-			for i := 0; i < numConstants; i++ {
+			for i := range numConstants {
 				consts[i] = cat.constGen(rng)
 			}
 		}

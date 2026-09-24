@@ -196,7 +196,7 @@ func TestCollector_Last_ReturnsNewest(t *testing.T) {
 
 func TestCollector_OrderPreserved(t *testing.T) {
 	col := &Collector{}
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		col.Append(Record(i, []float64{float64(i)}, nil, false))
 	}
 	for i, s := range col.History {

@@ -10,6 +10,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -99,8 +100,7 @@ func main() {
 
 	result, err := runPilot(cfg)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "mass_spring_damper: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("mass_spring_damper: %v\n", err)
 	}
 	fmt.Printf("mass_spring_damper complete: candidate=%s score=%.2f promoted=%t karva=%s\n", result.CandidateID, result.Score, result.Promoted, result.Karva)
 	fmt.Printf("split means: train=%.2f validation=%.2f test=%.2f final_abs_position=%.4f\n", result.TrainMeanScore, result.ValidMeanScore, result.TestMeanScore, result.FinalAbsPosition)
@@ -579,12 +579,16 @@ func exportArtifacts(policy controllerPolicyArtifact, outputDir string) ([]desig
 	}, nil
 }
 
-func writeJSONFile(filename string, value any) error {
+func writeJSONFile(filename string, value any) (err error) {
 	f, err := os.Create(filename)
 	if err != nil {
 		return fmt.Errorf("create %q: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); err == nil {
+			err = cerr
+		}
+	}()
 
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")

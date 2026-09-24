@@ -66,7 +66,7 @@ func ProcessVector(x []VectorInt, op sliceOp) (result VectorInt) {
 	result = make([]int, len(x[0]))
 	for i := 0; i < len(x[0]); i++ {
 		args := make([]int, len(x))
-		for j := 0; j < len(x); j++ {
+		for j := range x {
 			args[j] = x[j][i]
 		}
 		result[i] = op(args)
@@ -79,7 +79,7 @@ var VectorIntFuncs = functions.FuncMap{
 	// TODO(gmlewis): Change functions to operate on variable-length slices.
 	"+": VectorIntNode{0, "+", 2, func(x []VectorInt) VectorInt {
 		op := func(in []int) (result int) {
-			for i := 0; i < 2; /* len(in) */ i++ {
+			for i := range 2 {
 				result += in[i]
 			}
 			return result

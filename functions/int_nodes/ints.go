@@ -215,67 +215,27 @@ var Int = functions.FuncMap{
 }
 
 func gepMin2(x, y int) int {
-	if x > y {
-		return y
-	}
-	return x
+	return min(x, y)
 }
 
 func gepMin3(x, y, z int) int {
-	varTemp := x
-	if varTemp > y {
-		varTemp = y
-	}
-	if varTemp > z {
-		varTemp = z
-	}
-	return varTemp
+	return min(x, y, z)
 }
 
 func gepMin4(a, b, c, d int) int {
-	varTemp := a
-	if varTemp > b {
-		varTemp = b
-	}
-	if varTemp > c {
-		varTemp = c
-	}
-	if varTemp > d {
-		varTemp = d
-	}
-	return varTemp
+	return min(a, b, c, d)
 }
 
 func gepMax2(x, y int) int {
-	if x < y {
-		return y
-	}
-	return x
+	return max(x, y)
 }
 
 func gepMax3(x, y, z int) int {
-	varTemp := x
-	if varTemp < y {
-		varTemp = y
-	}
-	if varTemp < z {
-		varTemp = z
-	}
-	return varTemp
+	return max(x, y, z)
 }
 
 func gepMax4(a, b, c, d int) int {
-	varTemp := a
-	if varTemp < b {
-		varTemp = b
-	}
-	if varTemp < c {
-		varTemp = c
-	}
-	if varTemp < d {
-		varTemp = d
-	}
-	return varTemp
+	return max(a, b, c, d)
 }
 
 func gepLT2A(x, y int) int {

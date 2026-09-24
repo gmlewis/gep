@@ -409,7 +409,7 @@ func (g *Generation[T]) Transpose() {
 // performs a final Evaluate (and a final statistics record) and returns
 // BestIndividual.
 func (g *Generation[T]) Evolve(iterations int) Individual[T] {
-	for i := 0; i < iterations; i++ {
+	for i := range iterations {
 		g.Evaluate()
 		g.recordStats(i)
 		best := g.BestIndividual()

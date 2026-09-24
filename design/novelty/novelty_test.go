@@ -251,10 +251,7 @@ func TestCustomDistanceFunc(t *testing.T) {
 	// Manhattan distance
 	manhattan := func(a, b BehaviorVector) float64 {
 		var sum float64
-		n := len(a)
-		if len(b) > n {
-			n = len(b)
-		}
+		n := max(len(b), len(a))
 		for i := range n {
 			var ai, bi float64
 			if i < len(a) {

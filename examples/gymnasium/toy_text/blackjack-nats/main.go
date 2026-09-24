@@ -52,8 +52,12 @@ func main() {
 	}
 
 	agent := &agentT{nc: nc}
-	nc.Subscribe(*subj, agent.envHandler)
-	nc.Flush()
+	if _, err := nc.Subscribe(*subj, agent.envHandler); err != nil {
+		log.Fatal(err)
+	}
+	if err := nc.Flush(); err != nil {
+		log.Fatal(err)
+	}
 	if err := nc.LastError(); err != nil {
 		log.Fatal(err)
 	}
@@ -79,7 +83,9 @@ func (a *agentT) envHandler(msg *nats.Msg) {
 	switch msg.Subject {
 	case "gym.env.reset":
 	case "gym.env.obs":
-		a.nc.Publish(agentSubject, []byte("1"))
+		if err := a.nc.Publish(agentSubject, []byte("1")); err != nil {
+			log.Printf("Publish error: %v", err)
+		}
 	case "gym.env.update":
 	case "gym.env.decay_epsilon":
 	default:

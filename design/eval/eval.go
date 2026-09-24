@@ -81,10 +81,7 @@ func (r WorkerRunner[C, R]) RunBatch(ctx context.Context, req BatchRequest[C]) (
 		return BatchResult[R]{Items: results}, nil
 	}
 
-	workers := r.WorkerCount
-	if workers > len(req.Items) {
-		workers = len(req.Items)
-	}
+	workers := min(r.WorkerCount, len(req.Items))
 
 	jobs := make(chan int)
 	var wg sync.WaitGroup

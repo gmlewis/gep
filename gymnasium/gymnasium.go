@@ -34,7 +34,11 @@ func GetSpaces(environment string) (actionSpace, obsSpace *common.Space, err err
 	if err != nil {
 		return nil, nil, err
 	}
-	defer env.Close()
+	defer func() {
+		if cerr := env.Close(); err == nil {
+			err = cerr
+		}
+	}()
 
 	actionSpace, err = env.ActionSpace()
 	if err != nil {

@@ -296,7 +296,7 @@ func TestSelect_AllIndividualsAreDeepCopies(t *testing.T) {
 	g.Evaluate()
 
 	// Capture original pointers.
-	origPtrs := make([]interface{}, len(g.Individuals))
+	origPtrs := make([]any, len(g.Individuals))
 	for i := range g.Individuals {
 		origPtrs[i] = &g.Individuals[i].Genome.Genes[0].Symbols[0]
 	}
@@ -357,7 +357,7 @@ func TestSelect_Tournament(t *testing.T) {
 		t.Fatalf("NewWithSeed: %v", err)
 	}
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		g.Individuals[i].Score = 1000
 	}
 	for i := 5; i < len(g.Individuals); i++ {
@@ -497,7 +497,7 @@ func TestEvolve_DeterministicWithSeed(t *testing.T) {
 	g2.StopFunc = func(Individual[int]) bool { return false }
 
 	// Run a fixed number of steps on each.
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		g1.Evaluate()
 		g1.Select()
 		g2.Evaluate()

@@ -32,14 +32,14 @@ func randFloat64(rng *rand.Rand) float64 {
 // followed by c0..c(numConstants-1)) used by mutation operators.
 func buildTermChoices[T any](numTerminals, numConstants int) ([]Symbol[T], error) {
 	choices := make([]Symbol[T], 0, numTerminals+numConstants)
-	for i := 0; i < numTerminals; i++ {
+	for i := range numTerminals {
 		sym, err := NewTerminalSymbol[T](i)
 		if err != nil {
 			return nil, err
 		}
 		choices = append(choices, sym)
 	}
-	for i := 0; i < numConstants; i++ {
+	for i := range numConstants {
 		sym, err := NewConstantSymbol[T](i)
 		if err != nil {
 			return nil, err
@@ -129,10 +129,7 @@ func Inversion[T any](g Gene[T], headSize int, rng *rand.Rand) (Gene[T], error) 
 		return dst, nil
 	}
 	// Clamp headSize to actual symbol count.
-	hs := headSize
-	if hs > len(dst.Symbols) {
-		hs = len(dst.Symbols)
-	}
+	hs := min(headSize, len(dst.Symbols))
 	start := randIntn(hs, rng)
 	end := randIntn(hs, rng)
 	if start == end {
@@ -186,10 +183,7 @@ func ISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) (
 	insPos := 1 + randIntn(headSize-1, rng)
 
 	// Build new head: old[0:insPos] + isElem + old[insPos:] truncated to headSize.
-	hs := headSize
-	if hs > len(dst.Symbols) {
-		hs = len(dst.Symbols)
-	}
+	hs := min(headSize, len(dst.Symbols))
 	oldHead := make([]Symbol[T], hs)
 	copy(oldHead, dst.Symbols[:hs])
 
@@ -239,12 +233,9 @@ func RISTransposition[T any](g Gene[T], headSize, maxISLen int, rng *rand.Rand) 
 	}
 
 	// Collect function-symbol positions within the head.
-	hs := headSize
-	if hs > len(dst.Symbols) {
-		hs = len(dst.Symbols)
-	}
+	hs := min(headSize, len(dst.Symbols))
 	var funcPositions []int
-	for i := 0; i < hs; i++ {
+	for i := range hs {
 		if dst.Symbols[i].Kind == SymbolKindFunction {
 			funcPositions = append(funcPositions, i)
 		}
@@ -409,10 +400,7 @@ func GeneRecombine[T any](g1, g2 Genome[T], rng *rand.Rand) (Genome[T], Genome[T
 	if len(g1.Genes) == 0 || len(g2.Genes) == 0 {
 		return Genome[T]{}, Genome[T]{}, errors.New("core.GeneRecombine: genomes must have at least one gene")
 	}
-	minGenes := len(g1.Genes)
-	if len(g2.Genes) < minGenes {
-		minGenes = len(g2.Genes)
-	}
+	minGenes := min(len(g2.Genes), len(g1.Genes))
 
 	c1 := g1.Dup()
 	c2 := g2.Dup()

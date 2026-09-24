@@ -102,12 +102,16 @@ func Save(w io.Writer, snap *Snapshot) error {
 
 // SaveFile writes snap to the named file as indented JSON, creating or
 // truncating the file as needed.
-func SaveFile(filename string, snap *Snapshot) error {
+func SaveFile(filename string, snap *Snapshot) (err error) {
 	f, err := os.Create(filename)
 	if err != nil {
 		return fmt.Errorf("create checkpoint file %q: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); err == nil {
+			err = cerr
+		}
+	}()
 	if err := Save(f, snap); err != nil {
 		return fmt.Errorf("write checkpoint file %q: %w", filename, err)
 	}
@@ -141,7 +145,7 @@ func LoadFile(filename string) (*Snapshot, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open checkpoint file %q: %w", filename, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	return Load(f)
 }
 

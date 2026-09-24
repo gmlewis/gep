@@ -155,7 +155,7 @@ func TestNoImprovement_NegativePatienceClamped(t *testing.T) {
 
 func TestAny_EmptyNeverStops(t *testing.T) {
 	c := Any()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		if c.ShouldStop(i, float64(i)) {
 			t.Fatalf("Any() (empty) should never stop, but stopped at gen %d", i)
 		}

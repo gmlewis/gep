@@ -400,9 +400,9 @@ func TestEnvSeam_GymnasiumAgentsEvalRewardEvolve(t *testing.T) {
 
 	// Simulate one episode per agent with a fixed observation sequence.
 	numAgents := len(agents.Individuals)
-	for agentNum := 0; agentNum < numAgents; agentNum++ {
+	for agentNum := range numAgents {
 		obs := &fixedObs{values: []int{10, 5, 1}} // Blackjack-style obs
-		for step := 0; step < 5; step++ {
+		for step := range 5 {
 			var action int
 			if err := agents.EvaluateAgent(agentNum, step, obs, &action); err != nil {
 				t.Fatalf("agent %d step %d: EvaluateAgent: %v", agentNum, step, err)

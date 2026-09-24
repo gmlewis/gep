@@ -62,11 +62,8 @@ func Apply[T any](genomes []core.Genome[T], cfg Config, rng *rand.Rand) []core.G
 		g1 := genomes[i].Dup()
 		g2 := genomes[i+1].Dup()
 
-		geneCount := len(g1.Genes)
-		if len(g2.Genes) < geneCount {
-			geneCount = len(g2.Genes)
-		}
-		for j := 0; j < geneCount; j++ {
+		geneCount := min(len(g2.Genes), len(g1.Genes))
+		for j := range geneCount {
 			if cfg.OnePointRate > 0 && randFloat64() < cfg.OnePointRate {
 				if c1, c2, err := core.OnePointRecombine(g1.Genes[j], g2.Genes[j], rng); err == nil {
 					g1.Genes[j], g2.Genes[j] = c1, c2

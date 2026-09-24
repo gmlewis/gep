@@ -134,10 +134,7 @@ func Less(a, b AggregateResult) bool {
 	if a.AggregateScore != b.AggregateScore {
 		return a.AggregateScore > b.AggregateScore
 	}
-	n := len(a.Breakdown.Contributions)
-	if len(b.Breakdown.Contributions) < n {
-		n = len(b.Breakdown.Contributions)
-	}
+	n := min(len(b.Breakdown.Contributions), len(a.Breakdown.Contributions))
 	for i := range n {
 		ca := a.Breakdown.Contributions[i]
 		cb := b.Breakdown.Contributions[i]
