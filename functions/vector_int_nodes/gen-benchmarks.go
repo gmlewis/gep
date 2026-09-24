@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	filename = "vector_int-benchmarks_test.go"
+	filename = "vector-int-benchmarks_test.go"
 	pkgName  = "vectorIntNodes"
 )
 

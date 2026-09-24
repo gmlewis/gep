@@ -52,6 +52,13 @@ fi
 rm -f "${STATICCHECK_LOG}"
 echo "staticcheck: clean (SA* + U1000)"
 
+echo "Running go generate..."
+go generate ./...
+if [[ -n "$(git status --porcelain -- '*benchmarks_test.go')" ]]; then
+	echo "error: go generate produced uncommitted benchmark changes." >&2
+	exit 1
+fi
+
 echo "Running go mod tidy..."
 go mod tidy
 
