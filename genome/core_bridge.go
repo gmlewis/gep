@@ -8,11 +8,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gmlewis/gep/v2/core"
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
-	in "github.com/gmlewis/gep/v2/functions/int_nodes"
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
-	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v3/core"
+	bn "github.com/gmlewis/gep/v3/functions/bool_nodes"
+	in "github.com/gmlewis/gep/v3/functions/int_nodes"
+	mn "github.com/gmlewis/gep/v3/functions/math_nodes"
+	"github.com/gmlewis/gep/v3/gene"
 )
 
 // CoreBool converts a legacy boolean genome into the typed core representation.

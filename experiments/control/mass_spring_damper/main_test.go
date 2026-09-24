@@ -12,11 +12,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/design"
-	"github.com/gmlewis/gep/v2/design/checkpoint"
-	"github.com/gmlewis/gep/v2/design/promotion"
-	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/design"
+	"github.com/gmlewis/gep/v3/design/checkpoint"
+	"github.com/gmlewis/gep/v3/design/promotion"
+	boolNodes "github.com/gmlewis/gep/v3/functions/bool_nodes"
 )
 
 func TestMassSpringDamperPipelineSimulatorAndArtifacts(t *testing.T) {

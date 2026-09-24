@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/evolution"
-	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/evolution"
+	boolNodes "github.com/gmlewis/gep/v3/functions/bool_nodes"
 )
 
 var nandTests = []struct {

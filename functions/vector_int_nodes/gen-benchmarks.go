@@ -19,7 +19,7 @@ import (
 	"sort"
 	"text/template"
 
-	vin "github.com/gmlewis/gep/v2/functions/vector_int_nodes"
+	vin "github.com/gmlewis/gep/v3/functions/vector_int_nodes"
 )
 
 const (

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	bn "github.com/gmlewis/gep/v3/functions/bool_nodes"
 )
 
 func (g *Gene) generateBoolFunc() error {

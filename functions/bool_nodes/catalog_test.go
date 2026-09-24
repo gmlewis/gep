@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v3/core"
 )
 
 func TestCatalogFrom_RegistersAllSymbols(t *testing.T) {

@@ -15,12 +15,12 @@ import (
 	"math"
 	"os"
 
-	"github.com/gmlewis/gep/v2/codegen"
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/evolution"
-	evolutionMutation "github.com/gmlewis/gep/v2/evolution/mutation"
-	mathNodes "github.com/gmlewis/gep/v2/functions/math_nodes"
-	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v3/codegen"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/evolution"
+	evolutionMutation "github.com/gmlewis/gep/v3/evolution/mutation"
+	mathNodes "github.com/gmlewis/gep/v3/functions/math_nodes"
+	"github.com/gmlewis/gep/v3/grammars"
 )
 
 // srTests is a random sample of inputs and outputs for the function "a^4 + a^3 + a^2 + a"

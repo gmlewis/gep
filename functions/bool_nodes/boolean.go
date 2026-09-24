@@ -10,7 +10,7 @@ package boolNodes
 import (
 	"log"
 
-	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v3/functions"
 )
 
 // BoolNode is a boolean function used for the formation of GEP expressions.

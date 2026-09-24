@@ -4,8 +4,8 @@ package gymnasium
 import (
 	"fmt"
 
-	"github.com/gmlewis/gep/v2/common"
-	"github.com/gmlewis/gep/v2/gymnasium/envs/toy_text/blackjack"
+	"github.com/gmlewis/gep/v3/common"
+	"github.com/gmlewis/gep/v3/gymnasium/envs/toy_text/blackjack"
 )
 
 // Environment represents a pure Go training and execution environment.

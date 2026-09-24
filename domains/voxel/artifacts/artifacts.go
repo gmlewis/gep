@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gmlewis/gep/v2/domains/voxel"
+	"github.com/gmlewis/gep/v3/domains/voxel"
 )
 
 // JSON emits canonical indented JSON for one [voxel.VoxelProgram].

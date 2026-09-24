@@ -11,10 +11,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/codegen"
-	"github.com/gmlewis/gep/v2/functions"
-	"github.com/gmlewis/gep/v2/gene"
-	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v3/codegen"
+	"github.com/gmlewis/gep/v3/functions"
+	"github.com/gmlewis/gep/v3/gene"
+	"github.com/gmlewis/gep/v3/grammars"
 )
 
 func TestWriteNand(t *testing.T) {

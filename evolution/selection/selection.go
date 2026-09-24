@@ -10,7 +10,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v3/core"
 )
 
 // Candidate is a scored genome used by selection operators.

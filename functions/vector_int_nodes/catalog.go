@@ -5,8 +5,8 @@
 package vectorIntNodes
 
 import (
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/functions"
 )
 
 // vectorIntNodeAdapter adapts a functions.FuncNode to core.Node[functions.VectorInt].

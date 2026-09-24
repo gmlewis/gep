@@ -8,7 +8,7 @@ import (
 	"bytes"
 	_ "embed"
 
-	designscenarios "github.com/gmlewis/gep/v2/design/scenarios"
+	designscenarios "github.com/gmlewis/gep/v3/design/scenarios"
 )
 
 //go:embed testdata/set_smoke.json

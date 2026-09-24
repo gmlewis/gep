@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/domains/voxel"
+	"github.com/gmlewis/gep/v3/domains/voxel"
 )
 
 func testProgram() voxel.VoxelProgram {

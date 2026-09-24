@@ -13,7 +13,7 @@ package recombination
 import (
 	"math/rand"
 
-	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v3/core"
 )
 
 // Config controls which recombination operators are applied and at what rates.

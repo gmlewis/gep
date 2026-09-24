@@ -9,7 +9,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/common"
+	"github.com/gmlewis/gep/v3/common"
 	"github.com/google/go-cmp/cmp"
 )
 

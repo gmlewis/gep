@@ -5,7 +5,7 @@
 package boolNodes
 
 import (
-	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v3/functions"
 )
 
 // BoolMuxSystem defines the boolean functions available for this model.

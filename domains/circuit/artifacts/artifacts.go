@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/gmlewis/gep/v2/domains/circuit"
+	"github.com/gmlewis/gep/v3/domains/circuit"
 )
 
 // JSON emits canonical indented JSON for one [circuit.CircuitProgram].

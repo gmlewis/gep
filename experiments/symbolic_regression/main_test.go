@@ -9,10 +9,10 @@ import (
 	"math"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/evolution"
-	"github.com/gmlewis/gep/v2/functions"
-	mathNodes "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/evolution"
+	"github.com/gmlewis/gep/v3/functions"
+	mathNodes "github.com/gmlewis/gep/v3/functions/math_nodes"
 )
 
 var result float64

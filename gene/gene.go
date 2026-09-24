@@ -13,11 +13,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gmlewis/gep/v2/functions"
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
-	in "github.com/gmlewis/gep/v2/functions/int_nodes"
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
-	vin "github.com/gmlewis/gep/v2/functions/vector_int_nodes"
+	"github.com/gmlewis/gep/v3/functions"
+	bn "github.com/gmlewis/gep/v3/functions/bool_nodes"
+	in "github.com/gmlewis/gep/v3/functions/int_nodes"
+	mn "github.com/gmlewis/gep/v3/functions/math_nodes"
+	vin "github.com/gmlewis/gep/v3/functions/vector_int_nodes"
 )
 
 const (

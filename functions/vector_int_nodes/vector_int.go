@@ -10,7 +10,7 @@ package vectorIntNodes
 import (
 	"log"
 
-	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v3/functions"
 )
 
 type VectorInt = functions.VectorInt

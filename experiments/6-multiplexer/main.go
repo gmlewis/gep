@@ -13,12 +13,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/gmlewis/gep/v2/codegen"
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/evolution"
-	evolutionMutation "github.com/gmlewis/gep/v2/evolution/mutation"
-	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
-	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v3/codegen"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/evolution"
+	evolutionMutation "github.com/gmlewis/gep/v3/evolution/mutation"
+	boolNodes "github.com/gmlewis/gep/v3/functions/bool_nodes"
+	"github.com/gmlewis/gep/v3/grammars"
 )
 
 var multiTests = []struct {

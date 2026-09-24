@@ -11,9 +11,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/gmlewis/gep/v2/design"
-	"github.com/gmlewis/gep/v2/design/novelty"
-	"github.com/gmlewis/gep/v2/design/objectives"
+	"github.com/gmlewis/gep/v3/design"
+	"github.com/gmlewis/gep/v3/design/novelty"
+	"github.com/gmlewis/gep/v3/design/objectives"
 )
 
 // currentSchemaVersion is the version written into every new snapshot.

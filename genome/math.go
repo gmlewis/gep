@@ -7,7 +7,7 @@ package genome
 import (
 	"fmt"
 
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	mn "github.com/gmlewis/gep/v3/functions/math_nodes"
 )
 
 // EvalMath evaluates the genome as a floating-point expression and returns the result.

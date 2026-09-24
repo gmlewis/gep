@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v3/core"
 )
 
 // --- helpers ---

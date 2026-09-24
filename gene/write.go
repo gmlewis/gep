@@ -5,8 +5,8 @@
 package gene
 
 import (
-	"github.com/gmlewis/gep/v2/codegen"
-	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v3/codegen"
+	"github.com/gmlewis/gep/v3/grammars"
 )
 
 // Expression builds up the expression tree and returns the resulting string.

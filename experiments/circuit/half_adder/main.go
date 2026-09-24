@@ -15,17 +15,17 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/design"
-	"github.com/gmlewis/gep/v2/design/checkpoint"
-	"github.com/gmlewis/gep/v2/design/objectives"
-	"github.com/gmlewis/gep/v2/design/promotion"
-	designscenarios "github.com/gmlewis/gep/v2/design/scenarios"
-	"github.com/gmlewis/gep/v2/domains/circuit"
-	circuitartifacts "github.com/gmlewis/gep/v2/domains/circuit/artifacts"
-	circuitscenarios "github.com/gmlewis/gep/v2/domains/circuit/scenarios"
-	"github.com/gmlewis/gep/v2/evolution"
-	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/design"
+	"github.com/gmlewis/gep/v3/design/checkpoint"
+	"github.com/gmlewis/gep/v3/design/objectives"
+	"github.com/gmlewis/gep/v3/design/promotion"
+	designscenarios "github.com/gmlewis/gep/v3/design/scenarios"
+	"github.com/gmlewis/gep/v3/domains/circuit"
+	circuitartifacts "github.com/gmlewis/gep/v3/domains/circuit/artifacts"
+	circuitscenarios "github.com/gmlewis/gep/v3/domains/circuit/scenarios"
+	"github.com/gmlewis/gep/v3/evolution"
+	boolNodes "github.com/gmlewis/gep/v3/functions/bool_nodes"
 )
 
 var halfAdderTruthTable = []struct {

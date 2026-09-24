@@ -14,17 +14,17 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/design"
-	"github.com/gmlewis/gep/v2/design/checkpoint"
-	"github.com/gmlewis/gep/v2/design/objectives"
-	"github.com/gmlewis/gep/v2/design/promotion"
-	designscenarios "github.com/gmlewis/gep/v2/design/scenarios"
-	"github.com/gmlewis/gep/v2/domains/voxel"
-	voxelartifacts "github.com/gmlewis/gep/v2/domains/voxel/artifacts"
-	voxelscenarios "github.com/gmlewis/gep/v2/domains/voxel/scenarios"
-	"github.com/gmlewis/gep/v2/evolution"
-	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/design"
+	"github.com/gmlewis/gep/v3/design/checkpoint"
+	"github.com/gmlewis/gep/v3/design/objectives"
+	"github.com/gmlewis/gep/v3/design/promotion"
+	designscenarios "github.com/gmlewis/gep/v3/design/scenarios"
+	"github.com/gmlewis/gep/v3/domains/voxel"
+	voxelartifacts "github.com/gmlewis/gep/v3/domains/voxel/artifacts"
+	voxelscenarios "github.com/gmlewis/gep/v3/domains/voxel/scenarios"
+	"github.com/gmlewis/gep/v3/evolution"
+	boolNodes "github.com/gmlewis/gep/v3/functions/bool_nodes"
 )
 
 type runConfig struct {

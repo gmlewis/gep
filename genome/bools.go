@@ -7,7 +7,7 @@ package genome
 import (
 	"fmt"
 
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	bn "github.com/gmlewis/gep/v3/functions/bool_nodes"
 )
 
 // EvalBool evaluates the genome as a boolean expression and returns the result.

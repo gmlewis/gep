@@ -11,7 +11,7 @@ import (
 	"log"
 	"math"
 
-	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v3/functions"
 )
 
 // IntNode is an integer function used for the formation of GEP expressions.

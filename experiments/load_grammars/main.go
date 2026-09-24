@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v3/grammars"
 )
 
 func main() {

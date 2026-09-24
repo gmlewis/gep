@@ -1,4 +1,4 @@
-module github.com/gmlewis/gep/v2
+module github.com/gmlewis/gep/v3
 
 go 1.25.0
 

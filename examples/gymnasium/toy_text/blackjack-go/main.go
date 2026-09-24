@@ -11,10 +11,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gmlewis/gep/v2/common"
-	"github.com/gmlewis/gep/v2/env"
-	"github.com/gmlewis/gep/v2/grammars"
-	gym "github.com/gmlewis/gep/v2/gymnasium"
+	"github.com/gmlewis/gep/v3/common"
+	"github.com/gmlewis/gep/v3/env"
+	"github.com/gmlewis/gep/v3/grammars"
+	gym "github.com/gmlewis/gep/v3/gymnasium"
 )
 
 const (

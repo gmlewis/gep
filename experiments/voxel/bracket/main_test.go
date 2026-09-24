@@ -12,12 +12,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/design"
-	"github.com/gmlewis/gep/v2/design/checkpoint"
-	"github.com/gmlewis/gep/v2/design/promotion"
-	designscenarios "github.com/gmlewis/gep/v2/design/scenarios"
-	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/design"
+	"github.com/gmlewis/gep/v3/design/checkpoint"
+	"github.com/gmlewis/gep/v3/design/promotion"
+	designscenarios "github.com/gmlewis/gep/v3/design/scenarios"
+	boolNodes "github.com/gmlewis/gep/v3/functions/bool_nodes"
 )
 
 func TestBracketPipelineEvaluatorDecoderAndArtifacts(t *testing.T) {

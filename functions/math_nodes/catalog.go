@@ -7,8 +7,8 @@ package mathNodes
 import (
 	"fmt"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/functions"
 )
 
 // float64NodeAdapter adapts a functions.FuncNode to core.Node[float64].

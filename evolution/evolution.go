@@ -63,14 +63,14 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/evolution/evaluation"
-	"github.com/gmlewis/gep/v2/evolution/mutation"
-	"github.com/gmlewis/gep/v2/evolution/recombination"
-	"github.com/gmlewis/gep/v2/evolution/selection"
-	"github.com/gmlewis/gep/v2/evolution/statistics"
-	"github.com/gmlewis/gep/v2/evolution/termination"
-	"github.com/gmlewis/gep/v2/evolution/transposition"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/evolution/evaluation"
+	"github.com/gmlewis/gep/v3/evolution/mutation"
+	"github.com/gmlewis/gep/v3/evolution/recombination"
+	"github.com/gmlewis/gep/v3/evolution/selection"
+	"github.com/gmlewis/gep/v3/evolution/statistics"
+	"github.com/gmlewis/gep/v3/evolution/termination"
+	"github.com/gmlewis/gep/v3/evolution/transposition"
 )
 
 // ScoringFunc computes a fitness score for a genome.

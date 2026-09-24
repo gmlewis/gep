@@ -98,7 +98,7 @@ import (
 	"math/rand"
 	"slices"
 
-	"github.com/gmlewis/gep/v2/common"
+	"github.com/gmlewis/gep/v3/common"
 )
 
 // Environment represents a Blackjack environment.

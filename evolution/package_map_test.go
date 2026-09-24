@@ -23,16 +23,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/codegen"
-	"github.com/gmlewis/gep/v2/common"
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/env"
-	"github.com/gmlewis/gep/v2/evolution"
-	evolutionMutation "github.com/gmlewis/gep/v2/evolution/mutation"
-	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
-	mathNodes "github.com/gmlewis/gep/v2/functions/math_nodes"
-	"github.com/gmlewis/gep/v2/grammars"
-	"github.com/gmlewis/gep/v2/problems"
+	"github.com/gmlewis/gep/v3/codegen"
+	"github.com/gmlewis/gep/v3/common"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/env"
+	"github.com/gmlewis/gep/v3/evolution"
+	evolutionMutation "github.com/gmlewis/gep/v3/evolution/mutation"
+	boolNodes "github.com/gmlewis/gep/v3/functions/bool_nodes"
+	mathNodes "github.com/gmlewis/gep/v3/functions/math_nodes"
+	"github.com/gmlewis/gep/v3/grammars"
+	"github.com/gmlewis/gep/v3/problems"
 )
 
 // --- Typed evolution seam ---

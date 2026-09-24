@@ -4,8 +4,8 @@
 
 // Package problems provides reusable problem definitions for GEP experiments.
 //
-// It defines typed problem-facing seams over the [github.com/gmlewis/gep/v2/core]
-// and [github.com/gmlewis/gep/v2/fitness] packages, separating reusable
+// It defines typed problem-facing seams over the [github.com/gmlewis/gep/v3/core]
+// and [github.com/gmlewis/gep/v3/fitness] packages, separating reusable
 // domain-specific fitness/problem definitions from ad-hoc experiment code.
 //
 // # Core types
@@ -25,9 +25,9 @@
 // # Scoring functions
 //
 // Each problem type exposes methods that return an evolution-compatible scoring
-// function (func([github.com/gmlewis/gep/v2/core.Genome][T]) float64).
+// function (func([github.com/gmlewis/gep/v3/core.Genome][T]) float64).
 // These can be passed directly as the scoringFunc argument to
-// [github.com/gmlewis/gep/v2/evolution.New].
+// [github.com/gmlewis/gep/v3/evolution.New].
 //
 // Boolean scoring:
 //   - [BoolProblem.NumHitsScoringFunc] – score proportional to the number of

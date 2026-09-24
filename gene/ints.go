@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
-	in "github.com/gmlewis/gep/v2/functions/int_nodes"
+	in "github.com/gmlewis/gep/v3/functions/int_nodes"
 )
 
 func (g *Gene) generateIntFunc() error {

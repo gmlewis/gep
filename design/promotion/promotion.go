@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/gmlewis/gep/v2/design/objectives"
-	"github.com/gmlewis/gep/v2/design/scenarios"
+	"github.com/gmlewis/gep/v3/design/objectives"
+	"github.com/gmlewis/gep/v3/design/scenarios"
 )
 
 // AcceptanceCriterion defines the minimum requirements for a candidate to be

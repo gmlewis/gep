@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/design"
-	"github.com/gmlewis/gep/v2/design/checkpoint"
-	"github.com/gmlewis/gep/v2/design/novelty"
-	"github.com/gmlewis/gep/v2/design/objectives"
+	"github.com/gmlewis/gep/v3/design"
+	"github.com/gmlewis/gep/v3/design/checkpoint"
+	"github.com/gmlewis/gep/v3/design/novelty"
+	"github.com/gmlewis/gep/v3/design/objectives"
 )
 
 // --- helpers ---

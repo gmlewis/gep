@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v3/grammars"
 )
 
 // ProgramFromSymbols creates a Program from pre-extracted per-gene Karva

@@ -9,7 +9,7 @@ package evaluation
 import (
 	"sync"
 
-	"github.com/gmlewis/gep/v2/core"
+	"github.com/gmlewis/gep/v3/core"
 )
 
 // ScoringFunc computes a fitness score for a genome.

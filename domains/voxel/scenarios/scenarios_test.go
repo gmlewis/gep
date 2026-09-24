@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	designscenarios "github.com/gmlewis/gep/v2/design/scenarios"
+	designscenarios "github.com/gmlewis/gep/v3/design/scenarios"
 )
 
 func TestLoadFixtureSet(t *testing.T) {

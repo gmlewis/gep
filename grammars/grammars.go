@@ -14,7 +14,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/gmlewis/gep/v2/functions"
+	"github.com/gmlewis/gep/v3/functions"
 )
 
 // Functions is a collection of Functions available in the language grammar.

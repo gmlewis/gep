@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	mn "github.com/gmlewis/gep/v3/functions/math_nodes"
 )
 
 func (g *Gene) generateMathFunc() error {

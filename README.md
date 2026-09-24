@@ -1,6 +1,6 @@
 # Gene Expression Programming (GEP) in Go
 
-`github.com/gmlewis/gep/v2` is a typed Gene Expression Programming engine for
+`github.com/gmlewis/gep/v3` is a typed Gene Expression Programming engine for
 scientific and engineering search in Go.
 
 The repository now has a clear default architecture:
@@ -84,9 +84,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/evolution"
-	boolNodes "github.com/gmlewis/gep/v2/functions/bool_nodes"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/evolution"
+	boolNodes "github.com/gmlewis/gep/v3/functions/bool_nodes"
 )
 
 var nandCases = []struct {

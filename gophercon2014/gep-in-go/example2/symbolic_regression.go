@@ -9,9 +9,9 @@ import (
 	"log"
 	"math"
 
-	"github.com/gmlewis/gep/v2/core"
-	"github.com/gmlewis/gep/v2/evolution"
-	mathNodes "github.com/gmlewis/gep/v2/functions/math_nodes"
+	"github.com/gmlewis/gep/v3/core"
+	"github.com/gmlewis/gep/v3/evolution"
+	mathNodes "github.com/gmlewis/gep/v3/functions/math_nodes"
 )
 
 var srTests = []struct {

@@ -19,7 +19,7 @@ import (
 	"sort"
 	"text/template"
 
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
+	mn "github.com/gmlewis/gep/v3/functions/math_nodes"
 )
 
 const (

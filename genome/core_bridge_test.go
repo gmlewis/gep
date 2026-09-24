@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/functions"
-	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v3/functions"
+	"github.com/gmlewis/gep/v3/gene"
 )
 
 func mustGene(t *testing.T, karva string, funcType functions.FuncType) *gene.Gene {

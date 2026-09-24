@@ -11,8 +11,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/functions"
-	"github.com/gmlewis/gep/v2/gene"
+	"github.com/gmlewis/gep/v3/functions"
+	"github.com/gmlewis/gep/v3/gene"
 )
 
 const delta = 1.0

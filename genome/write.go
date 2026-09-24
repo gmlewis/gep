@@ -7,8 +7,8 @@ package genome
 import (
 	"io"
 
-	"github.com/gmlewis/gep/v2/codegen"
-	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v3/codegen"
+	"github.com/gmlewis/gep/v3/grammars"
 )
 
 func (g *Genome) Write(w io.Writer, grammar *grammars.Grammar) error {

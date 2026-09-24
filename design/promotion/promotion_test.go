@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/design/objectives"
-	"github.com/gmlewis/gep/v2/design/scenarios"
+	"github.com/gmlewis/gep/v3/design/objectives"
+	"github.com/gmlewis/gep/v3/design/scenarios"
 )
 
 // --- helpers ---

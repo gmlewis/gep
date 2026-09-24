@@ -7,9 +7,9 @@ package problems
 import (
 	"errors"
 
-	"github.com/gmlewis/gep/v2/core"
-	boolFitness "github.com/gmlewis/gep/v2/fitness/bool"
-	floatFitness "github.com/gmlewis/gep/v2/fitness/float"
+	"github.com/gmlewis/gep/v3/core"
+	boolFitness "github.com/gmlewis/gep/v3/fitness/bool"
+	floatFitness "github.com/gmlewis/gep/v3/fitness/float"
 )
 
 // Case is a single fitness evaluation case pairing an input vector with the
@@ -31,7 +31,7 @@ type Case[T any] struct {
 //
 // Use [NewBoolProblem] to construct a BoolProblem, then call one of its
 // scoring-function methods to obtain a func(core.Genome[bool]) float64 that
-// can be passed directly to [github.com/gmlewis/gep/v2/evolution.New].
+// can be passed directly to [github.com/gmlewis/gep/v3/evolution.New].
 type BoolProblem struct {
 	// Cases is the complete set of fitness evaluation cases for this problem.
 	Cases []Case[bool]
@@ -51,13 +51,13 @@ func NewBoolProblem(cases []Case[bool]) (*BoolProblem, error) {
 // The maximum possible score is scaleFactor * len(p.Cases).
 //
 // The returned function evaluates the genome against every case in p.Cases
-// using [github.com/gmlewis/gep/v2/core.Genome.Eval], then delegates to
-// [github.com/gmlewis/gep/v2/fitness/bool.NumHits] for the final score.
+// using [github.com/gmlewis/gep/v3/core.Genome.Eval], then delegates to
+// [github.com/gmlewis/gep/v3/fitness/bool.NumHits] for the final score.
 // A genome that fails to evaluate any case contributes a score of zero for
 // that case but does not stop the overall scoring run.
 //
 // The returned function is compatible with the scoringFunc argument of
-// [github.com/gmlewis/gep/v2/evolution.New].
+// [github.com/gmlewis/gep/v3/evolution.New].
 func (p *BoolProblem) NumHitsScoringFunc(scaleFactor float64) (func(core.Genome[bool]) float64, error) {
 	fitnessFunc, err := boolFitness.NumHits(scaleFactor)
 	if err != nil {
@@ -88,11 +88,11 @@ func (p *BoolProblem) NumHitsScoringFunc(scaleFactor float64) (func(core.Genome[
 // FloatProblem is a floating-point regression problem defined by a set of
 // [Case][float64] fitness cases.  It provides methods that return
 // evolution-compatible fitness functions, each corresponding to a different
-// error metric from [github.com/gmlewis/gep/v2/fitness/float].
+// error metric from [github.com/gmlewis/gep/v3/fitness/float].
 //
 // Use [NewFloatProblem] to construct a FloatProblem, then call one of its
 // scoring-function methods to obtain a func(core.Genome[float64]) float64 that
-// can be passed directly to [github.com/gmlewis/gep/v2/evolution.New].
+// can be passed directly to [github.com/gmlewis/gep/v3/evolution.New].
 type FloatProblem struct {
 	// Cases is the complete set of fitness evaluation cases for this problem.
 	Cases []Case[float64]
@@ -129,10 +129,10 @@ func (p *FloatProblem) evaluateFloat(g core.Genome[float64]) (predicted, target 
 // scaleFactor * len(p.Cases).
 //
 // precision must be in [0, 1].  The returned function delegates to
-// [github.com/gmlewis/gep/v2/fitness/float.NumHitsAbs] for the final score.
+// [github.com/gmlewis/gep/v3/fitness/float.NumHitsAbs] for the final score.
 //
 // The returned function is compatible with the scoringFunc argument of
-// [github.com/gmlewis/gep/v2/evolution.New].
+// [github.com/gmlewis/gep/v3/evolution.New].
 func (p *FloatProblem) NumHitsAbsScoringFunc(precision, scaleFactor float64) (func(core.Genome[float64]) float64, error) {
 	fitnessFunc, err := floatFitness.NumHitsAbs(precision, scaleFactor)
 	if err != nil {
@@ -154,11 +154,11 @@ func (p *FloatProblem) NumHitsAbsScoringFunc(precision, scaleFactor float64) (fu
 // scaleFactor / (1 + MSE/N).
 //
 // The returned function delegates to
-// [github.com/gmlewis/gep/v2/fitness/float.MeanSquaredErrorAbs] for the final
+// [github.com/gmlewis/gep/v3/fitness/float.MeanSquaredErrorAbs] for the final
 // score.
 //
 // The returned function is compatible with the scoringFunc argument of
-// [github.com/gmlewis/gep/v2/evolution.New].
+// [github.com/gmlewis/gep/v3/evolution.New].
 func (p *FloatProblem) MeanSquaredErrorAbsScoringFunc(scaleFactor float64) (func(core.Genome[float64]) float64, error) {
 	fitnessFunc, err := floatFitness.MeanSquaredErrorAbs(scaleFactor)
 	if err != nil {
@@ -179,10 +179,10 @@ func (p *FloatProblem) MeanSquaredErrorAbsScoringFunc(scaleFactor float64) (func
 // [0, scaleFactor].
 //
 // The returned function delegates to
-// [github.com/gmlewis/gep/v2/fitness/float.RSquare] for the final score.
+// [github.com/gmlewis/gep/v3/fitness/float.RSquare] for the final score.
 //
 // The returned function is compatible with the scoringFunc argument of
-// [github.com/gmlewis/gep/v2/evolution.New].
+// [github.com/gmlewis/gep/v3/evolution.New].
 func (p *FloatProblem) RSquareScoringFunc(scaleFactor float64) (func(core.Genome[float64]) float64, error) {
 	fitnessFunc, err := floatFitness.RSquare(scaleFactor)
 	if err != nil {

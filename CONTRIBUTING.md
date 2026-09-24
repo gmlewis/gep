@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to `github.com/gmlewis/gep/v2`.
+Thanks for contributing to `github.com/gmlewis/gep/v3`.
 
 The default goal is to keep strengthening the typed GEP platform so it
 is useful for scientific, engineering, and simulator-backed search

@@ -7,7 +7,7 @@ package genome
 import (
 	"fmt"
 
-	intN "github.com/gmlewis/gep/v2/functions/int_nodes"
+	intN "github.com/gmlewis/gep/v3/functions/int_nodes"
 )
 
 // EvalInt evaluates the genome as an integer expression and returns the result.

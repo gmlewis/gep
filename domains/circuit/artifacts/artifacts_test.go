@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gmlewis/gep/v2/domains/circuit"
+	"github.com/gmlewis/gep/v3/domains/circuit"
 )
 
 func testProgram() circuit.CircuitProgram {

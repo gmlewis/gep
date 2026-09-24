@@ -11,13 +11,13 @@ import (
 	"math/rand"
 	"sort"
 
-	"github.com/gmlewis/gep/v2/common"
-	"github.com/gmlewis/gep/v2/functions"
-	bn "github.com/gmlewis/gep/v2/functions/bool_nodes"
-	in "github.com/gmlewis/gep/v2/functions/int_nodes"
-	mn "github.com/gmlewis/gep/v2/functions/math_nodes"
-	"github.com/gmlewis/gep/v2/gene"
-	"github.com/gmlewis/gep/v2/genome"
+	"github.com/gmlewis/gep/v3/common"
+	"github.com/gmlewis/gep/v3/functions"
+	bn "github.com/gmlewis/gep/v3/functions/bool_nodes"
+	in "github.com/gmlewis/gep/v3/functions/int_nodes"
+	mn "github.com/gmlewis/gep/v3/functions/math_nodes"
+	"github.com/gmlewis/gep/v3/gene"
+	"github.com/gmlewis/gep/v3/genome"
 )
 
 const (

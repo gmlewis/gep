@@ -17,8 +17,8 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/gmlewis/gep/v2/gene"
-	"github.com/gmlewis/gep/v2/grammars"
+	"github.com/gmlewis/gep/v3/gene"
+	"github.com/gmlewis/gep/v3/grammars"
 )
 
 // Genome contains the genes that make up the genome.

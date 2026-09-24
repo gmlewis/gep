@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/gmlewis/gep/v2/functions"
-	vin "github.com/gmlewis/gep/v2/functions/vector_int_nodes"
+	"github.com/gmlewis/gep/v3/functions"
+	vin "github.com/gmlewis/gep/v3/functions/vector_int_nodes"
 )
 
 type VectorInt = functions.VectorInt
