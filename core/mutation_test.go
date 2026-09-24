@@ -584,3 +584,161 @@ func TestKarvaRoundtrip(t *testing.T) {
 		}
 	}
 }
+
+// --- ConstantMutate tests ---
+
+func TestConstantMutate_PerturbsConstants(t *testing.T) {
+	cat := newIntCatalog(t)
+	g := makeGene(t, "+.c0.c1", cat, []int{10, 20})
+	mutator := func(val int, rng *rand.Rand) int {
+		return val + 5
+	}
+	rng := rand.New(rand.NewSource(1))
+	mutated, err := ConstantMutate(g, 1.0, mutator, rng)
+	if err != nil {
+		t.Fatalf("ConstantMutate: %v", err)
+	}
+	// g.Constants should be unchanged (immutability).
+	if g.Constants[0] != 10 || g.Constants[1] != 20 {
+		t.Errorf("original constants modified: got %v, want [10, 20]", g.Constants)
+	}
+	// mutated.Constants should be perturbed.
+	if mutated.Constants[0] != 15 || mutated.Constants[1] != 25 {
+		t.Errorf("mutated constants: got %v, want [15, 25]", mutated.Constants)
+	}
+	// Symbols should remain identical.
+	if mutated.KarvaString() != g.KarvaString() {
+		t.Errorf("symbols changed: got %v, want %v", mutated.KarvaString(), g.KarvaString())
+	}
+}
+
+func TestConstantMutate_ZeroRate(t *testing.T) {
+	cat := newIntCatalog(t)
+	g := makeGene(t, "+.c0.c1", cat, []int{10, 20})
+	mutator := func(val int, rng *rand.Rand) int {
+		return val + 5
+	}
+	mutated, err := ConstantMutate(g, 0.0, mutator, nil)
+	if err != nil {
+		t.Fatalf("ConstantMutate: %v", err)
+	}
+	if mutated.Constants[0] != 10 || mutated.Constants[1] != 20 {
+		t.Errorf("constants modified with rate 0: got %v", mutated.Constants)
+	}
+}
+
+func TestConstantMutate_NilMutatorErrors(t *testing.T) {
+	cat := newIntCatalog(t)
+	g := makeGene(t, "+.c0.c1", cat, []int{10, 20})
+	_, err := ConstantMutate(g, 0.5, nil, nil)
+	if err == nil {
+		t.Fatal("ConstantMutate with rate > 0 and nil mutator: got nil error, want non-nil")
+	}
+}
+
+func TestConstantMutate_Deterministic(t *testing.T) {
+	cat := newIntCatalog(t)
+	g := makeGene(t, "+.c0.c1", cat, []int{10, 20})
+	mutator := func(val int, rng *rand.Rand) int {
+		return val + rng.Intn(100)
+	}
+	m1, err := ConstantMutate(g, 1.0, mutator, rand.New(rand.NewSource(42)))
+	if err != nil {
+		t.Fatalf("m1: %v", err)
+	}
+	m2, err := ConstantMutate(g, 1.0, mutator, rand.New(rand.NewSource(42)))
+	if err != nil {
+		t.Fatalf("m2: %v", err)
+	}
+	if m1.Constants[0] != m2.Constants[0] || m1.Constants[1] != m2.Constants[1] {
+		t.Errorf("determinism failed: %v vs %v", m1.Constants, m2.Constants)
+	}
+}
+
+func TestUniformFloat64Mutator(t *testing.T) {
+	mut := UniformFloat64Mutator(1.0)
+	rng := rand.New(rand.NewSource(123))
+	val := 5.0
+	res := mut(val, rng)
+	if res < 4.0 || res > 6.0 {
+		t.Errorf("UniformFloat64Mutator out of range [-1, 1]: got %f", res)
+	}
+}
+
+func TestGaussianFloat64Mutator(t *testing.T) {
+	mut := GaussianFloat64Mutator(0.5)
+	rng := rand.New(rand.NewSource(123))
+	val := 10.0
+	res := mut(val, rng)
+	if res == val {
+		t.Errorf("GaussianFloat64Mutator did not perturb: got %f", res)
+	}
+}
+
+// --- GeneRecombine tests ---
+
+func TestGeneRecombine_SwapsWholeGene(t *testing.T) {
+	cat := newIntCatalog(t)
+	link, err := NewLinkFunc[int]("+", func(v []int) int { return v[0] + v[1] })
+	if err != nil {
+		t.Fatalf("NewLinkFunc: %v", err)
+	}
+
+	geneA := makeGene(t, "+.d0.d1", cat, nil)
+	geneB := makeGene(t, "-.d0.d1", cat, nil)
+	geneC := makeGene(t, "*.d0.d1", cat, nil)
+	geneD := makeGene(t, "+.d1.d0", cat, nil)
+
+	g1 := Genome[int]{Genes: []Gene[int]{geneA, geneB}, Link: link}
+	g2 := Genome[int]{Genes: []Gene[int]{geneC, geneD}, Link: link}
+
+	rng := rand.New(rand.NewSource(1))
+	c1, c2, err := GeneRecombine(g1, g2, rng)
+	if err != nil {
+		t.Fatalf("GeneRecombine: %v", err)
+	}
+
+	// Verify that one gene was swapped
+	swappedGene0 := c1.Genes[0].KarvaString() == geneC.KarvaString() && c2.Genes[0].KarvaString() == geneA.KarvaString()
+	swappedGene1 := c1.Genes[1].KarvaString() == geneD.KarvaString() && c2.Genes[1].KarvaString() == geneB.KarvaString()
+
+	if !swappedGene0 && !swappedGene1 {
+		t.Fatalf("neither gene was swapped: c1=%s, c2=%s", c1.KarvaString(), c2.KarvaString())
+	}
+
+	// Verify immutability of original genomes
+	if g1.Genes[0].KarvaString() != geneA.KarvaString() || g1.Genes[1].KarvaString() != geneB.KarvaString() {
+		t.Errorf("g1 was modified: %s", g1.KarvaString())
+	}
+	if g2.Genes[0].KarvaString() != geneC.KarvaString() || g2.Genes[1].KarvaString() != geneD.KarvaString() {
+		t.Errorf("g2 was modified: %s", g2.KarvaString())
+	}
+}
+
+func TestGeneRecombine_Errors(t *testing.T) {
+	cat := newIntCatalog(t)
+	link, _ := NewLinkFunc[int]("+", func(v []int) int { return 0 })
+	g := Genome[int]{Genes: []Gene[int]{makeGene(t, "+.d0.d1", cat, nil)}, Link: link}
+	empty := Genome[int]{}
+
+	if _, _, err := GeneRecombine(empty, g, nil); err == nil {
+		t.Error("GeneRecombine(empty, g): got nil error, want non-nil")
+	}
+	if _, _, err := GeneRecombine(g, empty, nil); err == nil {
+		t.Error("GeneRecombine(g, empty): got nil error, want non-nil")
+	}
+}
+
+func TestGeneRecombine_Deterministic(t *testing.T) {
+	cat := newIntCatalog(t)
+	link, _ := NewLinkFunc[int]("+", func(v []int) int { return 0 })
+	g1 := Genome[int]{Genes: []Gene[int]{makeGene(t, "+.d0.d1", cat, nil), makeGene(t, "-.d0.d1", cat, nil)}, Link: link}
+	g2 := Genome[int]{Genes: []Gene[int]{makeGene(t, "*.d0.d1", cat, nil), makeGene(t, "+.d1.d0", cat, nil)}, Link: link}
+
+	c1a, c2a, _ := GeneRecombine(g1, g2, rand.New(rand.NewSource(42)))
+	c1b, c2b, _ := GeneRecombine(g1, g2, rand.New(rand.NewSource(42)))
+
+	if c1a.KarvaString() != c1b.KarvaString() || c2a.KarvaString() != c2b.KarvaString() {
+		t.Errorf("GeneRecombine not deterministic")
+	}
+}

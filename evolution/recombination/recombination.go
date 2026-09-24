@@ -26,13 +26,18 @@ type Config struct {
 	// TwoPointRate is the probability [0, 1] that each aligned gene pair
 	// undergoes two-point crossover.
 	TwoPointRate float64
+
+	// GeneRecombinationRate is the probability [0, 1] that an aligned genome
+	// pair undergoes gene recombination (swapping an entire gene).
+	GeneRecombinationRate float64
 }
 
 // Apply applies configured recombination operators and returns a new population.
 //
-// Operators are applied per aligned gene pair in this order:
-//  1. One-point recombination
-//  2. Two-point recombination
+// Operators are applied per aligned gene pair and genome pair in this order:
+//  1. One-point recombination (per gene)
+//  2. Two-point recombination (per gene)
+//  3. Gene recombination (per genome pair)
 //
 // rng may be nil; when nil the global math/rand source is used.
 func Apply[T any](genomes []core.Genome[T], cfg Config, rng *rand.Rand) []core.Genome[T] {
@@ -71,6 +76,12 @@ func Apply[T any](genomes []core.Genome[T], cfg Config, rng *rand.Rand) []core.G
 				if c1, c2, err := core.TwoPointRecombine(g1.Genes[j], g2.Genes[j], rng); err == nil {
 					g1.Genes[j], g2.Genes[j] = c1, c2
 				}
+			}
+		}
+
+		if cfg.GeneRecombinationRate > 0 && randFloat64() < cfg.GeneRecombinationRate {
+			if c1, c2, err := core.GeneRecombine(g1, g2, rng); err == nil {
+				g1, g2 = c1, c2
 			}
 		}
 

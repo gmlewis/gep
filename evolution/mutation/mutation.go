@@ -40,6 +40,10 @@ type Config struct {
 	// InversionRate is the probability [0, 1] that each gene undergoes head
 	// inversion. Zero disables the operator.
 	InversionRate float64
+
+	// ConstantMutationRate is the probability [0, 1] that each constant in each
+	// gene undergoes constant mutation. Zero disables the operator.
+	ConstantMutationRate float64
 }
 
 // Apply applies the configured mutation operators to each genome and returns a
@@ -83,6 +87,13 @@ func Apply[T any](genomes []core.Genome[T], cat *core.Catalog[T], cfg Config, rn
 			if cfg.InversionRate > 0 && randFloat64() < cfg.InversionRate {
 				if inv, err := core.Inversion(gene, cfg.HeadSize, rng); err == nil {
 					gene = inv
+				}
+			}
+
+			// 3. Constant mutation
+			if cfg.ConstantMutationRate > 0 && cat != nil && cat.ConstantMutator() != nil {
+				if mut, err := core.ConstantMutate(gene, cfg.ConstantMutationRate, cat.ConstantMutator(), rng); err == nil {
+					gene = mut
 				}
 			}
 

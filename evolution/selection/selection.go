@@ -95,3 +95,62 @@ func Roulette[T any](population []Candidate[T], cfg Config, rng *rand.Rand) []Ca
 	}
 	return result
 }
+
+// Tournament selects a new population using tournament selection.
+//
+// tournamentSize is the number of candidates randomly sampled for each
+// tournament; the best candidate from the sample is selected.
+// If tournamentSize <= 0, it defaults to 2.
+// If tournamentSize > len(population), it is clamped to len(population).
+//
+// The result has one selected candidate per input candidate.
+// Returned candidates are deep copies of selected genomes.
+func Tournament[T any](population []Candidate[T], tournamentSize int, cfg Config, rng *rand.Rand) []Candidate[T] {
+	if len(population) == 0 {
+		return nil
+	}
+
+	k := tournamentSize
+	if k <= 0 {
+		k = 2
+	}
+	if k > len(population) {
+		k = len(population)
+	}
+
+	effectiveScore := func(score float64) float64 {
+		if cfg.MinimizeScore {
+			return -score
+		}
+		return score
+	}
+
+	randIntn := func(n int) int {
+		if rng != nil {
+			return rng.Intn(n)
+		}
+		return rand.Intn(n) //nolint:gosec
+	}
+
+	result := make([]Candidate[T], 0, len(population))
+	for range population {
+		bestIdx := randIntn(len(population))
+		bestEff := effectiveScore(population[bestIdx].Score)
+
+		for i := 1; i < k; i++ {
+			challengerIdx := randIntn(len(population))
+			challengerEff := effectiveScore(population[challengerIdx].Score)
+			if challengerEff > bestEff {
+				bestIdx = challengerIdx
+				bestEff = challengerEff
+			}
+		}
+
+		result = append(result, Candidate[T]{
+			Genome: population[bestIdx].Genome.Dup(),
+			Score:  population[bestIdx].Score,
+		})
+	}
+
+	return result
+}

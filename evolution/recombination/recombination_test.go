@@ -153,3 +153,30 @@ func TestApply_Deterministic(t *testing.T) {
 		}
 	}
 }
+
+func TestApply_GeneRecombination(t *testing.T) {
+	genomes := newGenomes(t, 10)
+	origKarvas := make([]string, len(genomes))
+	for i, g := range genomes {
+		origKarvas[i] = g.KarvaString()
+	}
+
+	cfg := Config{GeneRecombinationRate: 1.0}
+	got := Apply(genomes, cfg, rand.New(rand.NewSource(123)))
+	if len(got) != len(genomes) {
+		t.Fatalf("got %d genomes, want %d", len(got), len(genomes))
+	}
+
+	changed := 0
+	for i := range got {
+		if err := got[i].Validate(); err != nil {
+			t.Errorf("genome[%d] invalid after gene recombination: %v", i, err)
+		}
+		if got[i].KarvaString() != origKarvas[i] {
+			changed++
+		}
+	}
+	if changed == 0 {
+		t.Fatal("GeneRecombinationRate=1.0: no genomes were changed")
+	}
+}

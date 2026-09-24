@@ -19,6 +19,15 @@ func randIntn(n int, rng *rand.Rand) int {
 	return rand.Intn(n) //nolint:gosec
 }
 
+// randFloat64 returns a random float in [0.0, 1.0) using rng when non-nil, else the
+// global math/rand source.
+func randFloat64(rng *rand.Rand) float64 {
+	if rng != nil {
+		return rng.Float64()
+	}
+	return rand.Float64() //nolint:gosec
+}
+
 // buildTermChoices builds the terminal symbol slice (d0..d(numTerminals-1)
 // followed by c0..c(numConstants-1)) used by mutation operators.
 func buildTermChoices[T any](numTerminals, numConstants int) ([]Symbol[T], error) {
@@ -340,4 +349,76 @@ func GeneTranspose[T any](g Genome[T], rng *rand.Rand) (Genome[T], error) {
 	copy(dst.Genes[1:idx+1], dst.Genes[0:idx])
 	dst.Genes[0] = selected
 	return dst, nil
+}
+
+// ConstantMutator mutates a single constant value.
+type ConstantMutator[T any] func(val T, rng *rand.Rand) T
+
+// ConstantMutate mutates the constants of a copy of gene g.
+// For each constant in g.Constants, mutator is called with probability rate in [0, 1].
+// If rate <= 0 or len(g.Constants) == 0, g is returned unchanged (deep-copied).
+// If rate > 0 and mutator is nil, an error is returned.
+func ConstantMutate[T any](g Gene[T], rate float64, mutator ConstantMutator[T], rng *rand.Rand) (Gene[T], error) {
+	if rate > 0 && mutator == nil {
+		return Gene[T]{}, errors.New("core.ConstantMutate: mutator cannot be nil when rate > 0")
+	}
+	dst := g.Dup()
+	if rate <= 0 || len(dst.Constants) == 0 {
+		return dst, nil
+	}
+	for i := range dst.Constants {
+		if randFloat64(rng) < rate {
+			dst.Constants[i] = mutator(dst.Constants[i], rng)
+		}
+	}
+	return dst, nil
+}
+
+// UniformFloat64Mutator returns a ConstantMutator for float64 that perturbs
+// the constant by adding a uniform random value in [-delta, delta].
+func UniformFloat64Mutator(delta float64) ConstantMutator[float64] {
+	return func(val float64, rng *rand.Rand) float64 {
+		r := randFloat64(rng)
+		return val + (r*2.0-1.0)*delta
+	}
+}
+
+// GaussianFloat64Mutator returns a ConstantMutator for float64 that perturbs
+// the constant with Gaussian noise with the given standard deviation.
+func GaussianFloat64Mutator(stdDev float64) ConstantMutator[float64] {
+	return func(val float64, rng *rand.Rand) float64 {
+		var norm float64
+		if rng != nil {
+			norm = rng.NormFloat64()
+		} else {
+			norm = rand.NormFloat64()
+		}
+		return val + norm*stdDev
+	}
+}
+
+// GeneRecombine performs gene recombination on copies of genomes g1 and g2.
+// In GEP, gene recombination exchanges an entire gene between two parent
+// chromosomes. A random gene position in [0, min(len(g1.Genes), len(g2.Genes)))
+// is chosen, and the entire gene at that position is swapped between the two
+// genomes.
+//
+// If either genome has no genes, an error is returned.
+// rng may be nil.
+func GeneRecombine[T any](g1, g2 Genome[T], rng *rand.Rand) (Genome[T], Genome[T], error) {
+	if len(g1.Genes) == 0 || len(g2.Genes) == 0 {
+		return Genome[T]{}, Genome[T]{}, errors.New("core.GeneRecombine: genomes must have at least one gene")
+	}
+	minGenes := len(g1.Genes)
+	if len(g2.Genes) < minGenes {
+		minGenes = len(g2.Genes)
+	}
+
+	c1 := g1.Dup()
+	c2 := g2.Dup()
+
+	idx := randIntn(minGenes, rng)
+	c1.Genes[idx], c2.Genes[idx] = c2.Genes[idx], c1.Genes[idx]
+
+	return c1, c2, nil
 }

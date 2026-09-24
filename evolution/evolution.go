@@ -139,6 +139,15 @@ type Generation[T any] struct {
 	// TerminationCriteria.
 	TerminationCriteria []termination.Criterion
 
+	// TournamentSize controls selection method. When > 0, tournament selection
+	// is used with this tournament size. When <= 0 (the default), roulette-wheel
+	// selection is used unless Selector is set.
+	TournamentSize int
+
+	// Selector is an optional custom selection function. When non-nil, it
+	// overrides TournamentSize and the default roulette-wheel selection.
+	Selector func(population []selection.Candidate[T], rng *rand.Rand) []selection.Candidate[T]
+
 	// cat is the typed function catalog used for point mutation.
 	cat *core.Catalog[T]
 
@@ -272,7 +281,9 @@ func (g *Generation[T]) BestIndividual() Individual[T] {
 }
 
 // Select replaces the current population with a new population drawn using the
-// roulette-wheel (fitness-proportionate) selection algorithm.
+// active selection algorithm. By default (when TournamentSize <= 0 and Selector == nil),
+// roulette-wheel (fitness-proportionate) selection is used. When TournamentSize > 0,
+// tournament selection is used. When Selector is set, it overrides both.
 //
 // All individuals' Scores must have been set by a prior call to Evaluate.
 // The method is safe to call even when all individuals have equal scores
@@ -283,9 +294,18 @@ func (g *Generation[T]) Select() {
 		candidates[i] = selection.Candidate[T]{Genome: ind.Genome, Score: ind.Score}
 	}
 
-	selected := selection.Roulette(candidates, selection.Config{
-		MinimizeScore: g.MinimizeScore,
-	}, g.rng)
+	var selected []selection.Candidate[T]
+	if g.Selector != nil {
+		selected = g.Selector(candidates, g.rng)
+	} else if g.TournamentSize > 0 {
+		selected = selection.Tournament(candidates, g.TournamentSize, selection.Config{
+			MinimizeScore: g.MinimizeScore,
+		}, g.rng)
+	} else {
+		selected = selection.Roulette(candidates, selection.Config{
+			MinimizeScore: g.MinimizeScore,
+		}, g.rng)
+	}
 
 	g.Individuals = make([]Individual[T], len(selected))
 	for i, ind := range selected {

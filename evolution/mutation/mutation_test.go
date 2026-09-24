@@ -219,3 +219,38 @@ func TestApply_AllOperators_NoAliasing(t *testing.T) {
 		}
 	}
 }
+
+func TestApply_ConstantMutation(t *testing.T) {
+	cat := newIntCatalog(t)
+	cat.SetConstantMutator(func(val int, rng *rand.Rand) int {
+		return val + 10
+	})
+	link := newSumLink(t)
+	g, err := core.NewRandomGenome(cat, 2, 4, 1, 2, link, rand.New(rand.NewSource(1)))
+	if err != nil {
+		t.Fatalf("NewRandomGenome: %v", err)
+	}
+	// Set initial constants
+	for j := range g.Genes {
+		g.Genes[j].Constants = []int{1, 2}
+	}
+	genomes := []core.Genome[int]{g}
+
+	cfg := Config{
+		ConstantMutationRate: 1.0,
+	}
+	mutated := Apply(genomes, cat, cfg, rand.New(rand.NewSource(42)))
+	if len(mutated) != 1 {
+		t.Fatalf("got %d genomes, want 1", len(mutated))
+	}
+	// Original constants must not be modified.
+	if g.Genes[0].Constants[0] != 1 || g.Genes[0].Constants[1] != 2 {
+		t.Errorf("original constants modified: %v", g.Genes[0].Constants)
+	}
+	// Mutated constants must be perturbed.
+	for geneIdx, gene := range mutated[0].Genes {
+		if gene.Constants[0] != 11 || gene.Constants[1] != 12 {
+			t.Errorf("gene[%d] constants not mutated: got %v, want [11, 12]", geneIdx, gene.Constants)
+		}
+	}
+}

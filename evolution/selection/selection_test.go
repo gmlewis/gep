@@ -137,3 +137,118 @@ func TestRoulette_FavorsLowerScoresWhenMinimizing(t *testing.T) {
 		t.Fatalf("low-score candidate selected only %d/%d times with MinimizeScore; expected dominance", selected, len(got))
 	}
 }
+
+// --- Tournament tests ---
+
+func TestTournament_Empty(t *testing.T) {
+	got := Tournament[int](nil, 2, Config{}, nil)
+	if got != nil {
+		t.Fatalf("Tournament(nil): got %v, want nil", got)
+	}
+	got = Tournament([]Candidate[int]{}, 2, Config{}, nil)
+	if got != nil {
+		t.Fatalf("Tournament(empty): got %v, want nil", got)
+	}
+}
+
+func TestTournament_PreservesPopulationSize(t *testing.T) {
+	pop := newPopulation(t, 10)
+	for i := range pop {
+		pop[i].Score = float64(i)
+	}
+	got := Tournament(pop, 3, Config{}, rand.New(rand.NewSource(5)))
+	if len(got) != len(pop) {
+		t.Fatalf("len(result)=%d, want %d", len(got), len(pop))
+	}
+}
+
+func TestTournament_ReturnsDeepCopies(t *testing.T) {
+	pop := newPopulation(t, 10)
+	for i := range pop {
+		pop[i].Score = float64(i + 1)
+	}
+	origPtrs := make([]interface{}, len(pop))
+	for i := range pop {
+		origPtrs[i] = &pop[i].Genome.Genes[0].Symbols[0]
+	}
+
+	got := Tournament(pop, 2, Config{}, rand.New(rand.NewSource(7)))
+	for i := range got {
+		newPtr := &got[i].Genome.Genes[0].Symbols[0]
+		for _, origPtr := range origPtrs {
+			if origPtr == newPtr {
+				t.Fatalf("result[%d] aliases input genome symbol storage", i)
+			}
+		}
+	}
+}
+
+func TestTournament_FavorsHigherScores(t *testing.T) {
+	pop := newPopulation(t, 20)
+	for i := 0; i < 5; i++ {
+		pop[i].Score = 1000
+	}
+	for i := 5; i < len(pop); i++ {
+		pop[i].Score = 1
+	}
+
+	got := Tournament(pop, 5, Config{}, rand.New(rand.NewSource(99)))
+	selected := 0
+	for _, ind := range got {
+		if ind.Score == 1000 {
+			selected++
+		}
+	}
+	if selected < 10 {
+		t.Fatalf("top candidates selected only %d/%d times; expected >= 10 with k=5", selected, len(got))
+	}
+}
+
+func TestTournament_FavorsLowerScoresWhenMinimizing(t *testing.T) {
+	pop := newPopulation(t, 20)
+	for i := 0; i < 5; i++ {
+		pop[i].Score = 1
+	}
+	for i := 5; i < len(pop); i++ {
+		pop[i].Score = 1000
+	}
+
+	got := Tournament(pop, 5, Config{MinimizeScore: true}, rand.New(rand.NewSource(99)))
+	selected := 0
+	for _, ind := range got {
+		if ind.Score == 1 {
+			selected++
+		}
+	}
+	if selected < 10 {
+		t.Fatalf("top candidates selected only %d/%d times with MinimizeScore; expected >= 10 with k=5", selected, len(got))
+	}
+}
+
+func TestTournament_Deterministic(t *testing.T) {
+	pop := newPopulation(t, 15)
+	for i := range pop {
+		pop[i].Score = float64(i)
+	}
+	got1 := Tournament(pop, 3, Config{}, rand.New(rand.NewSource(42)))
+	got2 := Tournament(pop, 3, Config{}, rand.New(rand.NewSource(42)))
+	for i := range got1 {
+		if got1[i].Genome.KarvaString() != got2[i].Genome.KarvaString() {
+			t.Errorf("not deterministic at index %d: %q vs %q", i, got1[i].Genome.KarvaString(), got2[i].Genome.KarvaString())
+		}
+	}
+}
+
+func TestTournament_ClampsTournamentSize(t *testing.T) {
+	pop := newPopulation(t, 5)
+	// tournamentSize <= 0 defaults to 2
+	got := Tournament(pop, 0, Config{}, rand.New(rand.NewSource(1)))
+	if len(got) != 5 {
+		t.Fatalf("got %d candidates, want 5", len(got))
+	}
+	// tournamentSize > len(pop) clamps to len(pop)
+	got = Tournament(pop, 999, Config{}, rand.New(rand.NewSource(1)))
+	if len(got) != 5 {
+		t.Fatalf("got %d candidates, want 5", len(got))
+	}
+}

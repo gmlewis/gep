@@ -564,6 +564,74 @@ func TestNewRandomGene_WithConstants(t *testing.T) {
 	if err := g.Validate(); err != nil {
 		t.Fatalf("gene.Validate: %v", err)
 	}
+	if len(g.Constants) != 2 {
+		t.Fatalf("len(g.Constants)=%d, want 2", len(g.Constants))
+	}
+	// Calling Eval with terminal input should not fail even if constant symbols are present.
+	if _, err := g.Eval([]int{10}); err != nil {
+		t.Fatalf("g.Eval with constants: %v", err)
+	}
+}
+
+func TestNewRandomGene_WithConstantGenerator(t *testing.T) {
+	cat := newIntCatalog(t)
+	cat.SetConstantGenerator(func(rng *rand.Rand) int {
+		return 42
+	})
+	if cat.ConstantGenerator() == nil {
+		t.Fatal("ConstantGenerator() is nil after SetConstantGenerator")
+	}
+
+	rng := rand.New(rand.NewSource(7))
+	g, err := NewRandomGene(cat, 4, 1, 3, rng)
+	if err != nil {
+		t.Fatalf("NewRandomGene: %v", err)
+	}
+	if len(g.Constants) != 3 {
+		t.Fatalf("len(g.Constants)=%d, want 3", len(g.Constants))
+	}
+	for i, c := range g.Constants {
+		if c != 42 {
+			t.Errorf("g.Constants[%d]=%d, want 42", i, c)
+		}
+	}
+}
+
+func TestNewRandomGenome_WithConstants(t *testing.T) {
+	cat := newIntCatalog(t)
+	cat.SetConstantGenerator(func(rng *rand.Rand) int {
+		return 99
+	})
+	link, err := NewLinkFunc[int]("+", func(v []int) int {
+		sum := 0
+		for _, x := range v {
+			sum += x
+		}
+		return sum
+	})
+	if err != nil {
+		t.Fatalf("NewLinkFunc: %v", err)
+	}
+	rng := rand.New(rand.NewSource(42))
+
+	genome, err := NewRandomGenome(cat, 2, 4, 1, 2, link, rng)
+	if err != nil {
+		t.Fatalf("NewRandomGenome: %v", err)
+	}
+	consts := genome.ConstsPerGene()
+	if len(consts) != 2 {
+		t.Fatalf("len(consts)=%d, want 2", len(consts))
+	}
+	for geneIdx, gc := range consts {
+		if len(gc) != 2 {
+			t.Fatalf("gene[%d] len(constants)=%d, want 2", geneIdx, len(gc))
+		}
+		for i, v := range gc {
+			if v != 99 {
+				t.Errorf("gene[%d].Constants[%d]=%d, want 99", geneIdx, i, v)
+			}
+		}
+	}
 }
 
 func TestNewRandomGene_HeadSizeZero(t *testing.T) {

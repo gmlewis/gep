@@ -173,7 +173,9 @@ func (l LinkFunc[T]) Eval(values []T) T { return l.fn(values) }
 
 // Catalog is a typed registry that maps Karva symbol names to Node[T] implementations.
 type Catalog[T any] struct {
-	nodes map[string]Node[T]
+	nodes    map[string]Node[T]
+	constGen func(rng *rand.Rand) T
+	constMut ConstantMutator[T]
 }
 
 // NewCatalog creates a new empty Catalog.
@@ -225,6 +227,26 @@ func (c *Catalog[T]) MaxArity() int {
 		}
 	}
 	return max
+}
+
+// SetConstantGenerator registers a generator for constant values when creating random genes.
+func (c *Catalog[T]) SetConstantGenerator(gen func(rng *rand.Rand) T) {
+	c.constGen = gen
+}
+
+// ConstantGenerator returns the registered constant generator, or nil if none is set.
+func (c *Catalog[T]) ConstantGenerator() func(rng *rand.Rand) T {
+	return c.constGen
+}
+
+// SetConstantMutator registers a mutator for perturbing constant values during mutation.
+func (c *Catalog[T]) SetConstantMutator(mut ConstantMutator[T]) {
+	c.constMut = mut
+}
+
+// ConstantMutator returns the registered constant mutator, or nil if none is set.
+func (c *Catalog[T]) ConstantMutator() ConstantMutator[T] {
+	return c.constMut
 }
 
 // ParseSymbols converts a Karva symbol string slice into a typed []Symbol[T].
@@ -457,7 +479,17 @@ func NewRandomGene[T any](cat *Catalog[T], headSize, numTerminals, numConstants 
 		syms = append(syms, termChoices[intn(len(termChoices))])
 	}
 
-	return Gene[T]{Symbols: syms}, nil
+	var consts []T
+	if numConstants > 0 {
+		consts = make([]T, numConstants)
+		if cat != nil && cat.constGen != nil {
+			for i := 0; i < numConstants; i++ {
+				consts[i] = cat.constGen(rng)
+			}
+		}
+	}
+
+	return Gene[T]{Symbols: syms, Constants: consts}, nil
 }
 
 // KarvaString returns the dot-separated Karva representation of the gene's symbols.

@@ -12,6 +12,7 @@ import (
 	"github.com/gmlewis/gep/v2/core"
 	"github.com/gmlewis/gep/v2/evolution/mutation"
 	"github.com/gmlewis/gep/v2/evolution/recombination"
+	"github.com/gmlewis/gep/v2/evolution/selection"
 	"github.com/gmlewis/gep/v2/evolution/statistics"
 	"github.com/gmlewis/gep/v2/evolution/termination"
 	"github.com/gmlewis/gep/v2/evolution/transposition"
@@ -348,6 +349,80 @@ func TestSelect_FavorsBetterIndividuals(t *testing.T) {
 	}
 }
 
+func TestSelect_Tournament(t *testing.T) {
+	cat := newIntCatalog(t)
+	link := newSumLink(t)
+	g, err := NewWithSeed(99, cat, 20, 4, 2, 2, 0, link, nil)
+	if err != nil {
+		t.Fatalf("NewWithSeed: %v", err)
+	}
+
+	for i := 0; i < 5; i++ {
+		g.Individuals[i].Score = 1000
+	}
+	for i := 5; i < len(g.Individuals); i++ {
+		g.Individuals[i].Score = 1
+	}
+
+	g.TournamentSize = 5
+	g.Select()
+
+	selected := 0
+	for _, ind := range g.Individuals {
+		if ind.Score == 1000 {
+			selected++
+		}
+	}
+	if selected < 10 {
+		t.Fatalf("top candidates selected only %d/%d times with tournament selection; expected >= 10", selected, len(g.Individuals))
+	}
+}
+
+func TestSelect_CustomSelector(t *testing.T) {
+	g := newTestGeneration(t, 10, nil)
+	called := false
+	g.Selector = func(pop []selection.Candidate[int], rng *rand.Rand) []selection.Candidate[int] {
+		called = true
+		res := make([]selection.Candidate[int], len(pop))
+		for i := range pop {
+			res[i] = selection.Candidate[int]{Genome: pop[0].Genome.Dup(), Score: 999}
+		}
+		return res
+	}
+	g.Select()
+	if !called {
+		t.Fatal("custom Selector was not called")
+	}
+	for i, ind := range g.Individuals {
+		if ind.Score != 999 {
+			t.Errorf("individual[%d].Score = %v, want 999", i, ind.Score)
+		}
+	}
+}
+
+func TestEvolve_WithTournamentSelection(t *testing.T) {
+	cat := newIntCatalog(t)
+	link := newSumLink(t)
+	g, err := NewWithSeed(42, cat, 20, 4, 1, 2, 0, link, func(genome core.Genome[int]) float64 {
+		val, err := genome.Eval([]int{1, 2})
+		if err != nil {
+			return 0
+		}
+		if val == 3 {
+			return 1000.0
+		}
+		return 10.0
+	})
+	if err != nil {
+		t.Fatalf("NewWithSeed: %v", err)
+	}
+	g.TournamentSize = 3
+	best := g.Evolve(100)
+	if best.Score < 1000 {
+		t.Fatalf("evolution with tournament selection did not reach target: best score = %f", best.Score)
+	}
+}
+
 // --- Evolve tests ---
 
 func TestEvolve_StopFuncHaltsEarly(t *testing.T) {
@@ -562,6 +637,49 @@ func TestMutate_HeadSizeOverriddenFromGeneration(t *testing.T) {
 	}
 }
 
+func TestMutate_ConstantMutation(t *testing.T) {
+	cat := newIntCatalog(t)
+	cat.SetConstantGenerator(func(rng *rand.Rand) int {
+		return 5
+	})
+	cat.SetConstantMutator(func(val int, rng *rand.Rand) int {
+		return val + 1
+	})
+	link := newSumLink(t)
+	gen, err := NewWithSeed(42, cat, 10, 4, 1, 1, 2, link, func(g core.Genome[int]) float64 {
+		return 1.0
+	})
+	if err != nil {
+		t.Fatalf("NewWithSeed: %v", err)
+	}
+	// Initial constants should be 5
+	for _, ind := range gen.Individuals {
+		for _, gene := range ind.Genome.Genes {
+			for _, c := range gene.Constants {
+				if c != 5 {
+					t.Fatalf("expected constant 5, got %d", c)
+				}
+			}
+		}
+	}
+
+	gen.MutationConfig = mutation.Config{
+		ConstantMutationRate: 1.0,
+	}
+	gen.Mutate()
+
+	// After mutation with rate 1.0, constants should be 6
+	for _, ind := range gen.Individuals {
+		for _, gene := range ind.Genome.Genes {
+			for _, c := range gene.Constants {
+				if c != 6 {
+					t.Errorf("expected mutated constant 6, got %d", c)
+				}
+			}
+		}
+	}
+}
+
 func TestEvolve_WithMutation_StillConverges(t *testing.T) {
 	// Evolve must still converge when mutation operators are active.
 	var callCount atomic.Int64
@@ -680,6 +798,30 @@ func TestEvolve_WithRecombination_StillConverges(t *testing.T) {
 	best := g.Evolve(200)
 	if best.Score < 1000.0 {
 		t.Fatalf("Evolve with recombination: best.Score=%v, want >= 1000", best.Score)
+	}
+}
+
+func TestEvolve_WithGeneRecombination_StillConverges(t *testing.T) {
+	var callCount atomic.Int64
+	sf := func(core.Genome[int]) float64 {
+		n := callCount.Add(1)
+		if n >= int64(5*10) {
+			return 1000.0
+		}
+		return 0.0
+	}
+	g := newTestGeneration(t, 13, sf)
+	g.RecombinationConfig = recombination.Config{
+		GeneRecombinationRate: 0.5,
+	}
+	best := g.Evolve(200)
+	if best.Score < 1000.0 {
+		t.Fatalf("Evolve with gene recombination: best.Score=%v, want >= 1000", best.Score)
+	}
+	for i, ind := range g.Individuals {
+		if err := ind.Genome.Validate(); err != nil {
+			t.Errorf("individual[%d] invalid after gene recombination: %v", i, err)
+		}
 	}
 }
 
